@@ -15,10 +15,11 @@
 import abc
 import numbers
 from functools import partial
+import warnings
 
 import numpy as np
 
-from tqdm import tqdm
+from tqdm import tqdm, TqdmWarning
 import warnings
 
 import jax
@@ -26,6 +27,8 @@ from jax.tree_util import tree_map
 
 from netket.logging import JsonLog
 from netket.utils import mpi
+
+warnings.filterwarnings("ignore", category=TqdmWarning)
 
 
 def _to_iterable(maybe_iterable):
