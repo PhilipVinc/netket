@@ -54,6 +54,11 @@ def sigmoid(x):
     return 1 / (1 + jnp.exp(-x))
 
 
+@add_complex_wrap(jax.nn.log_sigmoid)
+def log_sigmoid(x):
+    return -softplus(-x)
+
+
 @add_complex_wrap(jax.nn.swish)
 def swish(x):
     return x / (1 + jnp.exp(-x))
@@ -64,7 +69,8 @@ from jax.nn import elu
 from jax.nn import gelu
 from jax.nn import glu
 from jax.nn import leaky_relu
-from jax.nn import log_sigmoid
+
+# from jax.nn import log_sigmoid
 from jax.nn import log_softmax
 from jax.nn import normalize
 from jax.nn import relu
