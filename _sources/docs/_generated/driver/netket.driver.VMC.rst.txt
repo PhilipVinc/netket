@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: VMC.energy
       .. autoattribute:: VMC.optimizer
@@ -19,6 +20,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: VMC.advance
       .. automethod:: VMC.estimate

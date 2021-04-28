@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: CustomHilbert.is_discrete
       .. autoattribute:: CustomHilbert.is_finite
@@ -23,6 +24,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: CustomHilbert.all_states
       .. automethod:: CustomHilbert.numbers_to_states

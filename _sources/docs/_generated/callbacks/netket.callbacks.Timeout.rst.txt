@@ -13,6 +13,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: Timeout.__call__
       .. automethod:: Timeout.reset

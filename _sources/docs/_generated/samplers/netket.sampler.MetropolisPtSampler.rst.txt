@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: MetropolisPtSampler.machine_pow
       .. autoattribute:: MetropolisPtSampler.n_batches
@@ -22,6 +23,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: MetropolisPtSampler.init_state
       .. automethod:: MetropolisPtSampler.log_pdf

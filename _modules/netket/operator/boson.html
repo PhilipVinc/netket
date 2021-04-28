@@ -19,6 +19,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../../getting_started.html">Get Started</a></li>
                 <li><a href="../../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../../website/about.html">About</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -95,7 +96,21 @@
     <div class="body col-md-12 content" role="main">
       
   <h1>Source code for netket.operator.boson</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">DTypeLike</span>
+<span></span><span class="c1"># Copyright 2021 The NetKet Authors - All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">DType</span>
 
 <span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
 
@@ -103,7 +118,7 @@
 
 
 <div class="viewcode-block" id="destroy"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.operator.boson.destroy.html#netket.operator.boson.destroy">[docs]</a><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span>
-    <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DType</span> <span class="o">=</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LocalOperator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Builds the boson destruction operator :math:`\\hat{a}` acting on the `site`-th of the</span>
@@ -128,9 +143,7 @@
     <span class="k">return</span> <span class="n">_LocalOperator</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="p">[</span><span class="n">site</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.operator.boson.create.html#netket.operator.boson.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
-    <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="nb">float</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LocalOperator</span><span class="p">:</span>
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.operator.boson.create.html#netket.operator.boson.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DType</span> <span class="o">=</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LocalOperator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Builds the boson creation operator :math:`\\hat{a}^\\dagger` acting on the `site`-th of the</span>
 <span class="sd">     Hilbert space `hilbert`.</span>
@@ -154,9 +167,7 @@
     <span class="k">return</span> <span class="n">_LocalOperator</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="p">[</span><span class="n">site</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="number"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.operator.boson.number.html#netket.operator.boson.number">[docs]</a><span class="k">def</span> <span class="nf">number</span><span class="p">(</span>
-    <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="nb">float</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LocalOperator</span><span class="p">:</span>
+<div class="viewcode-block" id="number"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.operator.boson.number.html#netket.operator.boson.number">[docs]</a><span class="k">def</span> <span class="nf">number</span><span class="p">(</span><span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DType</span> <span class="o">=</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LocalOperator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Builds the number operator :math:`\\hat{a}^\\dagger\\hat{a}`  acting on the `site`-th of the</span>
 <span class="sd">    Hilbert space `hilbert`.</span>
@@ -181,7 +192,7 @@
 
 
 <div class="viewcode-block" id="proj"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.operator.boson.proj.html#netket.operator.boson.proj">[docs]</a><span class="k">def</span> <span class="nf">proj</span><span class="p">(</span>
-    <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DTypeLike</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">site</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">DType</span> <span class="o">=</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_LocalOperator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Builds the projector operator :math:`|n\\rangle\\langle n |` acting on the `site`-th of the</span>
@@ -228,7 +239,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: MetropolisSamplerNumpy.machine_pow
       .. autoattribute:: MetropolisSamplerNumpy.n_batches
@@ -21,6 +22,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: MetropolisSamplerNumpy.init_state
       .. automethod:: MetropolisSamplerNumpy.log_pdf

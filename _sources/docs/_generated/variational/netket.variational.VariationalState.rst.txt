@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: VariationalState.hilbert
       .. autoattribute:: VariationalState.model_state
@@ -20,6 +21,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: VariationalState.expect
       .. automethod:: VariationalState.expect_and_grad

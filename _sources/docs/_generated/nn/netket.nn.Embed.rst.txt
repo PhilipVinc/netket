@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: Embed.name
       .. autoattribute:: Embed.parent
@@ -19,10 +20,12 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: Embed.__call__
       .. automethod:: Embed.apply
       .. automethod:: Embed.attend
+      .. automethod:: Embed.bind
       .. automethod:: Embed.clone
       .. automethod:: Embed.embedding_init
       .. automethod:: Embed.get_variable

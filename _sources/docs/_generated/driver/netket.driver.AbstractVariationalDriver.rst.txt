@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: AbstractVariationalDriver.optimizer
       .. autoattribute:: AbstractVariationalDriver.state
@@ -18,6 +19,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: AbstractVariationalDriver.advance
       .. automethod:: AbstractVariationalDriver.estimate

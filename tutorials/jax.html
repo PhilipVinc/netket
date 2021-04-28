@@ -21,6 +21,7 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script src="../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -51,11 +52,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../website/get_started.html">Get Started</a></li>
+                <li><a href="../getting_started.html">Get Started</a></li>
                 <li><a href="../docs/getting_started.html">Documentation</a></li>
-                <li><a href="tutorials.html">Tutorials</a></li>
-                <li><a href="../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../website/about.html">About</a></li>
+                <li><a href="../tutorials.html">Tutorials</a></li>
+                <li><a href="../citing.html">Citing NetKet</a></li>
+                <li><a href="../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -350,24 +351,19 @@ div.rendered_html tbody tr:hover {
 <p>This feature will be available in the upcoming major release (version 3.0). While version 3.0 is still in beta development, users can already try this feature.</p>
 <div class="section" id="Prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#Prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>To try out integration with JAX, you first need to fetch the development version of NetKet (v3.0) We recommend using a virtual environment (either a python environment or a conda environment), for example</p>
+<p>To try out integration with JAX, you first need to fetch the beta version of NetKet v3 We recommend using a virtual environment (either a python environment or a conda environment), for example</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3 -m venv nk_env
 <span class="nb">source</span> nk_env/bin/activate
-pip install git+https://github.com/netket/netket@v3.0
+pip install --pre -U netket
 </pre></div>
 </div>
-<p>Frameworks such as JAX and Pytorch are add-ons for NetKet 3.0, thus they require separate installation. In this case, we can easily get JAX doing</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip install --upgrade jax jaxlib
-</pre></div>
-</div>
-<p>More information can also be found <a class="reference external" href="https://github.com/google/jax#installation">here</a>.</p>
 </div>
 <div class="section" id="Defining-the-quantum-system">
 <h2>Defining the quantum system<a class="headerlink" href="#Defining-the-quantum-system" title="Permalink to this headline">¶</a></h2>
 <p>NetKet allows for full flexibility in defining quantum systems, for example when tackling a ground-state search problem. While there are a few pre-defined hamiltonians, it is relatively straightforward to implement new quantum operators/ Hamiltonians.</p>
 <p>In the following, we consider the case of a transverse-field Ising model defined on a graph with random edges.</p>
 <div class="math notranslate nohighlight">
-\[H = -\sum_{i\in\textrm{nodes}}^{L} \sigma^x_{i} + J \sum_{(i,j)\in\textrm{edges}}\sigma_{i}^{z}\sigma_{i}^{z}\]</div>
+\[H = -\sum_{i\in\textrm{nodes}}^{L} \sigma^x_{i} + J \sum_{(i,j)\in\textrm{edges}}\sigma_{i}^{z}\sigma_{j}^{z}\]</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -629,7 +625,7 @@ Relative error is :  0.0017295387652704216
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

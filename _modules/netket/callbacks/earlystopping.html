@@ -19,6 +19,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../../getting_started.html">Get Started</a></li>
                 <li><a href="../../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../../website/about.html">About</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -95,28 +96,43 @@
     <div class="body col-md-12 content" role="main">
       
   <h1>Source code for netket.callbacks.earlystopping</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">infty</span>
+<span></span><span class="c1"># Copyright 2020, 2021 The NetKet Authors - All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="EarlyStopping"><a class="viewcode-back" href="../../../docs/_generated/callbacks/netket.callbacks.EarlyStopping.html#netket.callbacks.EarlyStopping">[docs]</a><span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A simple callback to stop NetKet if there are no improvements in the training&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EarlyStopping"><a class="viewcode-back" href="../../../docs/_generated/callbacks/netket.callbacks.EarlyStopping.html#netket.callbacks.EarlyStopping">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A simple callback to stop NetKet if there are no more improvements in the training.</span>
+<span class="sd">    based on `driver._loss_name`.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="EarlyStopping.__init__"><a class="viewcode-back" href="../../../docs/_generated/callbacks/netket.callbacks.EarlyStopping.html#netket.callbacks.EarlyStopping.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_delta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a new EarlyStopping object that monitors whether a driver is improving</span>
-<span class="sd">        over optimisation epochs based on `driver._loss_name`.</span>
+    <span class="n">min_delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="sd">&quot;&quot;&quot;Minimum change in the monitored quantity to qualify as an improvement.&quot;&quot;&quot;</span>
+    <span class="n">patience</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="sd">&quot;&quot;&quot;Number of epochs with no improvement after which training will be stopped.&quot;&quot;&quot;</span>
+    <span class="n">baseline</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;Baseline value for the monitored quantity. Training will stop if the driver hits the baseline.&quot;&quot;&quot;</span>
+    <span class="n">monitor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Loss statistic to monitor. Should be one of &#39;mean&#39;, &#39;variance&#39;, &#39;sigma&#39;.&quot;&quot;&quot;</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            min_delta: Minimum change in the monitored quantity to qualify as an improvement.</span>
-<span class="sd">            patience: Number of epochs with no improvement after which training will be stopped.</span>
-<span class="sd">            baseline: Baseline value for the monitored quantity. Training will stop if the driver</span>
-<span class="sd">                hits the baseline.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__min_delta</span> <span class="o">=</span> <span class="n">min_delta</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__patience</span> <span class="o">=</span> <span class="n">patience</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__baseline</span> <span class="o">=</span> <span class="n">baseline</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_best_val</span> <span class="o">=</span> <span class="n">infty</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__best_iter</span> <span class="o">=</span> <span class="mi">0</span></div>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">infty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_best_iter</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="EarlyStopping.__call__"><a class="viewcode-back" href="../../../docs/_generated/callbacks/netket.callbacks.EarlyStopping.html#netket.callbacks.EarlyStopping.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">log_data</span><span class="p">,</span> <span class="n">driver</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -130,16 +146,16 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A boolean. If True, training continues, else, it does not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">log_data</span><span class="p">[</span><span class="n">driver</span><span class="o">.</span><span class="n">_loss_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">real</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">log_data</span><span class="p">[</span><span class="n">driver</span><span class="o">.</span><span class="n">_loss_name</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">loss</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_val</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_best_val</span> <span class="o">=</span> <span class="n">loss</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__best_iter</span> <span class="o">=</span> <span class="n">step</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__baseline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">loss</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__baseline</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_best_iter</span> <span class="o">=</span> <span class="n">step</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">loss</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="p">(</span>
-            <span class="n">step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__best_iter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__patience</span>
-            <span class="ow">and</span> <span class="n">loss</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delta</span>
+            <span class="n">step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_iter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience</span>
+            <span class="ow">and</span> <span class="n">loss</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_best_val</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span>
         <span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
@@ -159,7 +175,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

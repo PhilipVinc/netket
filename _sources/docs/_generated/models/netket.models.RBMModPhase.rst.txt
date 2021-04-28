@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: RBMModPhase.alpha
       .. autoattribute:: RBMModPhase.name
@@ -22,10 +23,12 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: RBMModPhase.__call__
       .. automethod:: RBMModPhase.activation
       .. automethod:: RBMModPhase.apply
+      .. automethod:: RBMModPhase.bind
       .. automethod:: RBMModPhase.clone
       .. automethod:: RBMModPhase.get_variable
       .. automethod:: RBMModPhase.has_variable

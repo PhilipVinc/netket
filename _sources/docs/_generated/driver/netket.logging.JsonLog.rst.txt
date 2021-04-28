@@ -11,11 +11,13 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: JsonLog.data
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: JsonLog.__call__
       .. automethod:: JsonLog.flush

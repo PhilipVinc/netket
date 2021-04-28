@@ -19,6 +19,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../../getting_started.html">Get Started</a></li>
                 <li><a href="../../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../../website/about.html">About</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -96,13 +97,13 @@
       
   <h1>Source code for netket.models.ndm</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2021 The NetKet Authors - All rights reserved.</span>
-
+<span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="c1"># you may not use this file except in compliance with the License.</span>
 <span class="c1"># You may obtain a copy of the License at</span>
-
+<span class="c1">#</span>
 <span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
-
+<span class="c1">#</span>
 <span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
 <span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
@@ -119,16 +120,12 @@
 
 <span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
 <span class="kn">from</span> <span class="nn">netket.graph</span> <span class="kn">import</span> <span class="n">AbstractGraph</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PRNGKeyT</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">NNInitFunc</span>
 
 <span class="kn">from</span> <span class="nn">netket</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nknn</span>
 <span class="kn">from</span> <span class="nn">netket.nn.initializers</span> <span class="kn">import</span> <span class="n">lecun_normal</span><span class="p">,</span> <span class="n">variance_scaling</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">normal</span>
 
 <span class="kn">from</span> <span class="nn">.rbm</span> <span class="kn">import</span> <span class="n">RBM</span>
-
-<span class="n">PRNGKey</span> <span class="o">=</span> <span class="n">Any</span>
-<span class="n">Shape</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
-<span class="n">Dtype</span> <span class="o">=</span> <span class="n">Any</span>  <span class="c1"># this could be a real type?</span>
-<span class="n">Array</span> <span class="o">=</span> <span class="n">Any</span>
 
 <span class="n">default_kernel_init</span> <span class="o">=</span> <span class="n">normal</span><span class="p">(</span><span class="n">stddev</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
 
@@ -140,14 +137,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="sd">&quot;&quot;&quot;The dtype of the weights.&quot;&quot;&quot;</span>
     <span class="n">activation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">nknn</span><span class="o">.</span><span class="n">logcosh</span>
+    <span class="sd">&quot;&quot;&quot;The nonlinear activation function.&quot;&quot;&quot;</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;feature density. Number of features equal to alpha * input.shape[-1]&quot;&quot;&quot;</span>
     <span class="n">use_hidden_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;if True uses a bias in the dense layer (hidden layer bias).&quot;&quot;&quot;</span>
     <span class="n">use_visible_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;if True adds a bias to the input not passed through the nonlinear layer.&quot;&quot;&quot;</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;numerical precision of the computation see `jax.lax.Precision`for details.&quot;&quot;&quot;</span>
 
-    <span class="n">kernel_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
-    <span class="n">bias_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeros</span>
-    <span class="n">visible_bias_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeros</span>
+    <span class="n">kernel_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the Dense layer matrix.&quot;&quot;&quot;</span>
+    <span class="n">hidden_bias_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">zeros</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the hidden bias.&quot;&quot;&quot;</span>
+    <span class="n">visible_bias_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">zeros</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the visible bias.&quot;&quot;&quot;</span>
 
     <span class="nd">@nn</span><span class="o">.</span><span class="n">compact</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σr</span><span class="p">,</span> <span class="n">σc</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -157,7 +164,8 @@
             <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
             <span class="n">use_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_hidden_bias</span><span class="p">,</span>
             <span class="n">kernel_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_init</span><span class="p">,</span>
-            <span class="n">bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
+            <span class="n">bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_bias_init</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">xr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">W</span><span class="p">(</span><span class="n">σr</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">xc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="n">W</span><span class="p">(</span><span class="n">σc</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -188,21 +196,30 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="sd">&quot;&quot;&quot;The dtype of the weights.&quot;&quot;&quot;</span>
     <span class="n">activation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">nknn</span><span class="o">.</span><span class="n">logcosh</span>
+    <span class="sd">&quot;&quot;&quot;The nonlinear activation function.&quot;&quot;&quot;</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">use_hidden_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;feature density. Number of features equal to alpha * input.shape[-1]&quot;&quot;&quot;</span>
+    <span class="n">use_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;if True uses a bias in the dense layer (hidden layer bias).&quot;&quot;&quot;</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;numerical precision of the computation see `jax.lax.Precision`for details.&quot;&quot;&quot;</span>
 
-    <span class="n">kernel_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
-    <span class="n">bias_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeros</span>
+    <span class="n">kernel_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the Dense layer matrix.&quot;&quot;&quot;</span>
+    <span class="n">bias_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">zeros</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the hidden bias.&quot;&quot;&quot;</span>
 
     <span class="nd">@nn</span><span class="o">.</span><span class="n">compact</span>
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σr</span><span class="p">,</span> <span class="n">σc</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σr</span><span class="p">,</span> <span class="n">σc</span><span class="p">):</span>
         <span class="n">U_S</span> <span class="o">=</span> <span class="n">nknn</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Symm&quot;</span><span class="p">,</span>
             <span class="n">features</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">σr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
             <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
             <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">kernel_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_init</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">U_A</span> <span class="o">=</span> <span class="n">nknn</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ASymm&quot;</span><span class="p">,</span>
@@ -210,10 +227,11 @@
             <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
             <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">kernel_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_init</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">U_S</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">σr</span> <span class="o">+</span> <span class="n">σc</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">U_A</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">σr</span> <span class="o">-</span> <span class="n">σc</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_hidden_bias</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_bias</span><span class="p">:</span>
             <span class="n">bias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">(</span>
                 <span class="s2">&quot;bias&quot;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
@@ -234,29 +252,35 @@
 <span class="sd">    Assumes real dtype.</span>
 <span class="sd">    A discussion on the effect of the feature density for the pure and mixed part is</span>
 <span class="sd">    given in Vicentini et Al, PRL 122, 250503 (2019).</span>
-
-<span class="sd">    Attributes:</span>
-<span class="sd">        activation: The nonlinear activation function.</span>
-<span class="sd">        alpha: The feature density for the pure-part of the ansatz.</span>
-<span class="sd">        beta: The feature density for the mixed-part of the ansatz.</span>
-<span class="sd">        use_bias: whever to use the hidden bias in the dense layers.</span>
-<span class="sd">        use_visible_bias: whever to use a visible bias.</span>
-<span class="sd">        dtype: The dtype of the parameters.</span>
-<span class="sd">        kernel_init: the initializer for the dense kernels.</span>
-<span class="sd">        bias_init: the initializer for the biases.</span>
-<span class="sd">        visible_bias_init: the initialzier for the visible bias.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">activation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">nknn</span><span class="o">.</span><span class="n">logcosh</span>
-    <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">use_hidden_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">use_visible_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+    <span class="sd">&quot;&quot;&quot;The dtype of the weights.&quot;&quot;&quot;</span>
+    <span class="n">activation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">nknn</span><span class="o">.</span><span class="n">logcosh</span>
+    <span class="sd">&quot;&quot;&quot;The nonlinear activation function.&quot;&quot;&quot;</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;The feature density for the pure-part of the ansatz. </span>
+<span class="sd">    Number of features equal to alpha * input.shape[-1]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">beta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;The feature density for the mixed-part of the ansatz. </span>
+<span class="sd">    Number of features equal to beta * input.shape[-1]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">use_hidden_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;if True uses a bias in the dense layer (hidden layer bias).&quot;&quot;&quot;</span>
+    <span class="n">use_ancilla_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;if True uses a bias in the dense layer (hidden layer bias).&quot;&quot;&quot;</span>
+    <span class="n">use_visible_bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="sd">&quot;&quot;&quot;if True adds a bias to the input not passed through the nonlinear layer.&quot;&quot;&quot;</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;numerical precision of the computation see `jax.lax.Precision`for details.&quot;&quot;&quot;</span>
 
-    <span class="n">kernel_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
-    <span class="n">bias_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
-    <span class="n">visible_bias_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKey</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">Dtype</span><span class="p">],</span> <span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
+    <span class="n">kernel_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the Dense layer matrix.&quot;&quot;&quot;</span>
+    <span class="n">bias_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the hidden bias.&quot;&quot;&quot;</span>
+    <span class="n">visible_bias_init</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="n">default_kernel_init</span>
+    <span class="sd">&quot;&quot;&quot;Initializer for the visible bias.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NDM.__call__"><a class="viewcode-back" href="../../../docs/_generated/models/netket.models.NDM.html#netket.models.NDM.__call__">[docs]</a>    <span class="nd">@nn</span><span class="o">.</span><span class="n">compact</span>
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σ</span><span class="p">):</span>
@@ -271,7 +295,8 @@
             <span class="n">use_visible_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_visible_bias</span><span class="p">,</span>
             <span class="n">visible_bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visible_bias_init</span><span class="p">,</span>
             <span class="n">kernel_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_init</span><span class="p">,</span>
-            <span class="n">bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
+            <span class="n">hidden_bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">ψ_A</span> <span class="o">=</span> <span class="n">PureRBM</span><span class="p">(</span>
@@ -283,17 +308,19 @@
             <span class="n">use_visible_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_visible_bias</span><span class="p">,</span>
             <span class="n">visible_bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visible_bias_init</span><span class="p">,</span>
             <span class="n">kernel_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_init</span><span class="p">,</span>
-            <span class="n">bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
+            <span class="n">hidden_bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">Π</span> <span class="o">=</span> <span class="n">MixedRBM</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Mixed&quot;</span><span class="p">,</span>
             <span class="n">alpha</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
-            <span class="n">use_hidden_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_hidden_bias</span><span class="p">,</span>
+            <span class="n">use_bias</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_ancilla_bias</span><span class="p">,</span>
             <span class="n">activation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">,</span>
             <span class="n">kernel_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_init</span><span class="p">,</span>
             <span class="n">bias_init</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_init</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">ψ_S</span><span class="p">(</span><span class="n">σr</span><span class="p">,</span> <span class="n">σc</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ψ_A</span><span class="p">(</span><span class="n">σr</span><span class="p">,</span> <span class="n">σc</span><span class="p">,</span> <span class="n">symmetric</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="n">Π</span><span class="p">(</span><span class="n">σr</span><span class="p">,</span> <span class="n">σc</span><span class="p">)</span>
@@ -317,7 +344,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

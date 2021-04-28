@@ -11,23 +11,28 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: NDM.alpha
       .. autoattribute:: NDM.beta
       .. autoattribute:: NDM.name
       .. autoattribute:: NDM.parent
+      .. autoattribute:: NDM.precision
       .. autoattribute:: NDM.scope
+      .. autoattribute:: NDM.use_ancilla_bias
       .. autoattribute:: NDM.use_hidden_bias
       .. autoattribute:: NDM.use_visible_bias
       .. autoattribute:: NDM.variables
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: NDM.__call__
       .. automethod:: NDM.activation
       .. automethod:: NDM.apply
       .. automethod:: NDM.bias_init
+      .. automethod:: NDM.bind
       .. automethod:: NDM.clone
       .. automethod:: NDM.get_variable
       .. automethod:: NDM.has_variable

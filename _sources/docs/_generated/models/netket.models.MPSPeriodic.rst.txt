@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: MPSPeriodic.diag
       .. autoattribute:: MPSPeriodic.name
@@ -21,9 +22,11 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: MPSPeriodic.__call__
       .. automethod:: MPSPeriodic.apply
+      .. automethod:: MPSPeriodic.bind
       .. automethod:: MPSPeriodic.clone
       .. automethod:: MPSPeriodic.get_variable
       .. automethod:: MPSPeriodic.has_variable

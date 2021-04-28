@@ -19,6 +19,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../../getting_started.html">Get Started</a></li>
                 <li><a href="../../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../../website/about.html">About</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -96,13 +97,13 @@
       
   <h1>Source code for netket.variational.mc_state</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2021 The NetKet Authors - All rights reserved.</span>
-
+<span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="c1"># you may not use this file except in compliance with the License.</span>
 <span class="c1"># You may obtain a copy of the License at</span>
-
+<span class="c1">#</span>
 <span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
-
+<span class="c1">#</span>
 <span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
 <span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
@@ -131,7 +132,8 @@
 <span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
 <span class="kn">from</span> <span class="nn">netket.sampler</span> <span class="kn">import</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">SamplerState</span><span class="p">,</span> <span class="n">ExactSampler</span>
 <span class="kn">from</span> <span class="nn">netket.stats</span> <span class="kn">import</span> <span class="n">Stats</span><span class="p">,</span> <span class="n">statistics</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">sum_inplace</span>
-<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">flax</span> <span class="k">as</span> <span class="n">flax_utils</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">maybe_wrap_module</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">flax</span> <span class="k">as</span> <span class="n">flax_utils</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">,</span> <span class="n">maybe_wrap_module</span><span class="p">,</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">PRNGKeyT</span><span class="p">,</span> <span class="n">SeedT</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">NNInitFunc</span>
 <span class="kn">from</span> <span class="nn">netket.optimizer</span> <span class="kn">import</span> <span class="n">SR</span>
 <span class="kn">from</span> <span class="nn">netket.operator</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractOperator</span><span class="p">,</span>
@@ -144,12 +146,6 @@
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">VariationalState</span>
 
-<span class="n">PyTree</span> <span class="o">=</span> <span class="n">Any</span>
-<span class="n">PRNGKey</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span>
-<span class="n">SEED</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">PRNGKey</span><span class="p">]</span>
-<span class="n">InitFunType</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span>
-    <span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">PRNGKey</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">]</span>
-<span class="p">]</span>
 <span class="n">AFunType</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
 <span class="n">ATrainFunType</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span>
     <span class="p">[</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">PyTree</span><span class="p">]],</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span>
@@ -214,11 +210,11 @@
         <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
         <span class="n">n_discard</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTree</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">init_fun</span><span class="p">:</span> <span class="n">InitFunType</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">init_fun</span><span class="p">:</span> <span class="n">NNInitFunc</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">apply_fun</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sample_fun</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SEED</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">sampler_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SEED</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SeedT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sampler_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SeedT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">training_kwargs</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="p">):</span>
@@ -468,11 +464,26 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span>
 
-<div class="viewcode-block" id="MCState.evaluate"><a class="viewcode-back" href="../../../docs/_generated/variational/netket.variational.MCState.html#netket.variational.MCState.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="MCState.log_value"><a class="viewcode-back" href="../../../docs/_generated/variational/netket.variational.MCState.html#netket.variational.MCState.log_value">[docs]</a>    <span class="k">def</span> <span class="nf">log_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Evaluate the variational state given a batch of states.</span>
+<span class="sd">        Evaluate the variational state for a batch of states and returns</span>
+<span class="sd">        the logarithm of the amplitude of the quantum state. For pure states,</span>
+<span class="sd">        this is :math:`log(&lt;σ|ψ&gt;)`, whereas for mixed states this is</span>
+<span class="sd">        :math:`log(&lt;σr|ρ|σc&gt;)`, where ψ and ρ are respectively a pure state</span>
+<span class="sd">        (wavefunction) and a mixed state (density matrix).</span>
+<span class="sd">        For the density matrix, the left and right-acting states (row and column)</span>
+<span class="sd">        are obtained as :code:`σr=σ[::,0:N]` and :code:`σc=σ[::,N:]`.</span>
+
+<span class="sd">        Given a batch of inputs (Nb, N), returns a batch of outputs (Nb,).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_apply_fun</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">σ</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MCState.evaluate"><a class="viewcode-back" href="../../../docs/_generated/variational/netket.variational.MCState.html#netket.variational.MCState.evaluate">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Use MCState.log_value(σ) instead.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DEPRECATED: use log_value instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_value</span><span class="p">(</span><span class="n">σ</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MCState.expect"><a class="viewcode-back" href="../../../docs/_generated/variational/netket.variational.MCState.html#netket.variational.MCState.expect">[docs]</a>    <span class="k">def</span> <span class="nf">expect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Ô</span><span class="p">:</span> <span class="n">AbstractOperator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Stats</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilbert</span> <span class="o">==</span> <span class="n">Ô</span><span class="o">.</span><span class="n">hilbert</span><span class="p">:</span>
@@ -489,7 +500,7 @@
         <span class="n">σp</span><span class="p">,</span> <span class="n">mels</span> <span class="o">=</span> <span class="n">Ô</span><span class="o">.</span><span class="n">get_conn_padded</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">σ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])))</span>
 
         <span class="k">return</span> <span class="n">_expect</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_apply_fun</span><span class="p">,</span>
             <span class="n">kernel</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
@@ -531,7 +542,6 @@
             <span class="k">if</span> <span class="n">squared_operator</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Ô</span><span class="p">,</span> <span class="n">AbstractSuperOperator</span><span class="p">):</span>
                     <span class="n">Ō</span><span class="p">,</span> <span class="n">Ō_grad</span><span class="p">,</span> <span class="n">new_model_state</span> <span class="o">=</span> <span class="n">grad_expect_operator_Lrho2</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_apply_fun</span><span class="p">,</span>
                         <span class="n">mutable</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
@@ -542,7 +552,7 @@
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">Ō</span><span class="p">,</span> <span class="n">Ō_grad</span><span class="p">,</span> <span class="n">new_model_state</span> <span class="o">=</span> <span class="n">grad_expect_operator_kernel</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_apply_fun</span><span class="p">,</span>
                         <span class="n">local_value_squared_kernel</span><span class="p">,</span>
                         <span class="n">mutable</span><span class="p">,</span>
@@ -565,7 +575,7 @@
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">Ō</span><span class="p">,</span> <span class="n">Ō_grad</span><span class="p">,</span> <span class="n">new_model_state</span> <span class="o">=</span> <span class="n">grad_expect_operator_kernel</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_apply_fun</span><span class="p">,</span>
                 <span class="n">local_value_kernel</span><span class="p">,</span>
                 <span class="n">mutable</span><span class="p">,</span>
@@ -626,7 +636,7 @@
 
 <span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_expect</span><span class="p">(</span>
-    <span class="n">sampler</span><span class="p">:</span> <span class="n">Sampler</span><span class="p">,</span>
+    <span class="n">machine_pow</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">model_apply_fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">local_value_kernel</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
@@ -643,8 +653,7 @@
     <span class="n">logpsi</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">model_apply_fun</span><span class="p">({</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">model_state</span><span class="p">},</span> <span class="n">σ</span><span class="p">)</span>
 
     <span class="n">log_pdf</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span>
-        <span class="o">*</span> <span class="n">model_apply_fun</span><span class="p">({</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">model_state</span><span class="p">},</span> <span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">machine_pow</span> <span class="o">*</span> <span class="n">model_apply_fun</span><span class="p">({</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">model_state</span><span class="p">},</span> <span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
     <span class="p">)</span>
 
     <span class="n">local_value_vmap</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span>
@@ -722,7 +731,7 @@
 
 <span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">grad_expect_operator_kernel</span><span class="p">(</span>
-    <span class="n">sampler</span><span class="p">:</span> <span class="n">Sampler</span><span class="p">,</span>
+    <span class="n">machine_pow</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">model_apply_fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">local_kernel</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -764,8 +773,7 @@
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">log_pdf</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span>
-        <span class="o">*</span> <span class="n">model_apply_fun</span><span class="p">({</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">model_state</span><span class="p">},</span> <span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+        <span class="k">lambda</span> <span class="n">w</span><span class="p">,</span> <span class="n">σ</span><span class="p">:</span> <span class="n">machine_pow</span> <span class="o">*</span> <span class="n">model_apply_fun</span><span class="p">({</span><span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">model_state</span><span class="p">},</span> <span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
     <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">expect_closure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -788,9 +796,8 @@
     <span class="p">)</span>
 
 
-<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">grad_expect_operator_Lrho2</span><span class="p">(</span>
-    <span class="n">sampler</span><span class="p">:</span> <span class="n">Sampler</span><span class="p">,</span>
     <span class="n">model_apply_fun</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
     <span class="n">mutable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
@@ -925,7 +932,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

@@ -13,6 +13,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: HamiltonianRuleNumpy.init_state
       .. automethod:: HamiltonianRuleNumpy.random_state

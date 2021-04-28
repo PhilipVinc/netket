@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: Ising.H
       .. autoattribute:: Ising.J
@@ -20,10 +21,12 @@
       .. autoattribute:: Ising.h
       .. autoattribute:: Ising.hilbert
       .. autoattribute:: Ising.is_hermitian
+      .. autoattribute:: Ising.max_conn_size
       .. autoattribute:: Ising.size
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: Ising.__call__
       .. automethod:: Ising.apply

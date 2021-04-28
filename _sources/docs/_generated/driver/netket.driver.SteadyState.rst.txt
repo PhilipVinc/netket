@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: SteadyState.ldagl
       .. autoattribute:: SteadyState.optimizer
@@ -19,6 +20,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: SteadyState.advance
       .. automethod:: SteadyState.estimate

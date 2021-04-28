@@ -11,11 +11,13 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: CustomRuleNumpy.weight_list
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: CustomRuleNumpy.init_state
       .. automethod:: CustomRuleNumpy.random_state

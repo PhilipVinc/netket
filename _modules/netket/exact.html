@@ -19,6 +19,7 @@
     <script src="../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../getting_started.html">Get Started</a></li>
                 <li><a href="../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../website/about.html">About</a></li>
+                <li><a href="../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -95,7 +96,7 @@
     <div class="body col-md-12 content" role="main">
       
   <h1>Source code for netket.exact</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright 2019 The Simons Foundation, Inc. - All Rights Reserved.</span>
+<span></span><span class="c1"># Copyright 2020, 2021 The NetKet Authors - All rights reserved.</span>
 <span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="c1"># you may not use this file except in compliance with the License.</span>
@@ -216,8 +217,9 @@
 <div class="viewcode-block" id="steady_state"><a class="viewcode-back" href="../../docs/_generated/exact/netket.exact.steady_state.html#netket.exact.steady_state">[docs]</a><span class="k">def</span> <span class="nf">steady_state</span><span class="p">(</span><span class="n">lindblad</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ed&quot;</span><span class="p">,</span> <span class="n">rho0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the numerically exact steady-state of a lindblad master equation.</span>
 <span class="sd">    The computation is performed either through the exact diagonalization of the</span>
-<span class="sd">    hermitian L^\dagger L matrix, or by means of an iterative solver (bicgstabl)</span>
-<span class="sd">    targeting the solution of the non-hermitian system L\rho = 0 &amp;&amp; \Tr[\rho] = 1.</span>
+<span class="sd">    hermitian :math:`L^\dagger L` matrix, or by means of an iterative solver (bicgstabl)</span>
+<span class="sd">    targeting the solution of the non-hermitian system :math:`L\rho = 0`</span>
+<span class="sd">    and :math:`\mathrm{Tr}[\rho] = 1`.</span>
 
 <span class="sd">    Note that for systems with 7 or more sites it is usually computationally impossible</span>
 <span class="sd">    to build the full lindblad operator and therefore only `iterative` will work.</span>
@@ -232,18 +234,17 @@
 <span class="sd">        rho0: starting density matrix for the iterative diagonalization (default: None)</span>
 <span class="sd">        kwargs...: additional kwargs passed to bicgstabl</span>
 
-<span class="sd">    Optional args for iterative:</span>
-<span class="sd">        For full docs please consult SciPy documentation at</span>
-<span class="sd">        https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.bicgstab.html</span>
+<span class="sd">    For full docs please consult SciPy documentation at</span>
+<span class="sd">    https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.bicgstab.html</span>
 
+<span class="sd">    Keyword Args:</span>
 <span class="sd">        maxiter: maximum number of iterations for the iterative solver (default: None)</span>
 <span class="sd">        tol: The precision for the calculation (default: 1e-05)</span>
 <span class="sd">        callback: User-supplied function to call after each iteration. It is called as callback(xk),</span>
-<span class="sd">         where xk is the current solution vector</span>
+<span class="sd">                  where xk is the current solution vector</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The steady-state density matrix.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">array</span>
 
@@ -262,7 +263,7 @@
 <span class="sd">                matrix results in very low precision of the resulting steady-state</span>
 <span class="sd">                since the update to numpy 1.9.</span>
 <span class="sd">                We suggest using sparse=True, however, if you wish not to, you have</span>
-<span class="sd">                been warned. </span>
+<span class="sd">                been warned.</span>
 <span class="sd">                Your digits are your reponsability now.&quot;&quot;&quot;</span>
             <span class="p">)</span>
 
@@ -333,7 +334,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

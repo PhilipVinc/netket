@@ -11,12 +11,14 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: NetworkX.n_edges
       .. autoattribute:: NetworkX.n_nodes
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: NetworkX.adjacency_list
       .. automethod:: NetworkX.automorphisms

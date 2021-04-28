@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: BoseHubbard.H
       .. autoattribute:: BoseHubbard.J
@@ -21,11 +22,13 @@
       .. autoattribute:: BoseHubbard.edges
       .. autoattribute:: BoseHubbard.hilbert
       .. autoattribute:: BoseHubbard.is_hermitian
+      .. autoattribute:: BoseHubbard.max_conn_size
       .. autoattribute:: BoseHubbard.mu
       .. autoattribute:: BoseHubbard.size
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: BoseHubbard.__call__
       .. automethod:: BoseHubbard.apply

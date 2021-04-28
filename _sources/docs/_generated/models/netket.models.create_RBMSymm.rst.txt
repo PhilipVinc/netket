@@ -1,6 +1,0 @@
-﻿netket.models.create\_RBMSymm
-=============================
-
-.. currentmodule:: netket.models
-
-.. autofunction:: create_RBMSymm

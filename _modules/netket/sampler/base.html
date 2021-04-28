@@ -19,6 +19,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../../getting_started.html">Get Started</a></li>
                 <li><a href="../../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../../website/about.html">About</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -96,13 +97,13 @@
       
   <h1>Source code for netket.sampler.base</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2021 The NetKet Authors - All rights reserved.</span>
-
+<span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="c1"># you may not use this file except in compliance with the License.</span>
 <span class="c1"># You may obtain a copy of the License at</span>
-
+<span class="c1">#</span>
 <span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
-
+<span class="c1">#</span>
 <span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
 <span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
@@ -124,11 +125,10 @@
 <span class="kn">from</span> <span class="nn">netket</span> <span class="kn">import</span> <span class="n">jax</span> <span class="k">as</span> <span class="n">nkjax</span>
 <span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
 <span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">get_afun_if_module</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">PRNGKeyT</span>
 <span class="kn">from</span> <span class="nn">netket.jax</span> <span class="kn">import</span> <span class="n">HashablePartial</span>
 
-<span class="n">PyTree</span> <span class="o">=</span> <span class="n">Any</span>
-<span class="n">PRNGKeyType</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span>
-<span class="n">SeedType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">PRNGKeyType</span><span class="p">]</span>
+<span class="n">SeedType</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">PRNGKeyT</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="SamplerState"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.SamplerState.html#netket.sampler.SamplerState">[docs]</a><span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
@@ -165,7 +165,7 @@
     <span class="sd">&quot;&quot;&quot;Exponent of the pdf sampled&quot;&quot;&quot;</span>
 
     <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">pytree_node</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot;Dtype of the states returned.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;DType of the states returned.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Raise errors if hilbert is not an Hilbert</span>
@@ -232,7 +232,7 @@
 <span class="sd">        a flax&#39;s dataclass), and it can be serialized using Flax serialization methods.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            machine: a Flax module or callable apply_fun with the forward pass of the log-pdf.</span>
+<span class="sd">            machine: a Flax module or callable with the forward pass of the log-pdf.</span>
 <span class="sd">            parameters: The PyTree of parameters of the model.</span>
 <span class="sd">            seed: An optional seed or jax PRNGKey. If not specified, a random seed will be used.</span>
 
@@ -253,14 +253,13 @@
         <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SamplerState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SamplerState</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Resets the state of the sampler. To be used every time</span>
-<span class="sd">        the parameters are changed.</span>
+<span class="sd">        Resets the state of the sampler. To be used every time the parameters are changed.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            machine: a Flax module or callable apply_fun with the forward pass of the log-pdf.</span>
+<span class="sd">            machine: a Flax module or callable with the forward pass of the log-pdf.</span>
 <span class="sd">            parameters: The PyTree of parameters of the model.</span>
 <span class="sd">            state: The current state of the sampler. If it&#39;s not provided, it will be constructed</span>
-<span class="sd">            by calling `sampler.init_state(machine, parameters)` with a random seed.</span>
+<span class="sd">                by calling :code:`sampler.init_state(machine, parameters)` with a random seed.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A valid sampler state.</span>
@@ -280,10 +279,10 @@
 <span class="sd">        Samples the next state in the markov chain.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            machine: a Flax module or callable apply_fun with the forward pass of the log-pdf.</span>
+<span class="sd">            machine: a Flax module or callable apply function with the forward pass of the log-pdf.</span>
 <span class="sd">            parameters: The PyTree of parameters of the model.</span>
 <span class="sd">            state: The current state of the sampler. If it&#39;s not provided, it will be constructed</span>
-<span class="sd">            by calling `sampler.reset(machine, parameters)` with a random seed.</span>
+<span class="sd">                by calling :code:`sampler.reset(machine, parameters)` with a random seed.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            state: The new state of the sampler</span>
@@ -307,8 +306,8 @@
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            sampler: The Monte Carlo sampler.</span>
-<span class="sd">            machine: The model or apply_fun to sample from (if it&#39;s a function it should have</span>
-<span class="sd">                the signature f(parameters, σ) -&gt; jnp.ndarray).</span>
+<span class="sd">            machine: The model or callable to sample from (if it&#39;s a function it should have</span>
+<span class="sd">                the signature :code:`f(parameters, σ) -&gt; jnp.ndarray`).</span>
 <span class="sd">            parameters: The PyTree of parameters of the model.</span>
 <span class="sd">            state: current state of the sampler. If None, then initialises it.</span>
 <span class="sd">            chain_length: (default=1), the length of the chains.</span>
@@ -390,7 +389,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        sampler: The Monte Carlo sampler.</span>
-<span class="sd">        machine: a Flax module or callable apply_fun with the forward pass of the log-pdf.</span>
+<span class="sd">        machine: a Flax module or callable with the forward pass of the log-pdf.</span>
 <span class="sd">        parameters: The PyTree of parameters of the model.</span>
 <span class="sd">        seed: An optional seed or jax PRNGKey. If not specified, a random seed will be used.</span>
 
@@ -408,15 +407,14 @@
     <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SamplerState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SamplerState</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Resets the state of the sampler. To be used every time</span>
-<span class="sd">    the parameters are changed.</span>
+<span class="sd">    Resets the state of the sampler. To be used every time the parameters are changed.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        sampler: The Monte Carlo sampler.</span>
-<span class="sd">        machine: a Flax module or callable apply_fun with the forward pass of the log-pdf.</span>
+<span class="sd">        machine: a Flax module or Callable with the forward pass of the log-pdf.</span>
 <span class="sd">        parameters: The PyTree of parameters of the model.</span>
 <span class="sd">        state: The current state of the sampler. If it&#39;s not provided, it will be constructed</span>
-<span class="sd">        by calling `sampler.init_state(machine, parameters)` with a random seed.</span>
+<span class="sd">            by calling :code:`sampler.init_state(machine, parameters)` with a random seed.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A valid sampler state.</span>
@@ -435,10 +433,10 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        sampler: The Monte Carlo sampler.</span>
-<span class="sd">        machine: a Flax module or callable apply_fun with the forward pass of the log-pdf.</span>
+<span class="sd">        machine: a Flax module or callable with the forward pass of the log-pdf.</span>
 <span class="sd">        parameters: The PyTree of parameters of the model.</span>
 <span class="sd">        state: The current state of the sampler. If it&#39;s not provided, it will be constructed</span>
-<span class="sd">        by calling `sampler.reset(machine, parameters)` with a random seed.</span>
+<span class="sd">            by calling :code:`sampler.reset(machine, parameters)` with a random seed.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        state: The new state of the sampler</span>
@@ -460,8 +458,8 @@
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        sampler: The Monte Carlo sampler.</span>
-<span class="sd">        machine: The model or apply_fun to sample from (if it&#39;s a function it should have</span>
-<span class="sd">            the signature f(parameters, σ) -&gt; jnp.ndarray).</span>
+<span class="sd">        machine: The model or Callable to sample from (if it&#39;s a function it should have</span>
+<span class="sd">            the signature :code:`f(parameters, σ) -&gt; jnp.ndarray`).</span>
 <span class="sd">        parameters: The PyTree of parameters of the model.</span>
 <span class="sd">        state: current state of the sampler. If None, then initialises it.</span>
 <span class="sd">        chain_length: (default=1), the length of the chains.</span>
@@ -489,8 +487,8 @@
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        sampler: The Monte Carlo sampler.</span>
-<span class="sd">        machine: The model or apply_fun to sample from (if it&#39;s a function it should have</span>
-<span class="sd">            the signature f(parameters, σ) -&gt; jnp.ndarray).</span>
+<span class="sd">        machine: The model or Callable to sample from (if it&#39;s a function it should have</span>
+<span class="sd">            the signature :code:`f(parameters, σ) -&gt; jnp.ndarray`).</span>
 <span class="sd">        parameters: The PyTree of parameters of the model.</span>
 <span class="sd">        state: current state of the sampler. If None, then initialises it.</span>
 <span class="sd">        chain_length: (default=1), the length of the chains.</span>
@@ -516,7 +514,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

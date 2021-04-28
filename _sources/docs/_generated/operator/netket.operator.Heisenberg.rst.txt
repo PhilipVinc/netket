@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: Heisenberg.H
       .. autoattribute:: Heisenberg.J
@@ -21,6 +22,7 @@
       .. autoattribute:: Heisenberg.graph
       .. autoattribute:: Heisenberg.hilbert
       .. autoattribute:: Heisenberg.is_hermitian
+      .. autoattribute:: Heisenberg.max_conn_size
       .. autoattribute:: Heisenberg.mel_cutoff
       .. autoattribute:: Heisenberg.n_operators
       .. autoattribute:: Heisenberg.operators
@@ -29,6 +31,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: Heisenberg.__call__
       .. automethod:: Heisenberg.apply

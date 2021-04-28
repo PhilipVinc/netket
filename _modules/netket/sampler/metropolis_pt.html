@@ -19,6 +19,7 @@
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 <meta charset='utf-8'>
@@ -49,11 +50,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../../../website/get_started.html">Get Started</a></li>
+                <li><a href="../../../getting_started.html">Get Started</a></li>
                 <li><a href="../../../docs/getting_started.html">Documentation</a></li>
-                <li><a href="../../../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../../../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../../../website/about.html">About</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -96,13 +97,13 @@
       
   <h1>Source code for netket.sampler.metropolis_pt</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2021 The NetKet Authors - All rights reserved.</span>
-
+<span class="c1">#</span>
 <span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
 <span class="c1"># you may not use this file except in compliance with the License.</span>
 <span class="c1"># You may obtain a copy of the License at</span>
-
+<span class="c1">#</span>
 <span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
-
+<span class="c1">#</span>
 <span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
 <span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
 <span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
@@ -122,29 +123,17 @@
 
 <span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">struct</span>
 
-<span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
 <span class="kn">from</span> <span class="nn">netket</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">PRNGKeyT</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">SamplerState</span>
 <span class="kn">from</span> <span class="nn">.metropolis</span> <span class="kn">import</span> <span class="n">MetropolisSamplerState</span><span class="p">,</span> <span class="n">MetropolisSampler</span><span class="p">,</span> <span class="n">MetropolisRule</span>
-
-<span class="n">PyTree</span> <span class="o">=</span> <span class="n">Any</span>
-<span class="n">PRNGKey</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span>
 
 
 <span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span> <span class="nc">MetropolisPtSamplerState</span><span class="p">(</span><span class="n">MetropolisSamplerState</span><span class="p">):</span>
 
-    <span class="c1"># σ: jnp.ndarray</span>
-    <span class="c1"># &quot;&quot;&quot;Current batch of configurations in the markov chain.&quot;&quot;&quot;</span>
-    <span class="c1"># rng: jnp.ndarray</span>
-    <span class="c1"># &quot;&quot;&quot;State of the random number generator (key, in jax terms).&quot;&quot;&quot;</span>
-    <span class="c1"># rule_state: Optional[Any]</span>
-    <span class="c1"># &quot;&quot;&quot;Optional state of a transition rule.&quot;&quot;&quot;</span>
-    <span class="c1"># n_samples: int = 0</span>
-    <span class="c1"># &quot;&quot;&quot;Number of moves performed along the chains since the last reset.&quot;&quot;&quot;</span>
-    <span class="c1"># n_accepted: int = 0</span>
-    <span class="c1"># &quot;&quot;&quot;Number of accepted transitions along the chains since the last reset.&quot;&quot;&quot;</span>
     <span class="n">beta</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">n_accepted_per_beta</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
@@ -154,13 +143,21 @@
     <span class="n">exchange_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">acceptance_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">*</span> <span class="mi">100</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;MetropolisPtSamplerState(&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;# accepted = </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">%), &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">acceptance_rate</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">acc_string</span> <span class="o">=</span> <span class="s2">&quot;# accepted = </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">%), &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptance_ratio</span>
             <span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;rng state=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">acc_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;MetropolisNumpySamplerState(&quot;</span>
+            <span class="o">+</span> <span class="n">acc_string</span>
+            <span class="o">+</span> <span class="s2">&quot;rng state=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;MetropolisPtSamplerState(&quot;</span> <span class="o">+</span> <span class="n">acc_string</span> <span class="o">+</span> <span class="s2">&quot;rng state=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">text</span>
 
@@ -243,7 +240,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_replicas</span>
 
     <span class="k">def</span> <span class="nf">_init_state</span><span class="p">(</span>
-        <span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKey</span>
+        <span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyT</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetropolisPtSamplerState</span><span class="p">:</span>
         <span class="n">key_state</span><span class="p">,</span> <span class="n">key_rule</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">σ</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
@@ -259,8 +256,8 @@
             <span class="n">σ</span><span class="o">=</span><span class="n">σ</span><span class="p">,</span>
             <span class="n">rng</span><span class="o">=</span><span class="n">key_state</span><span class="p">,</span>
             <span class="n">rule_state</span><span class="o">=</span><span class="n">rule_state</span><span class="p">,</span>
-            <span class="n">n_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">n_accepted</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_steps_proc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_accepted_proc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">beta</span><span class="o">=</span><span class="n">beta</span><span class="p">,</span>
             <span class="n">beta_0_index</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
             <span class="n">n_accepted_per_beta</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
@@ -285,8 +282,8 @@
             <span class="n">σ</span><span class="o">=</span><span class="n">σ</span><span class="p">,</span>
             <span class="n">rng</span><span class="o">=</span><span class="n">new_rng</span><span class="p">,</span>
             <span class="n">rule_state</span><span class="o">=</span><span class="n">rule_state</span><span class="p">,</span>
-            <span class="n">n_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">n_accepted</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_steps_proc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">n_accepted_proc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">n_accepted_per_beta</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_replicas</span><span class="p">)),</span>
             <span class="n">beta_position</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,)),</span>
             <span class="n">beta_diffusion</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">)),</span>
@@ -499,7 +496,7 @@
                 <span class="n">rng</span><span class="o">=</span><span class="n">new_rng</span><span class="p">,</span>
                 <span class="n">σ</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">σ</span><span class="p">,</span>
                 <span class="c1"># n_accepted=s.accepted,</span>
-                <span class="n">n_samples</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">+</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_sweeps</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,</span>
+                <span class="n">n_steps_proc</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">n_steps_proc</span> <span class="o">+</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_sweeps</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,</span>
                 <span class="n">beta</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span>
                 <span class="n">beta_0_index</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">beta_0_index</span><span class="p">,</span>
                 <span class="n">beta_position</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">beta_position</span><span class="p">,</span>
@@ -716,7 +713,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

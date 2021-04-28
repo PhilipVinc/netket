@@ -13,6 +13,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: MetropolisRule.init_state
       .. automethod:: MetropolisRule.random_state

@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: GraphOperator.H
       .. autoattribute:: GraphOperator.T
@@ -20,6 +21,7 @@
       .. autoattribute:: GraphOperator.graph
       .. autoattribute:: GraphOperator.hilbert
       .. autoattribute:: GraphOperator.is_hermitian
+      .. autoattribute:: GraphOperator.max_conn_size
       .. autoattribute:: GraphOperator.mel_cutoff
       .. autoattribute:: GraphOperator.n_operators
       .. autoattribute:: GraphOperator.operators
@@ -27,6 +29,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: GraphOperator.__call__
       .. automethod:: GraphOperator.apply

@@ -19,6 +19,7 @@
     <script src="../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Defining Custom Models" href="custom_models.html" />
@@ -51,11 +52,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../website/get_started.html">Get Started</a></li>
+                <li><a href="../getting_started.html">Get Started</a></li>
                 <li><a href="getting_started.html">Documentation</a></li>
-                <li><a href="../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../website/about.html">About</a></li>
+                <li><a href="../tutorials.html">Tutorials</a></li>
+                <li><a href="../citing.html">Citing NetKet</a></li>
+                <li><a href="../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -126,6 +127,11 @@
 <li class="toctree-l2"><a class="reference internal" href="whats_new.html#api-changes">API Changes</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="superop.html">The Lindblad Master Equation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="superop.html#the-density-matrix-and-the-liouvillian">The Density Matrix and the Liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="superop.html#computing-observables">Computing Observables</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="varstate.html">The Variational State Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="varstate.html#constructing-a-variational-state">Constructing a Variational State</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="varstate.html#defining-models-flax">Defining models: Flax</a></li>
@@ -154,7 +160,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-flax-linen">Using Flax Linen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-jax-stax">Using Jax/Stax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="custom_models.html#id1">Using Jax/Stax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-haiku">Using Haiku</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
@@ -173,6 +179,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Lattice.html">netket.graph.Lattice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Chain.html">netket.graph.Chain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Grid.html">netket.graph.Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.SymmGroup.html">netket.graph.SymmGroup</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#hilbert">Hilbert</a><ul>
@@ -190,6 +197,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.LocalOperator.html">netket.operator.LocalOperator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.Ising.html">netket.operator.Ising</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.Heisenberg.html">netket.operator.Heisenberg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.PauliStrings.html">netket.operator.PauliStrings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.LocalLiouvillian.html">netket.operator.LocalLiouvillian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#pre-defined-operators">Pre-defined operators</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.boson.create.html">netket.operator.boson.create</a></li>
@@ -254,9 +262,10 @@
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMModPhase.html">netket.models.RBMModPhase</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMMultiVal.html">netket.models.RBMMultiVal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMSymm.html">netket.models.RBMSymm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.create_RBMSymm.html">netket.models.create_RBMSymm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.Jastrow.html">netket.models.Jastrow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.MPSPeriodic.html">netket.models.MPSPeriodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.NDM.html">netket.models.NDM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.GCNN.html">netket.models.GCNN</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#model-tools">Model tools</a><ul>
@@ -265,6 +274,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Dense.html">netket.nn.Dense</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseGeneral.html">netket.nn.DenseGeneral</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseSymm.html">netket.nn.DenseSymm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseEquivariant.html">netket.nn.DenseEquivariant</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Conv.html">netket.nn.Conv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Embed.html">netket.nn.Embed</a></li>
 </ul>
@@ -312,9 +322,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#logging-output">Logging output</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.JsonLog.html">netket.logging.JsonLog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.RuntimeLog.html">netket.logging.RuntimeLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.JsonLog.html">netket.logging.JsonLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.StateLog.html">netket.logging.StateLog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.TBLog.html">netket.logging.TBLog</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#utils">Utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/utils/netket.utils.HashableArray.html">netket.utils.HashableArray</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#callbacks">Callbacks</a><ul>
@@ -335,8 +350,8 @@
   <div class="section" id="the-drivers-api">
 <h1>The Drivers API<a class="headerlink" href="#the-drivers-api" title="Permalink to this headline">¶</a></h1>
 <p>In this section we will briefly describe the capabilities of the drivers API.
-This page assumes that you have already read and are familiar witht the <a href="#id1"><span class="problematic" id="id2">:docs:`Variational
-State interface &lt;variational_state&gt;`</span></a>.</p>
+This page assumes that you have already read and are familiar witht the <span class="xref std std-ref">Variational
+State interface</span>.</p>
 <p>In Netket there are two drivers, even though you can define your own; those are:</p>
 <ol class="arabic simple">
 <li><p><a class="reference internal" href="_generated/driver/netket.driver.VMC.html#netket.driver.VMC" title="netket.driver.VMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">VMC</span></code></a>, to find the ground state of an Hamiltonian</p></li>
@@ -390,15 +405,17 @@ desired output.</p>
 <ul>
 <li><p>The first argument must be the number of iterations to perform.</p></li>
 <li><p>The <code class="code docutils literal notranslate"><span class="pre">out</span></code> argument is used to pass the output loggers to the optimiser. It can take several values:</p>
-<ul class="simple">
+<ul>
 <li><p><code class="code docutils literal notranslate"><span class="pre">None</span></code>: No output will be logged (default).</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">string</span></code>: A default Json logger will be created, serializing data to the specified filename.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">Logger</span></code>: a logger, or iterable of loggers, respecting the standard loging interface. The available loggers are listed <a class="reference internal" href="api.html#logging-api"><span class="std std-ref">here</span></a>.</p></li>
-<li><p>The <code class="code docutils literal notranslate"><span class="pre">callbacks</span></code> can be used to pass callbacks to the optimisation driver. Callbacks must be callables with the signature</p></li>
+<li><p>The <code class="code docutils literal notranslate"><span class="pre">callbacks</span></code> can be used to pass callbacks to the optimisation driver. Callbacks must be callables with the signature
+.. code:: python</p>
+<blockquote>
+<div><p>(step:int, logdata:dict, driver:AbstractVariationalDriver) -&gt; bool</p>
+</div></blockquote>
+</li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">step</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">logdata</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span><span class="n">AbstractVariationalDriver</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
-</pre></div>
-</div>
 <p>The first argument is the step number, the second argument is the dictionary holding data that will be logged, and it can be modified by the callback, and the third is the driver itself, which can be used to access the current state or any other quantity.
 The output of the callback must be a boolean, which signals whever to continue the optimisation or not. When any one of the callbacks return <code class="code docutils literal notranslate"><span class="pre">False</span></code>, the optimisation will be stopped.
 Netket comes with a few built-in callbacks, listed <a class="reference internal" href="api.html#callbacks-api"><span class="std std-ref">in the API</span></a>, but you can also implement your own.</p>
@@ -422,7 +439,7 @@ Netket comes with a few built-in callbacks, listed <a class="reference internal"
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

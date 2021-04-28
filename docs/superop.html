@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Graph submodule &#8212; netket v3.0 documentation</title>
+    <title>The Lindblad Master Equation &#8212; netket v3.0 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
@@ -18,9 +18,14 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <script src="../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Variational State Interface" href="varstate.html" />
+    <link rel="prev" title="What’s New in v3.0" href="whats_new.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -49,11 +54,11 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="../website/get_started.html">Get Started</a></li>
+                <li><a href="../getting_started.html">Get Started</a></li>
                 <li><a href="getting_started.html">Documentation</a></li>
-                <li><a href="../tutorials/tutorials.html">Tutorials</a></li>
-                <li><a href="../website/citing.html">Citing NetKet</a></li>
-                <li><a href="../website/about.html">About</a></li>
+                <li><a href="../tutorials.html">Tutorials</a></li>
+                <li><a href="../citing.html">Citing NetKet</a></li>
+                <li><a href="../about.html">About</a></li>
                 <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
                 <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
             
@@ -108,7 +113,7 @@
   ---->
 </div>
 
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation-and-requirements">Installation and requirements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="getting_started.html#mpi">MPI</a></li>
@@ -122,6 +127,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s New in v3.0</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="whats_new.html#api-changes">API Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Lindblad Master Equation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-density-matrix-and-the-liouvillian">The Density Matrix and the Liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#computing-observables">Computing Observables</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="varstate.html">The Variational State Interface</a><ul>
@@ -152,7 +162,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-flax-linen">Using Flax Linen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-jax-stax">Using Jax/Stax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="custom_models.html#id1">Using Jax/Stax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-haiku">Using Haiku</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
@@ -171,6 +181,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Lattice.html">netket.graph.Lattice</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Chain.html">netket.graph.Chain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Grid.html">netket.graph.Grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.SymmGroup.html">netket.graph.SymmGroup</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#hilbert">Hilbert</a><ul>
@@ -188,6 +199,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.LocalOperator.html">netket.operator.LocalOperator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.Ising.html">netket.operator.Ising</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.Heisenberg.html">netket.operator.Heisenberg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.PauliStrings.html">netket.operator.PauliStrings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.LocalLiouvillian.html">netket.operator.LocalLiouvillian</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#pre-defined-operators">Pre-defined operators</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.boson.create.html">netket.operator.boson.create</a></li>
@@ -252,9 +264,10 @@
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMModPhase.html">netket.models.RBMModPhase</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMMultiVal.html">netket.models.RBMMultiVal</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMSymm.html">netket.models.RBMSymm</a></li>
-<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.create_RBMSymm.html">netket.models.create_RBMSymm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.Jastrow.html">netket.models.Jastrow</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.MPSPeriodic.html">netket.models.MPSPeriodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.NDM.html">netket.models.NDM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.GCNN.html">netket.models.GCNN</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#model-tools">Model tools</a><ul>
@@ -263,6 +276,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Dense.html">netket.nn.Dense</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseGeneral.html">netket.nn.DenseGeneral</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseSymm.html">netket.nn.DenseSymm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseEquivariant.html">netket.nn.DenseEquivariant</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Conv.html">netket.nn.Conv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Embed.html">netket.nn.Embed</a></li>
 </ul>
@@ -310,9 +324,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#logging-output">Logging output</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.JsonLog.html">netket.logging.JsonLog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.RuntimeLog.html">netket.logging.RuntimeLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.JsonLog.html">netket.logging.JsonLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.StateLog.html">netket.logging.StateLog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.TBLog.html">netket.logging.TBLog</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#utils">Utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/utils/netket.utils.HashableArray.html">netket.utils.HashableArray</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#callbacks">Callbacks</a><ul>
@@ -330,110 +349,60 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="graph-submodule">
-<span id="graph"></span><h1>Graph submodule<a class="headerlink" href="#graph-submodule" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="stuff">
-<span id="graph-stuf"></span><h2>Stuff<a class="headerlink" href="#stuff" title="Permalink to this headline">¶</a></h2>
-<p>This document describes the <a class="reference internal" href="api.html#graph-api"><span class="std std-ref">Graph</span></a> submodule.</p>
-<p>Most objects in Netket, such as Neural Quantum States, Operators
-and Hilbert spaces are defined on top of a Graph, which describes the
-physical lattice on top of which said object is defined.</p>
-<p>The abstract interface is defined within [AbstractGraph](#netket.graph.AbstractGraph),
-and a standard implementation is based upon the <a class="reference external" href="https://networkx.org/">NetworkX</a> library.</p>
-<p>Given a list of edges and vertices, it is possible to construct the NetworkX graph with the following
-function:</p>
-<dl class="py function">
-<dt id="netket.graph.Graph">
-<code class="sig-prename descclassname"><span class="pre">netket.graph.</span></code><code class="sig-name descname"><span class="pre">Graph</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/netket/graph/graph.html#Graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Graph" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs a Graph given a list of nodes and edges.
-:type nodes: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>
-:param nodes: A list of ints that index nodes of a graph
-:type edges: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>
-:param edges: A list of 2- or 3-tuples that denote an edge with an optional color</p>
-<p>The Graph can be constructed specifying only the edges and the nodes will be deduced from the edges.</p>
-<p class="rubric">Examples</p>
-<p>A 10-site one-dimensional lattice with periodic boundary conditions can be
-constructed specifying the edges as follows:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">netket</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">netket</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">edges</span><span class="o">=</span><span class="p">[[</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">)</span>
-<span class="go">10</span>
-</pre></div>
+  <div class="section" id="the-lindblad-master-equation">
+<h1>The Lindblad Master Equation<a class="headerlink" href="#the-lindblad-master-equation" title="Permalink to this headline">¶</a></h1>
+<p>In short: Many-body states in NetKet are stored in <a class="reference external" href="https://en.wikipedia.org/wiki/Endianness#Bi-endianness">big-endian format</a>, and that applies to super-operators too.</p>
+<p>This means that, if the local basis of your Hilbert space is <code class="code docutils literal notranslate"><span class="pre">[0,1]</span></code>, the joint Hilbert space
+composed of two sites will have 4 states, indexed in the following order: <code class="code docutils literal notranslate"><span class="pre">[00,01,10,11]</span></code>.
+This format is called Big-Endian because increasing the first element in the array will increase the
+index within the hilbert space more than increasing the last element in the array.</p>
+<p>This format is also the most natural in row-column languages such as Python/Numpy, as opposed to Julia
+and Fortran which are column-major.
+It is the format that arises if you take the kronecker product with numpy.</p>
+<p>This same ordering is then used when representing operators, as they inherit the ordering of the hilbert
+space along both of their dimensions.</p>
+<div class="section" id="the-density-matrix-and-the-liouvillian">
+<h2>The Density Matrix and the Liouvillian<a class="headerlink" href="#the-density-matrix-and-the-liouvillian" title="Permalink to this headline">¶</a></h2>
+<p>The lindblad master equation that is encoded in the Liouvillian is:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L} = -i \left[ \hat{H}, \hat{\rho}\right] + \sum_i \left[ \hat{L}_i\hat{\rho}\hat{L}_i^\dagger -
+    \left\{ \hat{L}_i^\dagger\hat{L}_i, \hat{\rho} \right\} \right]\]</div>
+<p>The liouvillian is a rank-4 tensor obtained by taking the kronecker product of
+two objects in the operator-space, and one can again choose row-stacking or column-stacking
+to represent it.</p>
+<p>Qutip and QuantumOptics.jl both use column-stacking, the first for historical reasons (due to
+their Matlab origins), the other to leverage the column-major nature of Julia. In NetKet 3 we
+switched to a row-major (row-stacking) encoding as it is more natural in Python and it simplifies
+working with operators.</p>
+<p>For performance reasons we pack together the Unitary and anti-Unitary terms into a single
+non hermitian Hamiltonian <span class="math notranslate nohighlight">\(\hat{H}_{nh}\)</span>, which allows us to rewrite the formula above as</p>
+<p>That is then composed with the jump operators in the inner kernel with the formula:</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{L} = -i \hat{H}_{nh}\hat{\rho} +i\hat{\rho}\hat{H}_{nh}^\dagger + \sum_i \hat{L}_i\hat{\rho}\hat{L}_i^\dagger\]</div>
+<p>Where <span class="math notranslate nohighlight">\(\hat{H}_{nh}\)</span> is given by the formula:</p>
+<div class="math notranslate nohighlight">
+\[\hat{H}_{nh} = \hat{H} - \sum_i \frac{i}{2}\hat{L}_i^\dagger\hat{L}_i\]</div>
+<p>The row-stacked, matrix-representation of the Liouvillian is then given by the following formula:</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathcal{L}} = -i \hat{H}_{nh} \otimes \hat{I} + i \hat{I} \otimes \hat{H}_{nh}^\star
++ \sum_i  \hat{L}_i\otimes\hat{L}_i^\star\]</div>
+<p>An intuitive derivation of the formula above can be had by trying to compute the connected elements of
+<span class="math notranslate nohighlight">\(\langle \sigma | \hat{\mathcal{L}}(\hat{\rho})|\eta\rangle\)</span> connecting to
+<span class="math notranslate nohighlight">\(\langle x | \hat{\rho} | y \rangle\)</span>.</p>
+<p>Alternatively, a formal derivation of the formula above is laied out by my fellow Fabrizio in the appendix
+A1 of <a class="reference external" href="https://arxiv.org/pdf/1909.11619.pdf#page=16">this article</a>.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkX</span></code></p>
-</dd>
-<dt class="field-even">Parameters</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>nodes</strong> (<em>List</em>) – </p></li>
-<li><p><strong>edges</strong> (<em>List</em>) – </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<p>However, for ease of use, the [Graph submodule](#netket.graph) provides several constructors for
-common lattices, such as N-dimensional grids, HyperCubes, Graphs without edges and several others.</p>
-<p>The full list is located in:</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="_generated/graph/netket.graph.Edgeless.html#netket.graph.Edgeless" title="netket.graph.Edgeless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">netket.graph.Edgeless</span></code></a></p></td>
-<td><p>Construct a set graph (collection of unconnected vertices).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="_generated/graph/netket.graph.Hypercube.html#netket.graph.Hypercube" title="netket.graph.Hypercube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">netket.graph.Hypercube</span></code></a></p></td>
-<td><p>A hypercube lattice of side L in d dimensions.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_generated/graph/netket.graph.Square.html#netket.graph.Square" title="netket.graph.Square"><code class="xref py py-obj docutils literal notranslate"><span class="pre">netket.graph.Square</span></code></a></p></td>
-<td><p>A square lattice of side L.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#netket.graph.Grid" title="netket.graph.Grid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">netket.graph.Grid</span></code></a></p></td>
-<td><p>A Grid lattice of d dimensions, and possibly different sizes of each dimension.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="_generated/graph/netket.graph.Lattice.html#netket.graph.Lattice" title="netket.graph.Lattice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">netket.graph.Lattice</span></code></a></p></td>
-<td><p>A lattice built translating a unit cell and adding edges between nearest neighbours sites.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="abstract-interface">
-<span id="graph-abstract-interface"></span><h2>Abstract Interface<a class="headerlink" href="#abstract-interface" title="Permalink to this headline">¶</a></h2>
-<p>All graphs inherit from the [AbstractGraph](#netket.graph.AbstractGraph) base class, and you should check
-it’s documentation to see the commplete list of supported properties.</p>
-<p>In general, with any graph you can do manipulations like the following:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">netket</span> <span class="k">as</span> <span class="nn">nk</span>
-
-<span class="n">nk</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Square</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-</pre></div>
-</div>
-<dl class="py class">
-<dt id="netket.graph.AbstractGraph">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">netket.graph.</span></code><code class="sig-name descname"><span class="pre">AbstractGraph</span></code><a class="reference internal" href="../_modules/netket/graph/abstract_graph.html#AbstractGraph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.AbstractGraph" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
-<p>Abstract class for NetKet graph objects.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="netket.graph.NetworkX">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">netket.graph.</span></code><code class="sig-name descname"><span class="pre">NetworkX</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/netket/graph/graph.html#NetworkX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.NetworkX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">netket.graph.abstract_graph.AbstractGraph</span></code></p>
-<p>Wrapper for a networkx graph</p>
-</dd></dl>
-
-</div>
-<div class="section" id="lattice-constructors">
-<h2>Lattice Constructors<a class="headerlink" href="#lattice-constructors" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="netket.graph.Grid">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">netket.graph.</span></code><code class="sig-name descname"><span class="pre">Grid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/netket/graph/grid.html#Grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Grid" title="Permalink to this definition">¶</a></dt>
-<dd><p>A Grid lattice of d dimensions, and possibly different sizes of each dimension.
-Periodic boundary conditions can also be imposed</p>
-</dd></dl>
-
+<div class="section" id="computing-observables">
+<h2>Computing Observables<a class="headerlink" href="#computing-observables" title="Permalink to this headline">¶</a></h2>
+<p>Expectation values of operators can be computed on a mixed state according to the well known formula</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\langle \hat{O} \rangle &amp;= \mathrm{Tr}[\hat{O}\hat{\rho}]  \\
+                &amp;= \sum_{\sigma,\eta} \langle \sigma | \hat{O} |\eta\rangle \langle\eta |\hat{\rho} |\sigma \rangle \\
+                &amp; = \sum_{\sigma,\eta} \frac{\langle \sigma | \hat{\rho} | \sigma\rangle}{\langle \sigma | \hat{\rho} | \sigma\rangle}\langle \sigma | \hat{O} |\eta\rangle \langle\eta |\hat{\rho} |\sigma \rangle\\
+                &amp;= \sum_{\sigma} \langle \sigma | \hat{\rho} | \sigma\rangle \left(\sum_\eta \langle \sigma | \hat{O} |\eta\rangle \frac{\langle\eta |\hat{\rho} |\sigma \rangle}{\langle \sigma | \hat{\rho} | \sigma\rangle}\right)\end{split}\]</div>
+<p>And since the diagonal elements of the density matrix are positive, real and normalized to 1, they form a well defined probability distribution that we can sample and use to estimate observables.</p>
+<p>The only downside of this approach is that the Markov-Chain that is needed to sample the diagonal elements
+is not the same as the one that can be used to sample the whole density matrix, which is used during optimization of the steady-state.</p>
 </div>
 </div>
 
@@ -451,7 +420,7 @@ Periodic boundary conditions can also be imposed</p>
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>

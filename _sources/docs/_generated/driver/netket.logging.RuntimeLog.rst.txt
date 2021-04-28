@@ -11,11 +11,13 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: RuntimeLog.data
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: RuntimeLog.__call__
       .. automethod:: RuntimeLog.flush

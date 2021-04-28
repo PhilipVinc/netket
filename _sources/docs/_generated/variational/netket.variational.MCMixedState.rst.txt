@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: MCMixedState.chain_length
       .. autoattribute:: MCMixedState.chain_length_diag
@@ -31,6 +32,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: MCMixedState.evaluate
       .. automethod:: MCMixedState.expect
@@ -41,6 +43,7 @@
       .. automethod:: MCMixedState.grad_operator
       .. automethod:: MCMixedState.init
       .. automethod:: MCMixedState.init_parameters
+      .. automethod:: MCMixedState.log_value
       .. automethod:: MCMixedState.quantum_geometric_tensor
       .. automethod:: MCMixedState.reset
       .. automethod:: MCMixedState.sample

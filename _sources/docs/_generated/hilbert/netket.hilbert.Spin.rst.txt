@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: Spin.is_discrete
       .. autoattribute:: Spin.is_finite
@@ -23,6 +24,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: Spin.all_states
       .. automethod:: Spin.numbers_to_states

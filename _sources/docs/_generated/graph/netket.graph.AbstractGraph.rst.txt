@@ -11,12 +11,14 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: AbstractGraph.n_edges
       .. autoattribute:: AbstractGraph.n_nodes
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: AbstractGraph.adjacency_list
       .. automethod:: AbstractGraph.automorphisms

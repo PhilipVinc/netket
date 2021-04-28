@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: Qubit.is_discrete
       .. autoattribute:: Qubit.is_finite
@@ -23,6 +24,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: Qubit.all_states
       .. automethod:: Qubit.numbers_to_states

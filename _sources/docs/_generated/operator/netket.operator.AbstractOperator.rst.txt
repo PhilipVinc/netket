@@ -11,16 +11,19 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: AbstractOperator.H
       .. autoattribute:: AbstractOperator.T
       .. autoattribute:: AbstractOperator.dtype
       .. autoattribute:: AbstractOperator.hilbert
       .. autoattribute:: AbstractOperator.is_hermitian
+      .. autoattribute:: AbstractOperator.max_conn_size
       .. autoattribute:: AbstractOperator.size
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: AbstractOperator.__call__
       .. automethod:: AbstractOperator.apply

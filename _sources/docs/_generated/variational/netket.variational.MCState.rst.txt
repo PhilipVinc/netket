@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: MCState.chain_length
       .. autoattribute:: MCState.hilbert
@@ -25,6 +26,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: MCState.evaluate
       .. automethod:: MCState.expect
@@ -32,6 +34,7 @@
       .. automethod:: MCState.grad
       .. automethod:: MCState.init
       .. automethod:: MCState.init_parameters
+      .. automethod:: MCState.log_value
       .. automethod:: MCState.quantum_geometric_tensor
       .. automethod:: MCState.reset
       .. automethod:: MCState.sample

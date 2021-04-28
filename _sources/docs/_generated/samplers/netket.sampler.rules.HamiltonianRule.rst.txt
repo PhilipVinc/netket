@@ -13,6 +13,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: HamiltonianRule.init_state
       .. automethod:: HamiltonianRule.random_state

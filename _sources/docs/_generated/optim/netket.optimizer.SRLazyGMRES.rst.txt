@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: SRLazyGMRES.M
       .. autoattribute:: SRLazyGMRES.atol
@@ -23,6 +24,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: SRLazyGMRES.create
       .. automethod:: SRLazyGMRES.replace

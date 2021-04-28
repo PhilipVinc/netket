@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: LocalOperator.H
       .. autoattribute:: LocalOperator.T
@@ -19,6 +20,7 @@
       .. autoattribute:: LocalOperator.dtype
       .. autoattribute:: LocalOperator.hilbert
       .. autoattribute:: LocalOperator.is_hermitian
+      .. autoattribute:: LocalOperator.max_conn_size
       .. autoattribute:: LocalOperator.mel_cutoff
       .. autoattribute:: LocalOperator.n_operators
       .. autoattribute:: LocalOperator.operators
@@ -26,6 +28,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: LocalOperator.__call__
       .. automethod:: LocalOperator.apply

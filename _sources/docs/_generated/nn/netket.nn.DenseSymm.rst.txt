@@ -11,6 +11,7 @@
    
       
    .. rst-class:: class-dl-groups
+
    Attributes
       .. autoattribute:: DenseSymm.name
       .. autoattribute:: DenseSymm.parent
@@ -21,10 +22,12 @@
    
       
    .. rst-class:: class-dl-groups
+
    Methods
       .. automethod:: DenseSymm.__call__
       .. automethod:: DenseSymm.apply
       .. automethod:: DenseSymm.bias_init
+      .. automethod:: DenseSymm.bind
       .. automethod:: DenseSymm.clone
       .. automethod:: DenseSymm.full_bias
       .. automethod:: DenseSymm.full_kernel
