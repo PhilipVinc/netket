@@ -35,6 +35,7 @@ __all__ = [
     "stats",
     "utils",
     "variational",
+    "dynamics",
     "nn",
 ]
 
@@ -54,6 +55,7 @@ from . import (
     stats,
     variational,
     optimizer,
+    dynamics,
 )
 
 # Main applications
@@ -61,6 +63,8 @@ from .driver import VMC
 from .driver import SteadyState
 
 # from .drivers import Qsr
+
+from .dynamics import TimeEvolution
 
 
 @_deprecated("VMC")

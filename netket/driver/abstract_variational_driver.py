@@ -142,7 +142,9 @@ class AbstractVariationalDriver(abc.ABC):
     @optimizer.setter
     def optimizer(self, optimizer):
         self._optimizer = optimizer
-        self._optimizer_state = optimizer.init(self.state.parameters)
+
+        if optimizer is not None:
+            self._optimizer_state = optimizer.init(self.state.parameters)
 
     @property
     def step_count(self):
@@ -151,6 +153,14 @@ class AbstractVariationalDriver(abc.ABC):
         This can be used, for example, to identify the line in a log file.
         """
         return self._step_count
+
+    @property
+    def step_value(self):
+        """
+        Returns a monotonic value identifying the current step. This might be the
+        step_count for a standard iterative optimizer, or the time for a time-evolution
+        """
+        return self.step_count
 
     def iter(self, n_steps: int, step: int = 1):
         """
@@ -191,7 +201,7 @@ class AbstractVariationalDriver(abc.ABC):
         show_progress=True,
         save_params_every=50,  # for default logger
         write_every=50,  # for default logger
-        step_size=1,  # for default logger
+        step_size=None,  # for default logger
         callback=lambda *x: True,
     ):
         """
@@ -233,6 +243,9 @@ class AbstractVariationalDriver(abc.ABC):
                 "Running the optimization but not saving the output."
             )
 
+        if step_size is None:
+            step_size = self._default_step_size
+
         # Log only non-root nodes
         if self._mynode == 0:
             # if out is a path, create an overwriting Json Log for output
@@ -247,26 +260,35 @@ class AbstractVariationalDriver(abc.ABC):
         callbacks = _to_iterable(callback)
         callback_stop = False
 
-        with tqdm(
-            self.iter(n_iter, step_size), total=n_iter, disable=not show_progress
-        ) as itr:
+        with tqdm(total=n_iter, disable=not show_progress) as pbar:
+            old_step_value = self.step_value
             first_step = True
 
-            for step in itr:
+            for step in self.iter(n_iter, step_size):
 
                 log_data = self.estimate(obs)
 
                 # if the cost-function is defined then report it in the progress bar
                 if self._loss_stats is not None:
-                    itr.set_postfix_str(self._loss_name + "=" + str(self._loss_stats))
                     log_data[self._loss_name] = self._loss_stats
+                    if self._loss_name is not None:
+                        pbar.set_postfix_str(
+                            self._loss_name + "=" + str(self._loss_stats)
+                        )
 
                 for callback in callbacks:
                     if not callback(step, log_data, self):
                         callback_stop = True
 
-                for logger in loggers:
-                    logger(self.step_count, log_data, self.state)
+                if len(loggers) > 0:
+                    self._log_additional_data(log_data, step)
+                    self._log_data = log_data
+                    for logger in loggers:
+                        logger(self.step_value, log_data, self.state)
+
+                # Update the progress bar
+                pbar.update(self.step_value - old_step_value)
+                old_step_value = self.step_value
 
                 if len(callbacks) > 0:
                     if mpi.mpi_any(callback_stop):
@@ -275,7 +297,10 @@ class AbstractVariationalDriver(abc.ABC):
                 # Reset the timing of tqdm after the first step, to ignore compilation time
                 if first_step:
                     first_step = False
-                    itr.unpause()
+                    pbar.unpause()
+
+            #  Final update so that it shows up filled.
+            pbar.update(self.step_value - old_step_value)
 
         # flush at the end of the evolution so that final values are saved to
         # file
@@ -308,6 +333,26 @@ class AbstractVariationalDriver(abc.ABC):
         self._optimizer_state, self.state.parameters = apply_gradient(
             self._optimizer.update, self._optimizer_state, dp, self.state.parameters
         )
+
+    def _log_additional_data(self, log_dict, step):
+        """
+        Adds additional data to the dictionary of logged data at every step.
+        Args:
+
+            :log_dict: the dictionary to be modified containing all the logged key-value pairs
+            :step: the step
+        """
+        pass
+
+    @property
+    def _default_step_size(self) -> int:
+        """
+        The default step size at which observables are computed and the progress bar is
+        updated.
+
+        Overriden by drivers like the time-evolution
+        """
+        return 1
 
 
 @partial(jax.jit, static_argnums=0)
