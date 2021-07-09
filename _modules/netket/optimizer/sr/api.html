@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.optimizer.sr.api &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -110,27 +110,28 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 
 <span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">wraps_legacy</span>
 <span class="kn">from</span> <span class="nn">netket.legacy.optimizer</span> <span class="kn">import</span> <span class="n">SR</span> <span class="k">as</span> <span class="n">SR_legacy</span>
 <span class="kn">from</span> <span class="nn">netket.legacy.machine</span> <span class="kn">import</span> <span class="n">AbstractMachine</span>
 
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">SR</span>
-<span class="kn">from</span> <span class="nn">.sr_onthefly</span> <span class="kn">import</span> <span class="n">SRLazyCG</span><span class="p">,</span> <span class="n">SRLazyGMRES</span>
+<span class="kn">from</span> <span class="nn">netket.utils.numbers</span> <span class="kn">import</span> <span class="n">is_scalar</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+
+<span class="kn">from</span> <span class="nn">..qgt</span> <span class="kn">import</span> <span class="n">QGTAuto</span>
+<span class="kn">from</span> <span class="nn">..preconditioner</span> <span class="kn">import</span> <span class="n">LinearPreconditioner</span>
+
+<span class="n">Preconditioner</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Preconditioner&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;solver&quot;</span><span class="p">])</span>
 
 <span class="n">default_iterative</span> <span class="o">=</span> <span class="s2">&quot;cg&quot;</span>
 <span class="c1"># default_direct = &quot;eigen&quot;</span>
 
 
-<div class="viewcode-block" id="SR"><a class="viewcode-back" href="../../../../docs/_generated/optim/netket.optimizer.SR.html#netket.optimizer.SR">[docs]</a><span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">SR_legacy</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">SR</span><span class="p">(</span>
-    <span class="n">diag_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
-    <span class="n">method</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">iterative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SR</span><span class="p">:</span>
+<span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">SR_legacy</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">build_SR</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">solver_restart</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct the structure holding the parameters for using the</span>
 <span class="sd">    Stochastic Reconfiguration/Natural gradient method.</span>
@@ -145,23 +146,143 @@
 <span class="sd">        diag_shift: Diagonal shift added to the S matrix</span>
 <span class="sd">        method: (cg, gmres) The specific method.</span>
 <span class="sd">        iterative: Whever to use an iterative method or not.</span>
+<span class="sd">        jacobian: Differentiation mode to precompute gradients</span>
+<span class="sd">                  can be &quot;holomorphic&quot;, &quot;R2R&quot;, &quot;R2C&quot;,</span>
+<span class="sd">                  None (if they shouldn&#39;t be precomputed)</span>
+<span class="sd">        rescale_shift: Whether to rescale the diagonal offsets in SR according</span>
+<span class="sd">                       to diagonal entries (only with precomputed gradients)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The SR parameter structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">iterative</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">method</span> <span class="o">=</span> <span class="n">default_iterative</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">iterative</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Non-iterative methods for SR are no longer implemented&quot;</span>
-        <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;cg&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">SRLazyCG</span><span class="p">(</span><span class="n">diag_shift</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;gmres&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">SRLazyGMRES</span><span class="p">(</span><span class="n">diag_shift</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only cg and gmres are implemented&quot;</span><span class="p">)</span></div>
+    <span class="c1">#  try to understand if this is the old API or new</span>
+    <span class="c1"># API</span>
+
+    <span class="n">old_api</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># new_api = False</span>
+
+    <span class="k">if</span> <span class="s2">&quot;matrix&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="c1"># new syntax</span>
+        <span class="k">return</span> <span class="n">_SR</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">legacy_kwargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;iterative&quot;</span><span class="p">,</span> <span class="s2">&quot;method&quot;</span><span class="p">]</span>
+    <span class="n">legacy_solver_kwargs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tol&quot;</span><span class="p">,</span> <span class="s2">&quot;atol&quot;</span><span class="p">,</span> <span class="s2">&quot;maxiter&quot;</span><span class="p">,</span> <span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;restart&quot;</span><span class="p">,</span> <span class="s2">&quot;solve_method&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">legacy_kwargs</span> <span class="o">+</span> <span class="n">legacy_solver_kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">old_api</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_scalar</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>  <span class="c1"># it&#39;s diag_shift</span>
+            <span class="n">old_api</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#    new_api = True</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">old_api</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#        new_api = True</span>
+
+    <span class="k">if</span> <span class="n">old_api</span><span class="p">:</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># diag shift</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;diag_shift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;SR takes at most 2 positional arguments but len(args) where provided&quot;</span>
+                <span class="p">)</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+
+        <span class="n">solver</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s2">&quot;iterative&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;iterative&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;method&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">legacy_solvers</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;cg&quot;</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cg</span><span class="p">,</span>
+                <span class="s2">&quot;gmres&quot;</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">gmres</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">legacy_solvers</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The old API only supports cg and gmres solvers. &quot;</span>
+                    <span class="s2">&quot;Migrate to the new API and use any solver from&quot;</span>
+                    <span class="s2">&quot;jax.scipy.sparse.linalg&quot;</span>
+                <span class="p">)</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="n">legacy_solvers</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]]</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cg</span>
+
+        <span class="n">solver_keys</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">has_solver_kw</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">legacy_solver_kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">solver_keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">has_solver_kw</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">has_solver_kw</span><span class="p">:</span>
+            <span class="n">solver</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">solver</span><span class="p">,</span> <span class="o">**</span><span class="n">solver_keys</span><span class="p">)</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">solver</span>
+
+    <span class="k">return</span> <span class="n">_SR</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">solver_restart</span><span class="o">=</span><span class="n">solver_restart</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SR"><a class="viewcode-back" href="../../../../docs/_generated/optim/netket.optimizer.SR.html#netket.optimizer.SR">[docs]</a><span class="k">class</span> <span class="nc">SR</span><span class="p">(</span><span class="n">LinearPreconditioner</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<span class="c1"># This will become the future implementation once legacy and semi-legacy</span>
+<span class="c1"># bejaviour is removed</span>
+<span class="k">def</span> <span class="nf">_SR</span><span class="p">(</span>
+    <span class="n">qgt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">solver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">diag_shift</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">solver_restart</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct the structure holding the parameters for using the</span>
+<span class="sd">    Stochastic Reconfiguration/Natural gradient method.</span>
+
+<span class="sd">    Depending on the arguments, an implementation is chosen. For</span>
+<span class="sd">    details on all possible kwargs check the specific SR implementations</span>
+<span class="sd">    in the documentation.</span>
+
+<span class="sd">    You can also construct one of those structures directly.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        qgt: The Quantum Geomtric Tensor type to use.</span>
+<span class="sd">        diag_shift: Diagonal shift added to the S matrix</span>
+<span class="sd">        method: (cg, gmres) The specific method.</span>
+<span class="sd">        iterative: Whever to use an iterative method or not.</span>
+<span class="sd">        jacobian: Differentiation mode to precompute gradients</span>
+<span class="sd">                  can be &quot;holomorphic&quot;, &quot;R2R&quot;, &quot;R2C&quot;,</span>
+<span class="sd">                         None (if they shouldn&#39;t be precomputed)</span>
+<span class="sd">        rescale_shift: Whether to rescale the diagonal offsets in SR according</span>
+<span class="sd">                       to diagonal entries (only with precomputed gradients)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The SR parameter structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">solver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cg</span>
+
+    <span class="k">if</span> <span class="n">qgt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">qgt</span> <span class="o">=</span> <span class="n">QGTAuto</span><span class="p">(</span><span class="n">solver</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">SR</span><span class="p">(</span>
+        <span class="n">partial</span><span class="p">(</span><span class="n">qgt</span><span class="p">,</span> <span class="n">diag_shift</span><span class="o">=</span><span class="n">diag_shift</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span>
+        <span class="n">solver</span><span class="o">=</span><span class="n">solver</span><span class="p">,</span>
+        <span class="n">solver_restart</span><span class="o">=</span><span class="n">solver_restart</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
     </div>
@@ -177,7 +298,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

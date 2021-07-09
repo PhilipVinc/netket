@@ -13,11 +13,13 @@
    .. rst-class:: class-dl-groups
 
    Attributes
+      .. autoattribute:: MetropolisSamplerNumpy.is_exact
       .. autoattribute:: MetropolisSamplerNumpy.machine_pow
       .. autoattribute:: MetropolisSamplerNumpy.n_batches
       .. autoattribute:: MetropolisSamplerNumpy.n_chains
+      .. autoattribute:: MetropolisSamplerNumpy.n_chains_per_rank
       .. autoattribute:: MetropolisSamplerNumpy.n_sweeps
-      .. autoattribute:: MetropolisSamplerNumpy.reset_chain
+      .. autoattribute:: MetropolisSamplerNumpy.reset_chains
       .. autoattribute:: MetropolisSamplerNumpy.rule
    
       

@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.driver.steady_state &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,16 +110,16 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
-
 <span class="kn">import</span> <span class="nn">jax</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
-<span class="kn">from</span> <span class="nn">jax.tree_util</span> <span class="kn">import</span> <span class="n">tree_map</span>
 
-<span class="kn">from</span> <span class="nn">netket.operator</span> <span class="kn">import</span> <span class="n">Squared</span>
-<span class="kn">from</span> <span class="nn">netket.stats</span> <span class="kn">import</span> <span class="n">Stats</span>
-
-<span class="kn">from</span> <span class="nn">netket.variational</span> <span class="kn">import</span> <span class="n">MCMixedState</span>
+<span class="kn">from</span> <span class="nn">netket.operator</span> <span class="kn">import</span> <span class="n">Squared</span><span class="p">,</span> <span class="n">AbstractSuperOperator</span>
+<span class="kn">from</span> <span class="nn">netket.vqs</span> <span class="kn">import</span> <span class="n">MCMixedState</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">warn_deprecation</span>
+<span class="kn">from</span> <span class="nn">netket.optimizer</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">identity_preconditioner</span><span class="p">,</span>
+    <span class="n">PreconditionerT</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">.vmc_common</span> <span class="kn">import</span> <span class="n">info</span>
 <span class="kn">from</span> <span class="nn">.abstract_variational_driver</span> <span class="kn">import</span> <span class="n">AbstractVariationalDriver</span>
@@ -135,9 +135,10 @@
         <span class="n">lindbladian</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">,</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-        <span class="n">variational_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">sr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">sr_restart</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">variational_state</span><span class="p">:</span> <span class="n">MCMixedState</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">preconditioner</span><span class="p">:</span> <span class="n">PreconditionerT</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sr</span><span class="p">:</span> <span class="n">PreconditionerT</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sr_restart</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -147,23 +148,57 @@
 <span class="sd">            lindbladian: The Lindbladian of the system.</span>
 <span class="sd">            optimizer: Determines how optimization steps are performed given the</span>
 <span class="sd">                bare energy gradient.</span>
-<span class="sd">            sr: Determines whether and how stochastic reconfiguration</span>
-<span class="sd">                is applied to the bare energy gradient before performing applying</span>
-<span class="sd">                the optimizer. If this parameter is not passed or None, SR is not used.</span>
-<span class="sd">            sr_restart: whever to restart the SR solver at every iteration, or use the</span>
-<span class="sd">                previous result to speed it up</span>
-
+<span class="sd">            preconditioner: Determines which preconditioner to use for the loss gradient.</span>
+<span class="sd">                This must be a tuple of `(object, solver)` as documented in the section</span>
+<span class="sd">                `preconditioners` in the documentation. The standard preconditioner</span>
+<span class="sd">                included with NetKet is Stochastic Reconfiguration. By default, no preconditioner</span>
+<span class="sd">                is used and the bare gradient is passed to the optimizer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variational_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">variational_state</span> <span class="o">=</span> <span class="n">MCMixedState</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lindbladian</span><span class="p">,</span> <span class="n">AbstractSuperOperator</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The first argument must be a super-operator&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">preconditioner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;sr is deprecated in favour of preconditioner kwarg. You should not pass both&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">preconditioner</span> <span class="o">=</span> <span class="n">sr</span>
+                <span class="n">warn_deprecation</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;The `sr` keyword argument is deprecated in favour of `preconditioner`.&quot;</span>
+                        <span class="s2">&quot;Please update your code to `SteadyState(.., precondioner=your_sr)`&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sr_restart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">preconditioner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;sr_restart only makes sense if you have a preconditioner/SR.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">preconditioner</span><span class="o">.</span><span class="n">solver_restart</span> <span class="o">=</span> <span class="n">sr_restart</span>
+                <span class="n">warn_deprecation</span><span class="p">(</span>
+                    <span class="p">(</span>
+                        <span class="s2">&quot;The `sr_restart` keyword argument is deprecated in favour of specifiying &quot;</span>
+                        <span class="s2">&quot;`solver_restart` in the constructor of the SR object.&quot;</span>
+                        <span class="s2">&quot;Please update your code to `SteadyState(.., preconditioner=nk.optimizer.SR(..., solver_restart=True/False))`&quot;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># move as kwarg once deprecations are removed</span>
+        <span class="k">if</span> <span class="n">preconditioner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">preconditioner</span> <span class="o">=</span> <span class="n">identity_preconditioner</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">variational_state</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">minimized_quantity_name</span><span class="o">=</span><span class="s2">&quot;LdagL&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_lind</span> <span class="o">=</span> <span class="n">lindbladian</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ldag_l</span> <span class="o">=</span> <span class="n">Squared</span><span class="p">(</span><span class="n">lindbladian</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">sr</span> <span class="o">=</span> <span class="n">sr</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sr_restart</span> <span class="o">=</span> <span class="n">sr_restart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preconditioner</span> <span class="o">=</span> <span class="n">preconditioner</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_dp</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_S</span> <span class="o">=</span> <span class="kc">None</span>
@@ -182,15 +217,9 @@
         <span class="c1"># Compute the local energy estimator and average Energy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loss_stats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">expect_and_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ldag_l</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">quantum_geometric_tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sr</span><span class="p">)</span>
-
-            <span class="c1"># use the previous solution as an initial guess to speed up the solution of the linear system</span>
-            <span class="n">x0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dp</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sr_restart</span> <span class="ow">is</span> <span class="kc">False</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sr_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_S</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># tree_map(lambda x, y: x if is_ccomplex(y) else x.real, self._grads, self.state.parameters)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span>
+        <span class="c1"># if it&#39;s the identity it does</span>
+        <span class="c1"># self._dp = self._loss_grad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preconditioner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span><span class="p">)</span>
 
         <span class="c1"># If parameters are real, then take only real part of the gradient (if it&#39;s complex)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dp</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_multimap</span><span class="p">(</span>
@@ -244,7 +273,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

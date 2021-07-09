@@ -3,17 +3,18 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>netket.driver.AbstractVariationalDriver &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -23,7 +24,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="netket.driver.VMC" href="netket.driver.VMC.html" />
-    <link rel="prev" title="netket.optimizer.RmsProp" href="../optim/netket.optimizer.RmsProp.html" />
+    <link rel="prev" title="netket.optimizer.solver.solve" href="../optim/netket.optimizer.solver.solve.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -111,7 +112,8 @@
   ---->
 </div>
 
-<ul class="current">
+<p class="caption"><span class="caption-text">Reference Documentation</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#installation-and-requirements">Installation and requirements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#mpi">MPI</a></li>
@@ -123,8 +125,31 @@
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#commented-example">Commented Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../whats_new.html">What’s New in v3.0</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../whats_new.html#api-changes">API Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b4-unreleased">NetKet 3.0b4 (unreleased)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#new-features">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#breaking-changes">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#internal-changes">Internal Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#bug-fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b3-published-on-9-july-2021">NetKet 3.0b3 (published on 9 july 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id1">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id2">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id3">Internal Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id4">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b2-published-on-31-may-2021">NetKet 3.0b2 (published on 31 May 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id5">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id6">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id7">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b1-published-beta-release">NetKet 3.0b1 (published beta release)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#api-changes">API Changes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../superop.html">The Lindblad Master Equation</a><ul>
@@ -148,11 +173,28 @@
 <li class="toctree-l2"><a class="reference internal" href="../../varstate.html#saving-and-loading-a-variational-state">Saving and Loading a Variational State</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../sr.html">Quantum Geometric Tensor and Stochastic Reconfiguration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../sr.html#stochastic-reconfiguration">Stochastic Reconfiguration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../sr.html#using-stochastic-reconfiguration">Using stochastic reconfiguration</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../drivers.html">The Drivers API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../drivers.html#constructing-a-driver">Constructing a driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../drivers.html#running-the-optimisation">Running the optimisation</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#parallelization">Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#running-on-cpu-when-gpus-are-present">Running on CPU when GPUs are present</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#using-gpus">Using GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#nans-in-training-and-loss-of-precision">NaNs in training and loss of precision</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Extending NetKet</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../custom_models.html">Defining Custom Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../custom_models.html#commonalities">Commonalities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../custom_models.html#defining-models-init-and-apply-functions">Defining models: init and apply functions</a></li>
@@ -163,31 +205,58 @@
 <li class="toctree-l2"><a class="reference internal" href="../../custom_models.html#using-haiku">Using Haiku</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#parallelization">Parallelization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#running-on-cpu-when-gpus-are-present">Running on CPU when GPUs are present</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#using-gpus">Using GPUs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#nans-in-training-and-loss-of-precision">NaNs in training and loss of precision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../custom_preconditioners.html">The preconditioner interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../custom_preconditioners.html#the-linearpreconditioner-interface">The LinearPreconditioner interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../custom_preconditioners.html#bare-interface">Bare interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../custom_preconditioners.html#linearoperator-interface">LinearOperator interface</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../custom_preconditioners.html#the-preconditioner-function-api">The preconditioner function API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to NetKet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#contributing-code-using-pull-requests">Contributing code using pull requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#netket-pull-request-checklist">NetKet pull request checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#single-change-commits-and-pull-requests">Single-change commits and pull requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#python-coding-style">Python coding style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#docstrings-and-type-hints">Docstrings and Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#visibility-of-public-api">Visibility of public API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#full-github-test-suite">Full GitHub test suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../writing-tests.html">Writing Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../writing-tests.html#test-structure-and-common-files">Test structure and common files.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../writing-tests.html#tests-and-mpi">Tests and MPI</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API documentation</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../../api.html">Public API: netket package</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#graph">Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.AbstractGraph.html">netket.graph.AbstractGraph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.NetworkX.html">netket.graph.NetworkX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.Graph.html">netket.graph.Graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.Edgeless.html">netket.graph.Edgeless</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.Hypercube.html">netket.graph.Hypercube</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.Lattice.html">netket.graph.Lattice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.lattice.LatticeSite.html">netket.graph.lattice.LatticeSite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.Chain.html">netket.graph.Chain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.Grid.html">netket.graph.Grid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../graph/netket.graph.SymmGroup.html">netket.graph.SymmGroup</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#hilbert">Hilbert</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.AbstractHilbert.html">netket.hilbert.AbstractHilbert</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Qubit.html">netket.hilbert.Qubit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Spin.html">netket.hilbert.Spin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.CustomHilbert.html">netket.hilbert.CustomHilbert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.DoubledHilbert.html">netket.hilbert.DoubledHilbert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Fock.html">netket.hilbert.Fock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Qubit.html">netket.hilbert.Qubit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Spin.html">netket.hilbert.Spin</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#operators">Operators</a><ul>
@@ -239,6 +308,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.MetropolisHamiltonian.html">netket.sampler.MetropolisHamiltonian</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.MetropolisLocalPt.html">netket.sampler.MetropolisLocalPt</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.MetropolisExchangePt.html">netket.sampler.MetropolisExchangePt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.ARDirectSampler.html">netket.sampler.ARDirectSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#transition-rules">Transition Rules</a><ul>
@@ -266,6 +336,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../models/netket.models.MPSPeriodic.html">netket.models.MPSPeriodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../models/netket.models.NDM.html">netket.models.NDM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../models/netket.models.GCNN.html">netket.models.GCNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/netket.models.ARNN.html">netket.models.ARNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/netket.models.ARNNDense.html">netket.models.ARNNDense</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#model-tools">Model tools</a><ul>
@@ -277,6 +349,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.DenseEquivariant.html">netket.nn.DenseEquivariant</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.Conv.html">netket.nn.Conv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.Embed.html">netket.nn.Embed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.MaskedDense1D.html">netket.nn.MaskedDense1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.MaskedConv1D.html">netket.nn.MaskedConv1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.MaskedConv2D.html">netket.nn.MaskedConv2D</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#activation-functions">Activation functions</a><ul>
@@ -292,27 +367,44 @@
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.softmax.html">netket.nn.softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.softplus.html">netket.nn.softplus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.swish.html">netket.nn.swish</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.logcosh.html">netket.nn.logcosh</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.log_cosh.html">netket.nn.log_cosh</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#variational-state-interface">Variational State Interface</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../variational/netket.variational.VariationalState.html">netket.variational.VariationalState</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../variational/netket.variational.MCState.html">netket.variational.MCState</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../variational/netket.variational.MCMixedState.html">netket.variational.MCMixedState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variational/netket.vqs.VariationalState.html">netket.vqs.VariationalState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variational/netket.vqs.MCState.html">netket.vqs.MCState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variational/netket.vqs.MCMixedState.html">netket.vqs.MCMixedState</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#optimizer">Optimizer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.SR.html">netket.optimizer.SR</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.SRLazyCG.html">netket.optimizer.SRLazyCG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.SRLazyGMRES.html">netket.optimizer.SRLazyGMRES</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.sr.LazySMatrix.html">netket.optimizer.sr.LazySMatrix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.Adam.html">netket.optimizer.Adam</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.AdaGrad.html">netket.optimizer.AdaGrad</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.Sgd.html">netket.optimizer.Sgd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.Momentum.html">netket.optimizer.Momentum</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.RmsProp.html">netket.optimizer.RmsProp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#optimizer-module">Optimizer Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#optimizers">Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.Adam.html">netket.optimizer.Adam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.AdaGrad.html">netket.optimizer.AdaGrad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.Sgd.html">netket.optimizer.Sgd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.Momentum.html">netket.optimizer.Momentum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.RmsProp.html">netket.optimizer.RmsProp</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#preconditioners">Preconditioners</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.SR.html">netket.optimizer.SR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#quantum-geometric-tensor">Quantum Geometric Tensor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTAuto.html">netket.optimizer.qgt.QGTAuto</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTOnTheFly.html">netket.optimizer.qgt.QGTOnTheFly</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTJacobianPyTree.html">netket.optimizer.qgt.QGTJacobianPyTree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTJacobianDense.html">netket.optimizer.qgt.QGTJacobianDense</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#dense-solvers">Dense solvers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.svd.html">netket.optimizer.solver.svd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.cholesky.html">netket.optimizer.solver.cholesky</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.LU.html">netket.optimizer.solver.LU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.solve.html">netket.optimizer.solver.solve</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../api.html#optimization-drivers">Optimization drivers</a><ul class="current">
@@ -347,34 +439,35 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="netket-driver-abstractvariationaldriver">
+  <section id="netket-driver-abstractvariationaldriver">
 <h1>netket.driver.AbstractVariationalDriver<a class="headerlink" href="#netket-driver-abstractvariationaldriver" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="netket.driver.AbstractVariationalDriver">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">netket.driver.</span></code><code class="sig-name descname"><span class="pre">AbstractVariationalDriver</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variational_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimized_quantity_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">netket.driver.</span></span><span class="sig-name descname"><span class="pre">AbstractVariationalDriver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variational_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimized_quantity_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
 <p>Abstract base class for NetKet Variational Monte Carlo drivers</p>
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variational_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimized_quantity_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variational_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimized_quantity_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="class-dl-groups">
 <dt>Attributes</dt><dd><dl class="py attribute">
-<dt id="netket.driver.AbstractVariationalDriver.optimizer">
-<code class="sig-name descname"><span class="pre">optimizer</span></code><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.optimizer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.optimizer">
+<span class="sig-name descname"><span class="pre">optimizer</span></span><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The optimizer used to update the parameters at every iteration.</p>
+</dd></dl>
 
 <dl class="py attribute">
-<dt id="netket.driver.AbstractVariationalDriver.state">
-<code class="sig-name descname"><span class="pre">state</span></code><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.state" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the machine that is optimized by this driver.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="netket.driver.AbstractVariationalDriver.step_count">
-<code class="sig-name descname"><span class="pre">step_count</span></code><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.step_count" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.step_count">
+<span class="sig-name descname"><span class="pre">step_count</span></span><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.step_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a monotonic integer labelling all the steps performed by this driver.
 This can be used, for example, to identify the line in a log file.</p>
 </dd></dl>
@@ -383,8 +476,8 @@ This can be used, for example, to identify the line in a log file.</p>
 </dl>
 <dl class="class-dl-groups">
 <dt>Methods</dt><dd><dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.advance">
-<code class="sig-name descname"><span class="pre">advance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.advance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.advance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.advance">
+<span class="sig-name descname"><span class="pre">advance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.advance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.advance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs <cite>steps</cite> optimization steps.</p>
 <p>steps: (Default=1) number of steps</p>
 <dl class="field-list simple">
@@ -395,8 +488,8 @@ This can be used, for example, to identify the line in a log file.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.estimate">
-<code class="sig-name descname"><span class="pre">estimate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.estimate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.estimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.estimate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return MCMC statistics for the expectation value of observables in the
 current state of the driver.</p>
 <dl class="field-list simple">
@@ -411,14 +504,14 @@ for the corresponding operators as leaves.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.info">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">info</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.info" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.info">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an info string used to print information to screen about this driver.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.iter">
-<code class="sig-name descname"><span class="pre">iter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.iter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.iter" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.iter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a generator which advances the VMC optimization, yielding
 after every <cite>step_size</cite> steps.</p>
 <dl class="field-list simple">
@@ -438,16 +531,16 @@ is advanced every turn.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.reset">
-<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.reset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets the driver.
 Concrete drivers should also call super().reset() to ensure that the step
 count is set to 0.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.run">
-<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">n_iter</span></em>, <em class="sig-param"><span class="pre">out=None</span></em>, <em class="sig-param"><span class="pre">obs=None</span></em>, <em class="sig-param"><span class="pre">show_progress=True</span></em>, <em class="sig-param"><span class="pre">save_params_every=50</span></em>, <em class="sig-param"><span class="pre">write_every=50</span></em>, <em class="sig-param"><span class="pre">step_size=1</span></em>, <em class="sig-param"><span class="pre">callback=&lt;function</span> <span class="pre">AbstractVariationalDriver.&lt;lambda&gt;&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.run" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">n_iter</span></em>, <em class="sig-param"><span class="pre">out=None</span></em>, <em class="sig-param"><span class="pre">obs=None</span></em>, <em class="sig-param"><span class="pre">show_progress=True</span></em>, <em class="sig-param"><span class="pre">save_params_every=50</span></em>, <em class="sig-param"><span class="pre">write_every=50</span></em>, <em class="sig-param"><span class="pre">step_size=1</span></em>, <em class="sig-param"><span class="pre">callback=&lt;function</span> <span class="pre">AbstractVariationalDriver.&lt;lambda&gt;&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes the Monte Carlo Variational optimization, updating the weights of the network
 stored in this driver for <cite>n_iter</cite> steps and dumping values of the observables <cite>obs</cite>
 in the output <cite>logger</cite>. If no logger is specified, creates a json file at <cite>out</cite>,
@@ -475,8 +568,8 @@ logger is provided)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.driver.AbstractVariationalDriver.update_parameters">
-<code class="sig-name descname"><span class="pre">update_parameters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.update_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.update_parameters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.driver.AbstractVariationalDriver.update_parameters">
+<span class="sig-name descname"><span class="pre">update_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/driver/abstract_variational_driver.html#AbstractVariationalDriver.update_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.driver.AbstractVariationalDriver.update_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the parameters of the machine using the optimizer in this driver</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -489,7 +582,7 @@ logger is provided)</p></li>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
     </div>
@@ -505,7 +598,7 @@ logger is provided)</p></li>
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

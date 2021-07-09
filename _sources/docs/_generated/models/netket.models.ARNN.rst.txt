@@ -1,0 +1,40 @@
+﻿netket.models.ARNN
+==================
+
+.. currentmodule:: netket.models
+
+.. autoclass:: ARNN
+   :show-inheritance:
+
+   .. automethod:: ARNN.__init__
+
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Attributes
+      .. autoattribute:: ARNN.name
+      .. autoattribute:: ARNN.parent
+      .. autoattribute:: ARNN.scope
+      .. autoattribute:: ARNN.variables
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+      .. automethod:: ARNN.apply
+      .. automethod:: ARNN.bind
+      .. automethod:: ARNN.clone
+      .. automethod:: ARNN.conditionals
+      .. automethod:: ARNN.get_variable
+      .. automethod:: ARNN.has_variable
+      .. automethod:: ARNN.init
+      .. automethod:: ARNN.init_with_output
+      .. automethod:: ARNN.is_mutable_collection
+      .. automethod:: ARNN.make_rng
+      .. automethod:: ARNN.param
+      .. automethod:: ARNN.setup
+      .. automethod:: ARNN.sow
+      .. automethod:: ARNN.variable
+
+   

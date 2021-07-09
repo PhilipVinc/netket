@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>netket.sampler.autoreg &#8212; netket v3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logonav.png"></span>
+          NetKet</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../getting_started.html">Get Started</a></li>
+                <li><a href="../../../docs/getting_started.html">Documentation</a></li>
+                <li><a href="../../../tutorials.html">Tutorials</a></li>
+                <li><a href="../../../citing.html">Citing NetKet</a></li>
+                <li><a href="../../../about.html">About</a></li>
+                <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+                <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <h1>Source code for netket.sampler.autoreg</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2021 The NetKet Authors - All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1">#    http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">netket.sampler</span> <span class="kn">import</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">SamplerState</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">struct</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PRNGKeyT</span><span class="p">,</span> <span class="n">PyTree</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
+
+
+<span class="k">def</span> <span class="nf">batch_choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Batched version of `jax.random.choice`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">      key: a PRNGKey used as the random key.</span>
+<span class="sd">      a: 1D array. Random samples are generated from its elements.</span>
+<span class="sd">      p: 2D array of shape `(batch_size, a.size)`. Each slice `p[i, :]` is</span>
+<span class="sd">        the probabilities associated with entries in `a` to generate a sample</span>
+<span class="sd">        at the index `i` of the output. Can be unnormalized.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      The generated samples as an 1D array of shape `(batch_size,)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p_cumsum</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">p_cumsum</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">*</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span> <span class="o">&gt;</span> <span class="n">p_cumsum</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">ARDirectSamplerState</span><span class="p">(</span><span class="n">SamplerState</span><span class="p">):</span>
+    <span class="n">σ</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="sd">&quot;&quot;&quot;current batch of (maybe partially sampled) configurations.&quot;&quot;&quot;</span>
+    <span class="n">cache</span><span class="p">:</span> <span class="n">PyTree</span>
+    <span class="sd">&quot;&quot;&quot;auxiliary states, e.g., used to implement fast autoregressive sampling.&quot;&quot;&quot;</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyT</span>
+    <span class="sd">&quot;&quot;&quot;state of the random number generator.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(rng state=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+
+<div class="viewcode-block" id="ARDirectSampler"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.ARDirectSampler.html#netket.sampler.ARDirectSampler">[docs]</a><span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">ARDirectSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Direct sampler for autoregressive neural networks.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_exact</span><span class="p">(</span><span class="n">sampler</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_init_cache</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">σ</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">σ</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;cache&quot;</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;cache&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cache</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">cache</span>
+
+    <span class="k">def</span> <span class="nf">_init_state</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">new_key</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">σ</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="p">)</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">_init_cache</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">σ</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ARDirectSamplerState</span><span class="p">(</span><span class="n">σ</span><span class="o">=</span><span class="n">σ</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">new_key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">_sample_chain</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">chain_length</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_sample_chain</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">chain_length</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_sample_next</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="n">σ</span><span class="p">,</span> <span class="n">new_state</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">_sample_chain</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">σ</span> <span class="o">=</span> <span class="n">σ</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">σ</span></div>
+
+
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_sample_chain</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">chain_length</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">scan_fun</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">σ</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">carry</span>
+        <span class="n">new_key</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="n">params</span><span class="p">,</span>
+            <span class="n">σ</span><span class="p">,</span>
+            <span class="n">cache</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">conditionals</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">local_states</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">local_states</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">[:,</span> <span class="n">index</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">new_σ</span> <span class="o">=</span> <span class="n">batch_choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">local_states</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">σ</span> <span class="o">=</span> <span class="n">σ</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new_σ</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">σ</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">new_key</span><span class="p">),</span> <span class="kc">None</span>
+
+    <span class="n">new_key</span><span class="p">,</span> <span class="n">key_init</span><span class="p">,</span> <span class="n">key_scan</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># We just need a buffer for `σ` before generating each sample</span>
+    <span class="c1"># The result does not depend on the initial contents in it</span>
+    <span class="n">σ</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">chain_length</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Init `cache` before generating each sample,</span>
+    <span class="c1"># even if `params` is not changed and `reset` is not called</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">_init_cache</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">σ</span><span class="p">,</span> <span class="n">key_init</span><span class="p">)</span>
+
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">σ</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">_</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span>
+        <span class="n">scan_fun</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">σ</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">key_scan</span><span class="p">),</span>
+        <span class="n">indices</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">σ</span> <span class="o">=</span> <span class="n">σ</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">chain_length</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+
+    <span class="n">new_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">σ</span><span class="o">=</span><span class="n">σ</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">new_key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">σ</span><span class="p">,</span> <span class="n">new_state</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
+    </p>
+  </div>
+</footer>
+
+<script type="text/javascript">
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+      })
+</script>
+
+<!-- Temporary footer
+<div class="footer-wip">
+  <div class="footer-wip-content">
+    This documentation refers to an unreleased version of Netket.
+  </div>
+</div>
+-->
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-118013987-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-118013987-1');
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "url": "https://www.netket.org",
+  "name": "NetKet",
+  "founder": "Giuseppe Carleo",
+  "foundingDate": "2018-04-24",
+  "foundingLocation" : "New York",
+  "logo": "https://www.netket.org/img/logo_small.jpg",
+  "sameAs": [
+    "https://twitter.com/NetKetOrg",
+    "https://github.com/NetKet/netket"
+  ],
+  "description" : "Netket is an open-source project delivering cutting-edge
+  methods for the study of many-body quantum systems with artificial neural
+  networks and machine learning techniques."
+}
+</script>
+
+  </body>
+</html>

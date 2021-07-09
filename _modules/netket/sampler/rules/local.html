@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.sampler.rules.local &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -111,10 +111,7 @@
 <span class="c1"># limitations under the License.</span>
 
 <span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">flax</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
 <span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">struct</span>
 
 <span class="kn">from</span> <span class="nn">netket.hilbert.random</span> <span class="kn">import</span> <span class="n">flip_state</span>
@@ -124,12 +121,12 @@
 
 <div class="viewcode-block" id="LocalRule"><a class="viewcode-back" href="../../../../docs/_generated/samplers/netket.sampler.rules.LocalRule.html#netket.sampler.rules.LocalRule">[docs]</a><span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span> <span class="nc">LocalRule</span><span class="p">(</span><span class="n">MetropolisRule</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A transition rule acting on the local degree of freedom.</span>
 
 <span class="sd">    This transition acts locally only on one local degree of freedom :math:`s_i`,</span>
 <span class="sd">    and proposes a new state: :math:`s_1 \dots s^\prime_i \dots s_N`,</span>
-<span class="sd">    where :math:`s^\prime_i \\neq s_i`.</span>
+<span class="sd">    where :math:`s^\prime_i \neq s_i`.</span>
 
 <span class="sd">    The transition probability associated to this</span>
 <span class="sd">    sampler can be decomposed into two steps:</span>
@@ -168,7 +165,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

@@ -3,23 +3,24 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Using a group convolutional neural network to learn the ground-state of a symmetric spin model &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../_static/js/rtd_theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -345,7 +346,7 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Using-a-group-convolutional-neural-network-to-learn-the-ground-state-of-a-symmetric-spin-model">
+<section id="Using-a-group-convolutional-neural-network-to-learn-the-ground-state-of-a-symmetric-spin-model">
 <h1>Using a group convolutional neural network to learn the ground-state of a symmetric spin model<a class="headerlink" href="#Using-a-group-convolutional-neural-network-to-learn-the-ground-state-of-a-symmetric-spin-model" title="Permalink to this headline">¶</a></h1>
 <p>The goal of this tutorial is to learn about group convolutional neural networks (G-CNNs), a useful tool for simulating lattices with high symmetry. The G-CNN is a generalization to the convolutional neural network (CNN) to non-abelian symmetry groups (groups that contain at least one pair of non-commuting elements). G-CNNs are a natural fit for lattices that have both point group and translational symmetries, as rotations, reflections and translations don’t commute with one-another.</p>
 <p>In this tutorial we will learn the ground state of the antiferromagnetic Heisenberg model on the honeycomb lattice. The Heisenberg Hamiltonian is defined as follows:</p>
@@ -354,8 +355,8 @@ div.rendered_html tbody tr:hover {
 <p>where <span class="math notranslate nohighlight">\(\vec{\sigma}_{i}\)</span> are Pauli matrices and <span class="math notranslate nohighlight">\(&lt;&gt;\)</span> denotes nearest neighbor interactons.</p>
 <p>For this tutorial, many of the calculations will be much faster on a GPU. If you don’t have access to a GPU, you can open a <a class="reference external" href="https://colab.research.google.com/">Google Colab</a> notebook, and set runtime type to GPU.</p>
 <p>This tutorial wil be split into two parts. First I’ll provide a brief introduction to G-CNNs and describe what advantages they bring. Second, we’ll use NetKet to find the ground state of the antiferromagnetic Heisenberg model on the honeycomb lattice. First we will simulate a lattice with <span class="math notranslate nohighlight">\(N=18\)</span> sites in order to compare with exact diagonalization. Then we will simulate a lattice with <span class="math notranslate nohighlight">\(N=72\)</span> sites.</p>
-</div>
-<div class="section" id="G-CNNs-are-generalizations-of-CNNs-to-non-abelian-groups">
+</section>
+<section id="G-CNNs-are-generalizations-of-CNNs-to-non-abelian-groups">
 <h1>G-CNNs are generalizations of CNNs to non-abelian groups<a class="headerlink" href="#G-CNNs-are-generalizations-of-CNNs-to-non-abelian-groups" title="Permalink to this headline">¶</a></h1>
 <p>The convolutional neural network (CNN) has revolutionized the field of computer vision. The CNN enforces translational invariance, which means that feeding a CNN translated copies of an image will produce the exact same output. This is important for recognizing objects, which may located differently in different images.</p>
 <p>The hidden layers of a CNN contain a group of <span class="math notranslate nohighlight">\({\bf features}\)</span>, corresponding to translations of the image, where each feature is represented by a vector. At each layer, the CNN integrates over these features to produce a different set of features over the translation group:</p>
@@ -390,8 +391,8 @@ import matplotlib.pyplot as plt
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="Defining-the-Hamiltonian">
+</section>
+<section id="Defining-the-Hamiltonian">
 <h1>Defining the Hamiltonian<a class="headerlink" href="#Defining-the-Hamiltonian" title="Permalink to this headline">¶</a></h1>
 <p>We begin by defining the Hamiltonian as a list of lattice points. NetKet will automatically convert these points into a graph with nearest neighbor connections. The honeycomb lattice is a triangular lattice with two sites per unit cell.</p>
 <div class="nbinput nblast docutils container">
@@ -459,8 +460,8 @@ ha = nk.operator.Heisenberg(hilbert=hi, graph=graph, sign_rule=True)
 <p>Since the Hexagonal lattice is bipartite, we know the phases obey a Marshall-Peierls sign rule. Therefore, we can use a real valued NN and just learn the amplitudes of the wavefunction.</p>
 <p>For models with a more complicated phase structure, its often better to learn the phases in an equal-amplitude configuration before training the amplitudes as detailed in <a class="reference external" href="https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.2.033075">this paper</a>. This can be implemented by first optimizing the weights on a modified model that sets <span class="math notranslate nohighlight">\(Re[log(\psi)] = 0\)</span></p>
 <p>We also optimize over states with total <span class="math notranslate nohighlight">\(S_z\)</span> of zero since we know the ground state has spin 0.</p>
-</div>
-<div class="section" id="Defining-the-GCNN">
+</section>
+<section id="Defining-the-GCNN">
 <h1>Defining the GCNN<a class="headerlink" href="#Defining-the-GCNN" title="Permalink to this headline">¶</a></h1>
 <p>We can define a GCNN with an arbitrary number of layers and specify the feature dimension of each layer accordingly:</p>
 <div class="nbinput nblast docutils container">
@@ -481,8 +482,8 @@ ma = nk.models.GCNN(symmetries = symmetries, layers = num_layers, features = fea
 </div>
 <p>This a G-CNN with four layers, where each hidden layer contains a feature vector of length 8 for each element in p6m. This means that each hidden state has <span class="math notranslate nohighlight">\(8 \times 192 = 768\)</span> nodes. This is a huge model! But since we’re not symmetry-averaging, we only need to compute one wavefunction for each <span class="math notranslate nohighlight">\({\bf \sigma}\)</span>.</p>
 <p>Feel free to try different shaped models. By default, the GCNN weights are initialized with variance scaling, which ensures that the activations will be unit-normal throughout the model at the start of training. Additionally, GCNN defaults to a SELU non-linearity, which moves the activations in the direction of unit-normal, even when they start to deviate. These features ensure that our model will behave well, even when we stack a large number of layers.</p>
-</div>
-<div class="section" id="Variational-Monte-Carlo">
+</section>
+<section id="Variational-Monte-Carlo">
 <h1>Variational Monte Carlo<a class="headerlink" href="#Variational-Monte-Carlo" title="Permalink to this headline">¶</a></h1>
 <p>In order to perform VMC we need to define a sampler and an optimizer. We sample using Metropolis-Hastings, which uses the exchange rule to propose new states. The exchange rule swaps the spin of two neighbouring sites, keeping the magnetization fixed (in this case, 0). We optimize uzing stochaistic reconfiguration, which uses curvature information to find the best direction of descent.</p>
 <div class="nbinput nblast docutils container">
@@ -601,8 +602,8 @@ gs.run(n_iter = 100,out = &#39;out&#39;)
 </pre></div></div>
 </div>
 <p>You will notice that the variance continues to get even smaller, giving evidence that we are nearing an eigenstate.</p>
-</div>
-<div class="section" id="Checking-with-ED">
+</section>
+<section id="Checking-with-ED">
 <h1>Checking with ED<a class="headerlink" href="#Checking-with-ED" title="Permalink to this headline">¶</a></h1>
 <p>It seems likely that our ground state is correct, as we approached an eigenstate with low energy, but lets be safe and check our work. We can do Lanczos diagonalization for small lattices in NetKet.</p>
 <div class="nbinput nblast docutils container">
@@ -648,8 +649,8 @@ print((ED_energy_18sites- vmc_energy_18sites)/ED_energy_18sites)
 </pre></div></div>
 </div>
 <p>Looks like our model did a good job! If you just trained for the first 100 iterations the error should be less than <span class="math notranslate nohighlight">\(10^{-4}\)</span> and if you trained with the larger batch size, the error should be close to <span class="math notranslate nohighlight">\(10^{-5}\)</span></p>
-</div>
-<div class="section" id="Simulating-A-Larger-Lattice">
+</section>
+<section id="Simulating-A-Larger-Lattice">
 <h1>Simulating A Larger Lattice<a class="headerlink" href="#Simulating-A-Larger-Lattice" title="Permalink to this headline">¶</a></h1>
 <p>Lets see how the GCNN does on a larger lattice that cannot be simulated with exact diagonalization. We’ll do a <span class="math notranslate nohighlight">\(6 \times 6\)</span> lattice which has <span class="math notranslate nohighlight">\(72\)</span> sites. We need to redefine a few things:</p>
 <div class="nbinput docutils container">
@@ -676,7 +677,7 @@ print(len(symmetries))
 #Redefine everything on bigger graph
 ma = nk.models.GCNN(symmetries = symmetries, layers = num_layers, features = feature_dims)
 sa = nk.sampler.MetropolisExchange(hilbert = hi, graph=graph, d_max=2)
-vstate = nk.variational.MCState(sampler=sa, model=ma, n_samples=100, n_discard=100)
+vstate = nk.variational.MCState(sampler=sa, model=ma, n_samples=100, n_discard_per_chain=100)
 gs = nk.driver.VMC(ha, op, sr=sr, variational_state=vstate)
 </pre></div>
 </div>
@@ -907,7 +908,7 @@ print((extrapolated_est-final_en)/extrapolated_est)
 </div>
 <p>If everything went well your error should be around .1%!</p>
 <p>This concludes the tutorial. Only an hour ago we knew nothing about the Heisenberg model on a Hexagonal lattice. Now we have an accurate approximation of the ground state wavefunction!</p>
-</div>
+</section>
 
 
     </div>
@@ -923,7 +924,7 @@ print((extrapolated_est-final_en)/extrapolated_est)
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

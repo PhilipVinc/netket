@@ -13,7 +13,7 @@
    .. rst-class:: class-dl-groups
 
    Attributes
-      .. autoattribute:: Spin.is_discrete
+      .. autoattribute:: Spin.constrained
       .. autoattribute:: Spin.is_finite
       .. autoattribute:: Spin.is_indexable
       .. autoattribute:: Spin.local_size

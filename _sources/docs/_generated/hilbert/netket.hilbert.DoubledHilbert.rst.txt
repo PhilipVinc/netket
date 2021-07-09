@@ -13,7 +13,6 @@
    .. rst-class:: class-dl-groups
 
    Attributes
-      .. autoattribute:: DoubledHilbert.is_discrete
       .. autoattribute:: DoubledHilbert.is_finite
       .. autoattribute:: DoubledHilbert.is_indexable
       .. autoattribute:: DoubledHilbert.local_size

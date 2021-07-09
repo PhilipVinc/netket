@@ -1,0 +1,44 @@
+﻿netket.nn.MaskedDense1D
+=======================
+
+.. currentmodule:: netket.nn
+
+.. autoclass:: MaskedDense1D
+   :show-inheritance:
+
+   .. automethod:: MaskedDense1D.__init__
+
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Attributes
+      .. autoattribute:: MaskedDense1D.name
+      .. autoattribute:: MaskedDense1D.parent
+      .. autoattribute:: MaskedDense1D.precision
+      .. autoattribute:: MaskedDense1D.scope
+      .. autoattribute:: MaskedDense1D.use_bias
+      .. autoattribute:: MaskedDense1D.variables
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+      .. automethod:: MaskedDense1D.__call__
+      .. automethod:: MaskedDense1D.apply
+      .. automethod:: MaskedDense1D.bias_init
+      .. automethod:: MaskedDense1D.bind
+      .. automethod:: MaskedDense1D.clone
+      .. automethod:: MaskedDense1D.get_variable
+      .. automethod:: MaskedDense1D.has_variable
+      .. automethod:: MaskedDense1D.init
+      .. automethod:: MaskedDense1D.init_with_output
+      .. automethod:: MaskedDense1D.is_mutable_collection
+      .. automethod:: MaskedDense1D.kernel_init
+      .. automethod:: MaskedDense1D.make_rng
+      .. automethod:: MaskedDense1D.param
+      .. automethod:: MaskedDense1D.setup
+      .. automethod:: MaskedDense1D.sow
+      .. automethod:: MaskedDense1D.variable
+
+   

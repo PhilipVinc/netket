@@ -1,0 +1,19 @@
+﻿netket.graph.lattice.LatticeSite
+================================
+
+.. currentmodule:: netket.graph.lattice
+
+.. autoclass:: LatticeSite
+   :show-inheritance:
+
+   .. automethod:: LatticeSite.__init__
+
+   
+      
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+
+   

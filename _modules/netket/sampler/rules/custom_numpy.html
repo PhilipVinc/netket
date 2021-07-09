@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.sampler.rules.custom_numpy &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
@@ -111,14 +111,12 @@
 <span class="c1"># limitations under the License.</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">struct</span>
 
-<span class="kn">from</span> <span class="nn">netket.legacy</span> <span class="kn">import</span> <span class="n">random</span> <span class="k">as</span> <span class="n">_random</span>
 <span class="kn">from</span> <span class="nn">netket.operator</span> <span class="kn">import</span> <span class="n">AbstractOperator</span>
 
 
@@ -141,10 +139,10 @@
         <span class="c1"># Raise errors if hilbert is not an Hilbert</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span> <span class="n">AbstractOperator</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Argument to CustomRuleNumpy must be a valid operator.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="nb">type</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;Argument to CustomRuleNumpy must be a valid operator, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;but operator is a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
+
         <span class="n">_check_operators</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="o">.</span><span class="n">operators</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -173,9 +171,15 @@
 <div class="viewcode-block" id="CustomRuleNumpy.transition"><a class="viewcode-back" href="../../../../docs/_generated/samplers/netket.sampler.rules.CustomRuleNumpy.html#netket.sampler.rules.CustomRuleNumpy.transition">[docs]</a>    <span class="k">def</span> <span class="nf">transition</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">σ</span><span class="p">):</span>
         <span class="n">rule_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">rule_state</span>
 
+        <span class="c1"># numba does not support jitting np.random number generators</span>
+        <span class="c1"># so we have to generate the random numbers outside the jit</span>
+        <span class="c1"># block</span>
+        <span class="n">rnd_uniform</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">σ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="n">_pick_random_and_init</span><span class="p">(</span>
             <span class="n">σ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
             <span class="n">rule_state</span><span class="o">.</span><span class="n">weight_cumsum</span><span class="p">,</span>
+            <span class="n">rnd_uniform</span><span class="o">=</span><span class="n">rnd_uniform</span><span class="p">,</span>
             <span class="n">out</span><span class="o">=</span><span class="n">rule_state</span><span class="o">.</span><span class="n">rand_op_n</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -183,25 +187,35 @@
             <span class="n">state</span><span class="o">.</span><span class="n">σ</span><span class="p">,</span> <span class="n">rule_state</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="n">rule_state</span><span class="o">.</span><span class="n">rand_op_n</span>
         <span class="p">)</span>
 
+        <span class="c1"># numba does not support jitting np.random number generators</span>
+        <span class="c1"># so we have to generate the random numbers outside the jit</span>
+        <span class="c1"># block</span>
+        <span class="n">rnd_uniform</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">σ1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="n">_choose_and_return</span><span class="p">(</span>
-            <span class="n">state</span><span class="o">.</span><span class="n">σ1</span><span class="p">,</span> <span class="n">σ_conns</span><span class="p">,</span> <span class="n">mels</span><span class="p">,</span> <span class="n">rule_state</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">log_prob_corr</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">σ1</span><span class="p">,</span>
+            <span class="n">σ_conns</span><span class="p">,</span>
+            <span class="n">mels</span><span class="p">,</span>
+            <span class="n">rule_state</span><span class="o">.</span><span class="n">sections</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">log_prob_corr</span><span class="p">,</span>
+            <span class="n">rnd_uniform</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
 <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_pick_random_and_init</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">move_cumulative</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_pick_random_and_init</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">move_cumulative</span><span class="p">,</span> <span class="n">rnd_uniform</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">_random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">rnd_uniform</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">move_cumulative</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
 
     <span class="c1"># return out</span>
 
 
 <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_choose_and_return</span><span class="p">(</span><span class="n">σp</span><span class="p">,</span> <span class="n">x_prime</span><span class="p">,</span> <span class="n">mels</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">log_prob_corr</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_choose_and_return</span><span class="p">(</span><span class="n">σp</span><span class="p">,</span> <span class="n">x_prime</span><span class="p">,</span> <span class="n">mels</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">log_prob_corr</span><span class="p">,</span> <span class="n">rnd_uniform</span><span class="p">):</span>
     <span class="n">low</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">σp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">_random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">rnd_uniform</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="n">exit_state</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">cumulative_prob</span> <span class="o">=</span> <span class="n">mels</span><span class="p">[</span><span class="n">low</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
         <span class="k">while</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">cumulative_prob</span><span class="p">:</span>
@@ -235,7 +249,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

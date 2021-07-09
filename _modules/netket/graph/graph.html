@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.graph.graph &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,181 +110,195 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">_nx</span>
+<span class="kn">import</span> <span class="nn">igraph</span>
 
-<span class="kn">from</span> <span class="nn">netket.utils.semigroup</span> <span class="kn">import</span> <span class="n">Permutation</span>
+<span class="kn">from</span> <span class="nn">netket.utils.deprecation</span> <span class="kn">import</span> <span class="n">warn_deprecation</span>
+<span class="kn">from</span> <span class="nn">netket.utils.group</span> <span class="kn">import</span> <span class="n">Permutation</span><span class="p">,</span> <span class="n">PermutationGroup</span>
+<span class="kn">from</span> <span class="nn">.abstract_graph</span> <span class="kn">import</span> <span class="n">AbstractGraph</span><span class="p">,</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">ColoredEdge</span><span class="p">,</span> <span class="n">EdgeSequence</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_graph</span> <span class="kn">import</span> <span class="n">AbstractGraph</span>
-<span class="kn">from</span> <span class="nn">.symmetry</span> <span class="kn">import</span> <span class="n">SymmGroup</span>
 
+<div class="viewcode-block" id="Graph"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph">[docs]</a><span class="k">class</span> <span class="nc">Graph</span><span class="p">(</span><span class="n">AbstractGraph</span><span class="p">):</span>
+    <span class="c1"># Initialization</span>
+    <span class="c1"># ------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Graph.__init__"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">edges</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ColoredEdge</span><span class="p">]],</span>
+        <span class="n">n_nodes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">edges</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_nodes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n_nodes</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_nodes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">igraph</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">colors</span><span class="p">})</span>
 
-<div class="viewcode-block" id="NetworkX"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX">[docs]</a><span class="k">class</span> <span class="nc">NetworkX</span><span class="p">(</span><span class="n">AbstractGraph</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Wrapper for a networkx graph&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span> <span class="o">=</span> <span class="n">graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="NetworkX.__init__"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">_nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a netket graph from a networkx graph.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_clean_edges</span><span class="p">(</span><span class="n">edges</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate and normalize edges argument.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;edges must be a sequence.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">edges</span><span class="p">,</span> <span class="p">[]</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            graph: A networkx graph (might be a :class:`networkx.Graph` or a :class:`networkx.MultiGraph`)</span>
+        <span class="n">e0</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e0</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Edges must be tuple of length 2 (or 3 for colored edges).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either all or none of the edges need to specify a color.&quot;</span><span class="p">)</span>
 
-<span class="sd">        Examples:</span>
-
-<span class="sd">            A graph of nodes [0,1,2] with edges [(0,1), (0,2), (1,2)]</span>
-
-<span class="sd">            &gt;&gt;&gt; import netket</span>
-<span class="sd">            &gt;&gt;&gt; import networkx</span>
-<span class="sd">            &gt;&gt;&gt; nx_g = networkx.Graph([(0,1), (0,2), (1,2)])</span>
-<span class="sd">            &gt;&gt;&gt; nk_g = netket.graph.NetworkX(nx_g)</span>
-<span class="sd">            &gt;&gt;&gt; print(nk_g.n_nodes)</span>
-<span class="sd">            3</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">_nx</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">)</span>
-            <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">_nx</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">multigraph</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;graph must be a networx Graph or MultiGraph&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">graph</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">_nx</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">edges</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">],</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
 
+    <span class="c1"># Conversion</span>
+    <span class="c1"># ------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Graph.from_igraph"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.from_igraph">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_igraph</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">igraph</span><span class="o">.</span><span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Graph&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new Graph instance from an igraph.Graph instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">graph</span><span class="o">.</span><span class="n">is_directed</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Directed graphs are not currently supported.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="s2">&quot;color&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">edge_attributes</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">es</span><span class="o">.</span><span class="n">set_attribute_values</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">ecount</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_colors</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;graph has &#39;color&#39; edge attributes, but not all colors are integers.&quot;</span>
+                <span class="p">)</span>
 
-<div class="viewcode-block" id="NetworkX.adjacency_list"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.adjacency_list">[docs]</a>    <span class="k">def</span> <span class="nf">adjacency_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="NetworkX.is_connected"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_nx</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Graph.from_networkx"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.from_networkx">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_networkx</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Graph&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new Graph instance from a networkx graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ig</span> <span class="o">=</span> <span class="n">igraph</span><span class="o">.</span><span class="n">Graph</span><span class="o">.</span><span class="n">from_networkx</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_igraph</span><span class="p">(</span><span class="n">ig</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NetworkX.nodes"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.nodes">[docs]</a>    <span class="k">def</span> <span class="nf">nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">()</span></div>
+<div class="viewcode-block" id="Graph.to_igraph"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.to_igraph">[docs]</a>    <span class="k">def</span> <span class="nf">to_igraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a copy of this graph as an igraph.Graph instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="NetworkX.edges"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.edges">[docs]</a>    <span class="k">def</span> <span class="nf">edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;color&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">((</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;color&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">color</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># color is False</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span></div>
+<div class="viewcode-block" id="Graph.to_networkx"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.to_networkx">[docs]</a>    <span class="k">def</span> <span class="nf">to_networkx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a copy of this graph as an igraph.Graph instance.</span>
+<span class="sd">        This method requires networkx to be installed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">to_networkx</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="NetworkX.distances"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.distances">[docs]</a>    <span class="k">def</span> <span class="nf">distances</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="n">_nx</span><span class="o">.</span><span class="n">floyd_warshall_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+    <span class="c1"># Graph properties</span>
+    <span class="c1"># ------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Graph.adjacency_list"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.adjacency_list">[docs]</a>    <span class="k">def</span> <span class="nf">adjacency_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">get_adjlist</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="NetworkX.is_bipartite"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.is_bipartite">[docs]</a>    <span class="k">def</span> <span class="nf">is_bipartite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_nx</span><span class="o">.</span><span class="n">is_bipartite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Graph.is_connected"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.is_connected">[docs]</a>    <span class="k">def</span> <span class="nf">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">is_connected</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Graph.is_bipartite"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.is_bipartite">[docs]</a>    <span class="k">def</span> <span class="nf">is_bipartite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">is_bipartite</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The number of nodes (or vertices) in the graph&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The number of edges in the graph.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">ecount</span><span class="p">()</span>
 
-<div class="viewcode-block" id="NetworkX.automorphisms"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.NetworkX.html#netket.graph.NetworkX.automorphisms">[docs]</a>    <span class="k">def</span> <span class="nf">automorphisms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SymmGroup</span><span class="p">:</span>
-        <span class="c1"># TODO: check how to compute these when we have a coloured graph where there could</span>
-        <span class="c1">#       be a duplicated edge with two different colors.</span>
+<div class="viewcode-block" id="Graph.nodes"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.nodes">[docs]</a>    <span class="k">def</span> <span class="nf">nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">vcount</span><span class="p">())</span></div>
 
-        <span class="c1"># For the moment, if there are colors, the method returns a NotImplementedError:</span>
-        <span class="n">colors</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;automorphisms is not yet implemented for colored edges&quot;</span>
+<div class="viewcode-block" id="Graph.edges"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.edges">[docs]</a>    <span class="k">def</span> <span class="nf">edges</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">return_color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">filter_color</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EdgeSequence</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn_deprecation</span><span class="p">(</span>
+                <span class="s2">&quot;The color option has been split into return_color and filter_color.&quot;</span>
             <span class="p">)</span>
+            <span class="c1"># need to check for bool first, because bool is a subclass of int</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+                <span class="n">return_color</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">filter_color</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Incorrect type for &#39;color&#39;&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_color</span> <span class="ow">and</span> <span class="n">filter_color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">get_edgelist</span><span class="p">()</span>
+
+        <span class="n">edges_with_color</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">get_edgelist</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filter_color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edges_with_color</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">filter_color</span><span class="p">,</span> <span class="n">edges_with_color</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_color</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="o">*</span><span class="n">e</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges_with_color</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">aux_graph</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-            <span class="n">aux_graph</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span>
-            <span class="n">aux_graph</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">())</span>
-            <span class="n">ismags</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">isomorphism</span><span class="o">.</span><span class="n">GraphMatcher</span><span class="p">(</span><span class="n">aux_graph</span><span class="p">,</span> <span class="n">aux_graph</span><span class="p">)</span>
-            <span class="n">_automorphisms</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">Permutation</span><span class="p">([</span><span class="n">iso</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">aux_graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">()])</span>
-                <span class="k">for</span> <span class="n">iso</span> <span class="ow">in</span> <span class="n">ismags</span><span class="o">.</span><span class="n">isomorphisms_iter</span><span class="p">()</span>
-            <span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span> <span class="o">=</span> <span class="n">SymmGroup</span><span class="p">(</span><span class="n">_automorphisms</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span></div>
+            <span class="k">return</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges_with_color</span><span class="p">]</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">edge_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edges</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">es</span><span class="o">.</span><span class="n">get_attribute_values</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="c1"># Graph algorithms</span>
+    <span class="c1"># ------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Graph.distances"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.distances">[docs]</a>    <span class="k">def</span> <span class="nf">distances</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">shortest_paths</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_automorphisms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the graph autmorphisms of this graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_colors</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_igraph</span><span class="o">.</span><span class="n">get_isomorphisms_vf2</span><span class="p">(</span>
+            <span class="n">edge_color1</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edge_color2</span><span class="o">=</span><span class="n">colors</span>
+        <span class="p">)</span>
+
+        <span class="c1"># sort them s.t. the identity comes first</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">PermutationGroup</span><span class="p">([</span><span class="n">Permutation</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="c1"># TODO turn into a struct.property_cached?</span>
+<div class="viewcode-block" id="Graph.automorphisms"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Graph.html#netket.graph.Graph.automorphisms">[docs]</a>    <span class="k">def</span> <span class="nf">automorphisms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PermutationGroup</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_automorphisms</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_automorphisms</span></div>
+
+    <span class="c1"># Output and drawing</span>
+    <span class="c1"># ------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(n_nodes=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(n_nodes=</span><span class="si">{}</span><span class="s2">, n_edges=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_edges</span>
         <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">Graph</span><span class="p">(</span><span class="n">nodes</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">edges</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">NetworkX</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Constructs a Graph given a list of nodes and edges.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        nodes: A list of ints that index nodes of a graph</span>
-<span class="sd">        edges: A list of 2- or 3-tuples that denote an edge with an optional color</span>
-
-<span class="sd">    The Graph can be constructed specifying only the edges and the nodes will be deduced from the edges.</span>
-
-<span class="sd">    Examples:</span>
-<span class="sd">        A 10-site one-dimensional lattice with periodic boundary conditions can be</span>
-<span class="sd">        constructed specifying the edges as follows:</span>
-
-<span class="sd">        &gt;&gt;&gt; import netket</span>
-<span class="sd">        &gt;&gt;&gt; g=netket.graph.Graph(edges=[[i, (i + 1) % 10] for i in range(10)])</span>
-<span class="sd">        &gt;&gt;&gt; print(g.n_nodes)</span>
-<span class="sd">        10</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;nodes must be a list&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;edges must be a list&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">edges</span><span class="p">:</span>
-        <span class="n">type_condition</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span>
-        <span class="p">]</span>
-        <span class="k">if</span> <span class="kc">False</span> <span class="ow">in</span> <span class="n">type_condition</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;edges must be a list of lists or tuples&quot;</span><span class="p">)</span>
-
-        <span class="n">edges_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">edges_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;edges must be a list of lists or tuples of the same length (2 or 3)&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">edges_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">edges_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;edges must be a list of lists or tuples of the same length (2 or 3), where the third column indicates the color&quot;</span>
-            <span class="p">)</span>
-
-        <span class="c1"># Sort node names for ordering reasons:</span>
-    <span class="k">if</span> <span class="n">nodes</span><span class="p">:</span>
-        <span class="n">node_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">edges</span><span class="p">:</span>
-        <span class="n">node_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">((</span><span class="n">node</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges_array</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">edge</span><span class="p">)))</span>
-
-    <span class="n">graph</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">node_names</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">edges</span><span class="p">:</span>
-        <span class="n">graph</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">edges_array</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">edges_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># edges with color</span>
-            <span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e</span><span class="p">):</span> <span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">}</span>
-            <span class="n">_nx</span><span class="o">.</span><span class="n">set_edge_attributes</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;color&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># only one color</span>
-            <span class="n">_nx</span><span class="o">.</span><span class="n">set_edge_attributes</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;color&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">NetworkX</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="Edgeless"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Edgeless.html#netket.graph.Edgeless">[docs]</a><span class="k">def</span> <span class="nf">Edgeless</span><span class="p">(</span><span class="n">nodes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NetworkX</span><span class="p">:</span>
+<div class="viewcode-block" id="Edgeless"><a class="viewcode-back" href="../../../docs/_generated/graph/netket.graph.Edgeless.html#netket.graph.Edgeless">[docs]</a><span class="k">def</span> <span class="nf">Edgeless</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct a set graph (collection of unconnected vertices).</span>
 
@@ -299,23 +313,16 @@
 <span class="sd">        &gt;&gt;&gt; print(g.n_edges)</span>
 <span class="sd">        0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;nodes must be either an integer or a list&quot;</span><span class="p">)</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-
-    <span class="n">edgelessgraph</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
-    <span class="n">edgelessgraph</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">NetworkX</span><span class="p">(</span><span class="n">edgelessgraph</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">Graph</span><span class="p">([],</span> <span class="n">n_nodes</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">DoubledGraph</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">AbstractGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NetworkX</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">DoubledGraph</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">AbstractGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DoubledGraph(graph)</span>
 
-<span class="sd">    Constructs a DoubledGraph representing the doubled hilbert space of a density operator.</span>
-<span class="sd">    The resulting graph is composed of two disjoint sub-graphs identical to the input.</span>
+<span class="sd">    Constructs a DoubledGraph representing the doubled hilbert space of a density</span>
+<span class="sd">    operator. The resulting graph is composed of two disjoint sub-graphs identical</span>
+<span class="sd">    to the input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        graph: The graph to double</span>
@@ -324,26 +331,17 @@
     <span class="n">dedges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">())</span>
     <span class="n">n_v</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">n_nodes</span>
 
-    <span class="n">dnodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_v</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">n_v</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_v</span><span class="p">)]</span>
-
+    <span class="n">dnodes</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_v</span>
     <span class="n">dedges</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">n_v</span><span class="p">,</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">n_v</span><span class="p">)</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">()]</span>
 
-    <span class="k">return</span> <span class="n">Graph</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">dnodes</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="n">dedges</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Graph</span><span class="p">(</span><span class="n">n_nodes</span><span class="o">=</span><span class="n">dnodes</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="n">dedges</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">disjoint_union</span><span class="p">(</span><span class="n">graph_1</span><span class="p">:</span> <span class="n">NetworkX</span><span class="p">,</span> <span class="n">graph_2</span><span class="p">:</span> <span class="n">NetworkX</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NetworkX</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">disjoint_union</span><span class="p">(</span><span class="n">graph_1</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">graph_2</span><span class="p">:</span> <span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    disjoint_union(graph_1, graph_2)</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        graph_1: a NetworkX graph</span>
-<span class="sd">        graph_2: a NetworkX graph</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        The Disjoint union of the two graphs. See NetworkX documentation for more informations.</span>
+<span class="sd">    Returns the disjoint union of two graphs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">union_graph</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">disjoint_union</span><span class="p">(</span><span class="n">graph_1</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">graph_2</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">NetworkX</span><span class="p">(</span><span class="n">union_graph</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Graph</span><span class="o">.</span><span class="n">from_igraph</span><span class="p">(</span><span class="n">igraph</span><span class="o">.</span><span class="n">disjoint_union</span><span class="p">([</span><span class="n">graph_1</span><span class="o">.</span><span class="n">_igraph</span><span class="p">,</span> <span class="n">graph_2</span><span class="o">.</span><span class="n">_igraph</span><span class="p">]))</span>
 </pre></div>
 
     </div>
@@ -359,7 +357,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

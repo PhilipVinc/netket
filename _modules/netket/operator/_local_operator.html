@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.operator._local_operator &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -111,20 +111,17 @@
 <span class="c1"># limitations under the License.</span>
 
 <span class="kn">import</span> <span class="nn">numbers</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Array</span>
 <span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
 
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
-
 <span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span><span class="p">,</span> <span class="n">Fock</span>
 
 <span class="kn">from</span> <span class="nn">._abstract_operator</span> <span class="kn">import</span> <span class="n">AbstractOperator</span>
-<span class="kn">from</span> <span class="nn">._lazy</span> <span class="kn">import</span> <span class="n">Transpose</span><span class="p">,</span> <span class="n">Adjoint</span><span class="p">,</span> <span class="n">Squared</span>
+<span class="kn">from</span> <span class="nn">._lazy</span> <span class="kn">import</span> <span class="n">Transpose</span>
 
 
 <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -258,8 +255,6 @@
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">acting_on_sorted</span> <span class="o">==</span> <span class="n">acting_on</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">mat</span><span class="p">,</span> <span class="n">acting_on</span>
 
-    <span class="n">acting_on_sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">acting_on</span><span class="p">)</span>
-
     <span class="c1"># could write custom binary &lt;-&gt; int logic instead of using Fock...</span>
     <span class="c1"># Since i need to work with bit-strings (where instead of bits i</span>
     <span class="c1"># have integers, in order to support arbitrary size spaces) this</span>
@@ -321,7 +316,7 @@
 
 <span class="sd">           &gt;&gt;&gt; from netket.hilbert import CustomHilbert</span>
 <span class="sd">           &gt;&gt;&gt; from netket.operator import LocalOperator</span>
-<span class="sd">           &gt;&gt;&gt; hi = CustomHilbert(local_states=[1, -1])**20</span>
+<span class="sd">           &gt;&gt;&gt; hi = CustomHilbert(local_states=[-1, 1])**20</span>
 <span class="sd">           &gt;&gt;&gt; empty_hat = LocalOperator(hi)</span>
 <span class="sd">           &gt;&gt;&gt; print(len(empty_hat.acting_on))</span>
 <span class="sd">           0</span>
@@ -689,7 +684,7 @@
 
         <span class="k">if</span> <span class="n">operator</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">n_local_states_per_site</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">r</span><span class="sd">&quot;&quot;&quot;the given operator matrix has shape={} and acts on </span>
+                <span class="sa">r</span><span class="sd">&quot;&quot;&quot;the given operator matrix has shape={} and acts on</span>
 <span class="sd">                    the sites={}, which have a local hilbert space size of</span>
 <span class="sd">                    sizes={} giving an expected shape</span>
 <span class="sd">                    for the operator expected_shape={}.&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -713,7 +708,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_acting_on</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">acting_size</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span>
             <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acting_on</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">acting_size</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="n">InvalidInputError</span><span class="p">(</span><span class="s2">&quot;Operator acts on an invalid set of sites&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Operator acts on an invalid set of sites&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_local_states</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_local_states</span><span class="p">,</span>
@@ -957,7 +952,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_conn_flattened_kernel</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
             <span class="n">sections</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_local_states</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_basis</span><span class="p">,</span>
@@ -1254,7 +1249,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

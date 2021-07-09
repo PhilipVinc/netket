@@ -1,0 +1,20 @@
+﻿netket.optimizer.qgt.QGTAuto
+============================
+
+.. currentmodule:: netket.optimizer.qgt
+
+.. autoclass:: QGTAuto
+   :show-inheritance:
+
+   .. automethod:: QGTAuto.__init__
+
+   
+      
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+      .. automethod:: QGTAuto.__call__
+
+   

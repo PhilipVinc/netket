@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.sampler.metropolis_pt &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,8 +110,6 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
-
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -119,16 +117,22 @@
 <span class="kn">import</span> <span class="nn">jax</span>
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
 <span class="kn">from</span> <span class="nn">jax.experimental</span> <span class="kn">import</span> <span class="n">loops</span>
-<span class="kn">from</span> <span class="nn">jax.experimental</span> <span class="kn">import</span> <span class="n">host_callback</span> <span class="k">as</span> <span class="n">hcb</span>
-
-<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">struct</span>
 
 <span class="kn">from</span> <span class="nn">netket</span> <span class="kn">import</span> <span class="n">config</span>
-<span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
 <span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">PRNGKeyT</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">struct</span>
 
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">SamplerState</span>
-<span class="kn">from</span> <span class="nn">.metropolis</span> <span class="kn">import</span> <span class="n">MetropolisSamplerState</span><span class="p">,</span> <span class="n">MetropolisSampler</span><span class="p">,</span> <span class="n">MetropolisRule</span>
+<span class="c1"># for deprecations</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">wraps_legacy</span>
+<span class="kn">from</span> <span class="nn">netket.legacy.machine</span> <span class="kn">import</span> <span class="n">AbstractMachine</span>
+<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MetropolisLocalPt</span> <span class="k">as</span> <span class="n">LegacyMetropolisLocalPt</span><span class="p">,</span>
+    <span class="n">MetropolisExchangePt</span> <span class="k">as</span> <span class="n">LegacyMetropolisExchangePt</span><span class="p">,</span>
+    <span class="n">MetropolisHamiltonianPt</span> <span class="k">as</span> <span class="n">LegacyMetropolisHamiltonianPt</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">.metropolis</span> <span class="kn">import</span> <span class="n">MetropolisSamplerState</span><span class="p">,</span> <span class="n">MetropolisSampler</span>
 
 
 <span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
@@ -145,7 +149,7 @@
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">acc_string</span> <span class="o">=</span> <span class="s2">&quot;# accepted = </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">%), &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptance_ratio</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptance</span> <span class="o">*</span> <span class="mi">100</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">acc_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -162,7 +166,36 @@
         <span class="k">return</span> <span class="n">text</span>
 
 
-<div class="viewcode-block" id="MetropolisPtSampler"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisPtSampler.html#netket.sampler.MetropolisPtSampler">[docs]</a><span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="n">_init_doc</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">``MetropolisSampler`` is a generic Metropolis-Hastings sampler using</span>
+<span class="s2">a transition rule to perform moves in the Markov Chain.</span>
+<span class="s2">The transition kernel is used to generate</span>
+<span class="s2">a proposed state :math:`s^\prime`, starting from the current state :math:`s`.</span>
+<span class="s2">The move is accepted with probability</span>
+
+<span class="s2">.. math::</span>
+<span class="s2">    A(s\rightarrow s^\prime) = \mathrm</span><span class="si">{min}</span><span class="s2">\left (1,\frac{P(s^\prime)}{P(s)} F(e^{L(s,s^\prime)})\right),</span>
+
+<span class="s2">where the probability being sampled from is :math:`P(s)=|M(s)|^p. Here ::math::`M(s)` is a</span>
+<span class="s2">user-provided function (the machine), :math:`p` is also user-provided with default value :math:`p=2`,</span>
+<span class="s2">and :math:`L(s,s^\prime)` is a suitable correcting factor computed by the transition kernel.</span>
+
+
+<span class="s2">Args:</span>
+<span class="s2">    hilbert: The hilbert space to sample</span>
+<span class="s2">    rule: A `MetropolisRule` to generate random transitions from a given state as</span>
+<span class="s2">            well as uniform random states.</span>
+<span class="s2">    n_chains: The number of Markov Chain to be run in parallel on a single process.</span>
+<span class="s2">    n_sweeps: The number of exchanges that compose a single sweep.</span>
+<span class="s2">            If None, sweep_size is equal to the number of degrees of freedom being sampled</span>
+<span class="s2">            (the size of the input vector s to the machine).</span>
+<span class="s2">    n_chains: The number of batches of the states to sample (default = 8)</span>
+<span class="s2">    machine_pow: The power to which the machine should be exponentiated to generate the pdf (default = 2).</span>
+<span class="s2">    dtype: The dtype of the statees sampled (default = np.float32).</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="MetropolisPtSampler"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisPtSampler.html#netket.sampler.MetropolisPtSampler">[docs]</a><span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">init_doc</span><span class="o">=</span><span class="n">_init_doc</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">MetropolisPtSampler</span><span class="p">(</span><span class="n">MetropolisSampler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Metropolis-Hastings with Parallel Tempering sampler.</span>
@@ -175,58 +208,18 @@
     <span class="n">n_replicas</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">pytree_node</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;The number of replicas&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MetropolisPtSampler.__init__"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisPtSampler.html#netket.sampler.MetropolisPtSampler.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span>
-        <span class="n">rule</span><span class="p">:</span> <span class="n">MetropolisRule</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">n_replicas</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ``MetropolisSampler`` is a generic Metropolis-Hastings sampler using</span>
-<span class="sd">        a transition rule to perform moves in the Markov Chain.</span>
-<span class="sd">        The transition kernel is used to generate</span>
-<span class="sd">        a proposed state :math:`s^\prime`, starting from the current state :math:`s`.</span>
-<span class="sd">        The move is accepted with probability</span>
-
-<span class="sd">        .. math::</span>
-<span class="sd">            A(s\\rightarrow s^\\prime) = \\mathrm{min}\\left (1,\\frac{P(s^\\prime)}{P(s)} F(e^{L(s,s^\\prime)})\\right),</span>
-
-<span class="sd">        where the probability being sampled from is :math:`P(s)=|M(s)|^p. Here ::math::`M(s)` is a</span>
-<span class="sd">        user-provided function (the machine), :math:`p` is also user-provided with default value :math:`p=2`,</span>
-<span class="sd">        and :math:`L(s,s^\\prime)` is a suitable correcting factor computed by the transition kernel.</span>
-
-
-<span class="sd">        Args:</span>
-<span class="sd">            hilbert: The hilbert space to sample</span>
-<span class="sd">            rule: A `MetropolisRule` to generate random transitions from a given state as</span>
-<span class="sd">                    well as uniform random states.</span>
-<span class="sd">            n_chains: The number of Markov Chain to be run in parallel on a single process.</span>
-<span class="sd">            n_sweeps: The number of exchanges that compose a single sweep.</span>
-<span class="sd">                    If None, sweep_size is equal to the number of degrees of freedom being sampled</span>
-<span class="sd">                    (the size of the input vector s to the machine).</span>
-<span class="sd">            n_chains: The number of batches of the states to sample (default = 8)</span>
-<span class="sd">            machine_pow: The power to which the machine should be exponentiated to generate the pdf (default = 2).</span>
-<span class="sd">            dtype: The dtype of the statees sampled (default = np.float32).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">FLAGS</span><span class="p">[</span><span class="s2">&quot;NETKET_EXPERIMENTAL&quot;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">                               Parallel Tempering samplers are under development and</span>
 <span class="sd">                               are known not to work.</span>
-<span class="sd">                               </span>
+
 <span class="sd">                               If you want to debug it, set the environment variable</span>
 <span class="sd">                               NETKET_EXPERIMENTAL=1</span>
 <span class="sd">                               &quot;&quot;&quot;</span>
             <span class="p">)</span>
 
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_replicas&quot;</span><span class="p">,</span> <span class="n">n_replicas</span><span class="p">)</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_replicas</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
@@ -309,7 +302,7 @@
         <span class="k">with</span> <span class="n">loops</span><span class="o">.</span><span class="n">Scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">rng</span>
             <span class="n">s</span><span class="o">.</span><span class="n">σ</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">log_prob</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">log_prob</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
             <span class="n">s</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">beta</span>
 
             <span class="c1"># for logging</span>
@@ -336,7 +329,9 @@
                 <span class="n">σp</span><span class="p">,</span> <span class="n">log_prob_correction</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span>
                     <span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">key1</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">σ</span>
                 <span class="p">)</span>
-                <span class="n">proposal_log_prob</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">σp</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+                <span class="n">proposal_log_prob</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">σp</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+                <span class="p">)</span>
 
                 <span class="n">uniform</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key2</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_batches</span><span class="p">,))</span>
                 <span class="k">if</span> <span class="n">log_prob_correction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -368,7 +363,7 @@
                     <span class="n">maxval</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                     <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,),</span>
                 <span class="p">)</span>  <span class="c1"># 0 or 1</span>
-                <span class="n">iswap_order</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">swap_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1">#  1 or 0</span>
+                <span class="c1"># iswap_order = jnp.mod(swap_order + 1, 2)  #  1 or 0</span>
 
                 <span class="c1"># indices of even swapped elements (per-row)</span>
                 <span class="n">idxs</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_replicas</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
@@ -420,7 +415,8 @@
 
                 <span class="n">do_swap</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">do_swap</span><span class="p">,</span> <span class="n">do_swap</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                     <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_replicas</span><span class="p">)</span>
-                <span class="p">)</span>  <span class="c1">#  concat along last dimension</span>
+                <span class="p">)</span>  <span class="c1"># concat along last dimension</span>
+
                 <span class="c1"># roll if swap_ordeer is odd</span>
                 <span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">out_axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="k">def</span> <span class="nf">fix_swap</span><span class="p">(</span><span class="n">do_swap</span><span class="p">,</span> <span class="n">swap_order</span><span class="p">):</span>
@@ -432,7 +428,7 @@
                 <span class="c1"># jax.experimental.host_callback.id_print(state.beta)</span>
                 <span class="c1"># jax.experimental.host_callback.id_print(proposed_beta)</span>
 
-                <span class="n">new_beta</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">do_swap</span><span class="p">,</span> <span class="n">proposed_beta</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+                <span class="c1"># new_beta = jax.numpy.where(do_swap, proposed_beta, beta)</span>
 
                 <span class="k">def</span> <span class="nf">cb</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
                     <span class="n">_bt</span><span class="p">,</span> <span class="n">_pbt</span><span class="p">,</span> <span class="n">new_beta</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">do_swap</span><span class="p">,</span> <span class="n">log_prob</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="n">data</span>
@@ -536,21 +532,14 @@
         <span class="p">)</span></div>
 
 
-<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">wraps_legacy</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.machine</span> <span class="kn">import</span> <span class="n">AbstractMachine</span>
-
-<span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">LocalRule</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="n">MetropolisLocalPt</span> <span class="k">as</span> <span class="n">LegacyMetropolisLocalPt</span>
-
-
 <div class="viewcode-block" id="MetropolisLocalPt"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisLocalPt.html#netket.sampler.MetropolisLocalPt">[docs]</a><span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">LegacyMetropolisLocalPt</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">MetropolisLocalPt</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sampler acting on one local degree of freedom.</span>
 
 <span class="sd">    This sampler acts locally only on one local degree of freedom :math:`s_i`,</span>
 <span class="sd">    and proposes a new state: :math:`s_1 \dots s^\prime_i \dots s_N`,</span>
-<span class="sd">    where :math:`s^\prime_i \\neq s_i`.</span>
+<span class="sd">    where :math:`s^\prime_i \neq s_i`.</span>
 
 <span class="sd">    The transition probability associated to this</span>
 <span class="sd">    sampler can be decomposed into two steps:</span>
@@ -580,11 +569,9 @@
 <span class="sd">        machine_pow: The power to which the machine should be exponentiated to generate the pdf (default = 2).</span>
 <span class="sd">        dtype: The dtype of the statees sampled (default = np.float32).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">LocalRule</span>
+
     <span class="k">return</span> <span class="n">MetropolisPtSampler</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">LocalRule</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">ExchangeRule</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="n">MetropolisExchangePt</span> <span class="k">as</span> <span class="n">LegacyMetropolisExchangePt</span>
 
 
 <div class="viewcode-block" id="MetropolisExchangePt"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisExchangePt.html#netket.sampler.MetropolisExchangePt">[docs]</a><span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">LegacyMetropolisExchangePt</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
@@ -628,27 +615,22 @@
 <span class="sd">          Sampling from a RBM machine in a 1D lattice of spin 1/2, using</span>
 <span class="sd">          nearest-neighbours exchanges.</span>
 
+<span class="sd">          &gt;&gt;&gt; import pytest; pytest.skip(&quot;EXPERIMENTAL&quot;)</span>
 <span class="sd">          &gt;&gt;&gt; import netket as nk</span>
+<span class="sd">          &gt;&gt;&gt; import netket.sampler.metropolis_pt as mpt</span>
 <span class="sd">          &gt;&gt;&gt;</span>
 <span class="sd">          &gt;&gt;&gt; g=nk.graph.Hypercube(length=10,n_dim=2,pbc=True)</span>
-<span class="sd">          &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5,graph=g)</span>
-<span class="sd">          &gt;&gt;&gt;</span>
-<span class="sd">          &gt;&gt;&gt; # RBM Spin Machine</span>
-<span class="sd">          &gt;&gt;&gt; ma = nk.machine.RbmSpin(alpha=1, hilbert=hi)</span>
+<span class="sd">          &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5, N=g.n_nodes)</span>
 <span class="sd">          &gt;&gt;&gt;</span>
 <span class="sd">          &gt;&gt;&gt; # Construct a MetropolisExchange Sampler</span>
-<span class="sd">          &gt;&gt;&gt; sa = nk.sampler.MetropolisExchange(machine=ma)</span>
-<span class="sd">          &gt;&gt;&gt; print(sa.machine.hilbert.size)</span>
-<span class="sd">          100</span>
+<span class="sd">          &gt;&gt;&gt; sa = mpt.MetropolisExchangePt(hi, graph=g)</span>
+<span class="sd">          &gt;&gt;&gt; print(sa)</span>
+<span class="sd">          MetropolisSampler(rule = ExchangeRule(# of clusters: 200), n_chains = 16, machine_power = 2, n_sweeps = 100, dtype = &lt;class &#39;numpy.float64&#39;&gt;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">ExchangeRule</span>
+
     <span class="n">rule</span> <span class="o">=</span> <span class="n">ExchangeRule</span><span class="p">(</span><span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">d_max</span><span class="o">=</span><span class="n">d_max</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MetropolisPtSampler</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">HamiltonianRule</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MetropolisHamiltonianPt</span> <span class="k">as</span> <span class="n">LegacyMetropolisHamiltonianPt</span><span class="p">,</span>
-<span class="p">)</span>
 
 
 <span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">LegacyMetropolisHamiltonianPt</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
@@ -682,20 +664,23 @@
 <span class="sd">    Examples:</span>
 <span class="sd">       Sampling from a RBM machine in a 1D lattice of spin 1/2</span>
 
+<span class="sd">       &gt;&gt;&gt; import pytest; pytest.skip(&quot;EXPERIMENTAL&quot;)</span>
 <span class="sd">       &gt;&gt;&gt; import netket as nk</span>
+<span class="sd">       &gt;&gt;&gt; import netket.sampler.metropolis_pt as mpt</span>
 <span class="sd">       &gt;&gt;&gt;</span>
 <span class="sd">       &gt;&gt;&gt; g=nk.graph.Hypercube(length=10,n_dim=2,pbc=True)</span>
-<span class="sd">       &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5,graph=g)</span>
-<span class="sd">       &gt;&gt;&gt;</span>
-<span class="sd">       &gt;&gt;&gt; # RBM Spin Machine</span>
-<span class="sd">       &gt;&gt;&gt; ma = nk.machine.RbmSpin(alpha=1, hilbert=hi)</span>
+<span class="sd">       &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5, N=g.n_nodes)</span>
 <span class="sd">       &gt;&gt;&gt;</span>
 <span class="sd">       &gt;&gt;&gt; # Transverse-field Ising Hamiltonian</span>
-<span class="sd">       &gt;&gt;&gt; ha = nk.operator.Ising(hilbert=hi, h=1.0)</span>
+<span class="sd">       &gt;&gt;&gt; ha = nk.operator.Ising(hilbert=hi, h=1.0, graph=g)</span>
 <span class="sd">       &gt;&gt;&gt;</span>
-<span class="sd">       &gt;&gt;&gt; # Construct a MetropolisHamiltonian Sampler</span>
-<span class="sd">       &gt;&gt;&gt; sa = nk.sampler.MetropolisHamiltonian(machine=ma,hamiltonian=ha)</span>
+<span class="sd">       &gt;&gt;&gt; # Construct a MetropolisExchange Sampler</span>
+<span class="sd">       &gt;&gt;&gt; sa = mpt.MetropolisHamiltonianPt(hi, hamiltonian=ha)</span>
+<span class="sd">       &gt;&gt;&gt; print(sa)</span>
+<span class="sd">       MetropolisSampler(rule = HamiltonianRule(Ising(J=1.0, h=1.0; dim=100)), n_chains = 16, machine_power = 2, n_sweeps = 100, dtype = &lt;class &#39;numpy.float64&#39;&gt;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">HamiltonianRule</span>
+
     <span class="n">rule</span> <span class="o">=</span> <span class="n">HamiltonianRule</span><span class="p">(</span><span class="n">hamiltonian</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MetropolisPtSampler</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
@@ -713,7 +698,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

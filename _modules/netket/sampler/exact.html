@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.sampler.exact &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,16 +110,16 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
 <span class="kn">import</span> <span class="nn">jax</span>
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
 <span class="kn">from</span> <span class="nn">jax.experimental</span> <span class="kn">import</span> <span class="n">host_callback</span> <span class="k">as</span> <span class="n">hcb</span>
 
-<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">struct</span>
-
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-
 <span class="kn">from</span> <span class="nn">netket.nn</span> <span class="kn">import</span> <span class="n">to_array</span>
-<span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">struct</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">SeedT</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">SamplerState</span>
 
@@ -145,13 +145,22 @@
 <span class="sd">    option.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_init_state</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_exact</span><span class="p">(</span><span class="n">sampler</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_init_state</span><span class="p">(</span>
+        <span class="n">sampler</span><span class="p">,</span>
+        <span class="n">machine</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SeedT</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="n">pdf</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">n_states</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ExactSamplerState</span><span class="p">(</span><span class="n">pdf</span><span class="o">=</span><span class="n">pdf</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ExactSamplerState</span><span class="p">(</span><span class="n">pdf</span><span class="o">=</span><span class="n">pdf</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="n">pdf</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span>
-            <span class="n">to_array</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span> <span class="o">**</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span>
+            <span class="n">to_array</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">machine</span><span class="o">.</span><span class="n">apply</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span> <span class="o">**</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span>
         <span class="p">)</span>
         <span class="n">pdf</span> <span class="o">=</span> <span class="n">pdf</span> <span class="o">/</span> <span class="n">pdf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
@@ -162,7 +171,7 @@
         <span class="n">numbers</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
             <span class="n">rng</span><span class="p">,</span>
             <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">n_states</span><span class="p">,</span>
-            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,),</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,),</span>
             <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">p</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">pdf</span><span class="p">,</span>
         <span class="p">)</span>
@@ -170,24 +179,34 @@
         <span class="c1"># We use a host-callback to convert integers labelling states to</span>
         <span class="c1"># valid state-arrays because that code is written with numba and</span>
         <span class="c1"># we have not yet converted it to jax.</span>
-        <span class="n">cb</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">numbers</span><span class="p">:</span> <span class="n">host_numbers_to_states</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">numbers</span><span class="p">)</span>
-
         <span class="n">sample</span> <span class="o">=</span> <span class="n">hcb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
-            <span class="n">cb</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">numbers</span><span class="p">:</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">numbers_to_states</span><span class="p">(</span><span class="n">numbers</span><span class="p">),</span>
             <span class="n">numbers</span><span class="p">,</span>
             <span class="n">result_shape</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">ShapeDtypeStruct</span><span class="p">(</span>
-                <span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">float64</span>
+                <span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">jnp</span><span class="o">.</span><span class="n">float64</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
         <span class="n">new_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">new_rng</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_sample_chain</span><span class="p">(</span>
+        <span class="n">sampler</span><span class="p">,</span>
+        <span class="n">machine</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+        <span class="n">state</span><span class="p">:</span> <span class="n">SamplerState</span><span class="p">,</span>
+        <span class="n">chain_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">SamplerState</span><span class="p">]:</span>
+        <span class="c1"># Reimplement sample_chain because we can sample the whole &#39;chain&#39; in one</span>
+        <span class="c1"># go, since it&#39;s not really a chain anyway. This will be much faster because</span>
+        <span class="c1"># we call into python only once.</span>
+        <span class="k">return</span> <span class="n">_sample_chain</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">chain_length</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="n">sampler</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s2">&quot;ExactSampler(&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  hilbert = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  n_chains = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  n_chains_per_rank = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  machine_power = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  dtype = </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="p">)</span>
@@ -195,19 +214,45 @@
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="n">sampler</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="s2">&quot;ExactSampler(&quot;</span>
-            <span class="o">+</span> <span class="s2">&quot;n_chains = </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;n_chains_per_rank = </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;machine_power = </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;dtype = </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="p">)</span></div>
 
 
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="n">ExactSampler</span> <span class="k">as</span> <span class="n">LegacyExactSampler</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.machine</span> <span class="kn">import</span> <span class="n">AbstractMachine</span>
-<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">wraps_legacy</span>
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_sample_chain</span><span class="p">(</span>
+    <span class="n">sampler</span><span class="p">,</span>
+    <span class="n">machine</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">SamplerState</span><span class="p">,</span>
+    <span class="n">chain_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">SamplerState</span><span class="p">]:</span>
+    <span class="n">new_rng</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+        <span class="n">rng</span><span class="p">,</span>
+        <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">n_states</span><span class="p">,</span>
+        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">chain_length</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,),</span>
+        <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">pdf</span><span class="p">,</span>
+    <span class="p">)</span>
 
+    <span class="c1"># For future investigators:</span>
+    <span class="c1"># this will lead to a crash if numbers_to_state throws.</span>
+    <span class="c1"># it throws if we feed it nans!</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">hcb</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">numbers</span><span class="p">:</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">numbers_to_states</span><span class="p">(</span><span class="n">numbers</span><span class="p">),</span>
+        <span class="n">numbers</span><span class="p">,</span>
+        <span class="n">result_shape</span><span class="o">=</span><span class="n">jax</span><span class="o">.</span><span class="n">ShapeDtypeStruct</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">chain_length</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+            <span class="n">jnp</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="n">chain_length</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span>
+    <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">host_numbers_to_states</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">numbers</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">hilbert</span><span class="o">.</span><span class="n">numbers_to_states</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">new_rng</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -223,7 +268,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

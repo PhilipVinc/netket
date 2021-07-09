@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.sampler.metropolis &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -116,12 +116,20 @@
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
 <span class="kn">from</span> <span class="nn">jax.experimental</span> <span class="kn">import</span> <span class="n">loops</span>
 
-<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">struct</span>
-
-<span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
-<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">n_nodes</span>
-<span class="kn">from</span> <span class="nn">netket.stats</span> <span class="kn">import</span> <span class="n">sum_inplace</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">mpi</span>
 <span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PyTree</span><span class="p">,</span> <span class="n">PRNGKeyT</span>
+
+<span class="kn">from</span> <span class="nn">netket.utils.deprecation</span> <span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">warn_deprecation</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">struct</span>
+
+<span class="c1"># TODO remove</span>
+<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">wraps_legacy</span>
+<span class="kn">from</span> <span class="nn">netket.legacy.machine</span> <span class="kn">import</span> <span class="n">AbstractMachine</span>
+<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MetropolisLocal</span> <span class="k">as</span> <span class="n">LegacyMetropolisLocal</span><span class="p">,</span>
+    <span class="n">MetropolisExchange</span> <span class="k">as</span> <span class="n">LegacyMetropolisExchange</span><span class="p">,</span>
+    <span class="n">MetropolisHamiltonian</span> <span class="k">as</span> <span class="n">LegacyMetropolisHamiltonian</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Sampler</span><span class="p">,</span> <span class="n">SamplerState</span>
 
@@ -237,8 +245,8 @@
     <span class="sd">&quot;&quot;&quot;Number of accepted transitions among the chains in this process since the last reset.&quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">acceptance_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The percentage of accepted moves across all chains and MPI processes.</span>
+    <span class="k">def</span> <span class="nf">acceptance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The fraction of accepted moves across all chains and MPI processes.</span>
 
 <span class="sd">        The rate is computed since the last reset of the sampler.</span>
 <span class="sd">        Will return None if no sampling has been performed since then.</span>
@@ -246,32 +254,53 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="sd">&quot;&quot;&quot;Please use the attribute `.acceptance` instead of</span>
+<span class="sd">        `.acceptance_ratio`. The new attribute `.acceptance` returns the</span>
+<span class="sd">        acceptance ratio ∈ [0,1], instead of the current `acceptance_ratio`</span>
+<span class="sd">        returning a percentage, which is a bug.&quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">acceptance_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;DEPRECATED: Please use the attribute `.acceptance` instead of</span>
+<span class="sd">        `.acceptance_ratio`. The new attribute `.acceptance` returns the</span>
+<span class="sd">        acceptance ratio ∈ [0,1], instead of the current `acceptance_ratio`</span>
+<span class="sd">        returning a percentage, which is a bug.</span>
+
+<span class="sd">        The percentage of accepted moves across all chains and MPI processes.</span>
+
+<span class="sd">        The rate is computed since the last reset of the sampler.</span>
+<span class="sd">        Will return None if no sampling has been performed since then.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptance</span> <span class="o">*</span> <span class="mi">100</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Total number of moves performed across all processes since the last reset.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps_proc</span> <span class="o">*</span> <span class="n">n_nodes</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps_proc</span> <span class="o">*</span> <span class="n">mpi</span><span class="o">.</span><span class="n">n_nodes</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_accepted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Total number of moves accepted across all processes since the last reset.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">sum_inplace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_accepted_proc</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mpi</span><span class="o">.</span><span class="n">mpi_sum_jax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_accepted_proc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">acc_string</span> <span class="o">=</span> <span class="s2">&quot;# accepted = </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">%), &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptance_ratio</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_accepted</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acceptance</span> <span class="o">*</span> <span class="mi">100</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">acc_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;MetropolisSamplerState(</span><span class="si">{</span><span class="n">acc_string</span><span class="si">}</span><span class="s2">rng state=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">acc_string</span><span class="si">}</span><span class="s2">rng state=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rng</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 
 
 <div class="viewcode-block" id="MetropolisSampler"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisSampler.html#netket.sampler.MetropolisSampler">[docs]</a><span class="nd">@struct</span><span class="o">.</span><span class="n">dataclass</span>
 <span class="k">class</span> <span class="nc">MetropolisSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Metropolis-Hastings sampler for an Hilbert space according to a specific transition rule.</span>
 
 <span class="sd">    The transition rule is used to generate a proposed state :math:`s^\prime`, starting from the</span>
@@ -279,7 +308,7 @@
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        A(s \\rightarrow s^\\prime) = \\mathrm{min} \\left( 1,\\frac{P(s^\\prime)}{P(s)} F(e^{L(s,s^\\prime)}) \\right) ,</span>
+<span class="sd">        A(s \rightarrow s^\prime) = \mathrm{min} \left( 1,\frac{P(s^\prime)}{P(s)} F(e^{L(s,s^\prime)}) \right) ,</span>
 
 <span class="sd">    where the probability being sampled from is :math:`P(s)=|M(s)|^p. Here ::math::`M(s)` is a</span>
 <span class="sd">    user-provided function (the machine), :math:`p` is also user-provided with default value :math:`p=2`,</span>
@@ -290,21 +319,13 @@
 
     <span class="n">rule</span><span class="p">:</span> <span class="n">MetropolisRule</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="sd">&quot;&quot;&quot;The metropolis transition rule.&quot;&quot;&quot;</span>
-    <span class="n">n_sweeps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">pytree_node</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">n_sweeps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">pytree_node</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Number of sweeps for each step along the chain. Defaults to number of sites in hilbert space.&quot;&quot;&quot;</span>
-    <span class="n">reset_chain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">reset_chains</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">pytree_node</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;If True resets the chain state when reset is called (every new sampling).&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MetropolisSampler.__init__"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisSampler.html#netket.sampler.MetropolisSampler.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span><span class="p">,</span>
-        <span class="n">rule</span><span class="p">:</span> <span class="n">MetropolisRule</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">n_sweeps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">reset_chain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__pre_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hilbert</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a Metropolis Sampler.</span>
 
 <span class="sd">        Args:</span>
@@ -314,20 +335,24 @@
 <span class="sd">            n_sweeps: The number of exchanges that compose a single sweep.</span>
 <span class="sd">                    If None, sweep_size is equal to the number of degrees of freedom being sampled</span>
 <span class="sd">                    (the size of the input vector s to the machine).</span>
-<span class="sd">            reset_chain: If False the state configuration is not resetted when reset() is called.</span>
+<span class="sd">            reset_chains: If False the state configuration is not resetted when reset() is called.</span>
 <span class="sd">            n_chains: The number of Markov Chain to be run in parallel on a single process.</span>
-<span class="sd">            n_chains: The number of batches of the states to sample (default = 8)</span>
 <span class="sd">            machine_pow: The power to which the machine should be exponentiated to generate the pdf (default = 2).</span>
 <span class="sd">            dtype: The dtype of the statees sampled (default = np.float32).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">n_sweeps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">n_sweeps</span> <span class="o">=</span> <span class="n">hilbert</span><span class="o">.</span><span class="n">size</span>
+        <span class="c1"># process arguments in the base</span>
+        <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__pre_init__</span><span class="p">(</span><span class="n">hilbert</span><span class="o">=</span><span class="n">hilbert</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;rule&quot;</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_sweeps&quot;</span><span class="p">,</span> <span class="n">n_sweeps</span><span class="p">)</span>
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;reset_chain&quot;</span><span class="p">,</span> <span class="n">reset_chain</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;rule&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="c1"># deprecation warnings</span>
+        <span class="k">if</span> <span class="s2">&quot;reset_chain&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">warn_deprecation</span><span class="p">(</span>
+                <span class="s2">&quot;The keyword argument `reset_chain` is deprecated in favour of `reset_chains`&quot;</span>
+            <span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;reset_chains&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;reset_chain&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span>
 
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
@@ -335,20 +360,25 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rule</span><span class="p">,</span> <span class="n">MetropolisRule</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rule must be a MetropolisRule.&quot;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_chains</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;reset_chains must be a boolean.&quot;</span><span class="p">)</span>
+
         <span class="c1">#  Default value of n_sweeps</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sweeps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sweeps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_sweeps&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_state</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="n">key_state</span><span class="p">,</span> <span class="n">key_rule</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">rule_state</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">init_state</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">key_rule</span><span class="p">)</span>
-        <span class="n">σ</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">σ</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span> <span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="p">)</span>
 
         <span class="n">state</span> <span class="o">=</span> <span class="n">MetropolisSamplerState</span><span class="p">(</span><span class="n">σ</span><span class="o">=</span><span class="n">σ</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">key_state</span><span class="p">,</span> <span class="n">rule_state</span><span class="o">=</span><span class="n">rule_state</span><span class="p">)</span>
 
         <span class="c1"># If we don&#39;t reset the chain at every sampling iteration, then reset it</span>
         <span class="c1"># now.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sampler</span><span class="o">.</span><span class="n">reset_chain</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sampler</span><span class="o">.</span><span class="n">reset_chains</span><span class="p">:</span>
             <span class="n">key_state</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key_state</span><span class="p">)</span>
             <span class="n">σ</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">random_state</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
             <span class="n">state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">σ</span><span class="o">=</span><span class="n">σ</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">key_state</span><span class="p">)</span>
@@ -358,7 +388,7 @@
     <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="n">new_rng</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">rng</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">sampler</span><span class="o">.</span><span class="n">reset_chain</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sampler</span><span class="o">.</span><span class="n">reset_chains</span><span class="p">:</span>
             <span class="n">σ</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">random_state</span><span class="p">(</span><span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">σ</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span>
@@ -375,7 +405,7 @@
         <span class="k">with</span> <span class="n">loops</span><span class="o">.</span><span class="n">Scope</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">rng</span>
             <span class="n">s</span><span class="o">.</span><span class="n">σ</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">log_prob</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">log_prob</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">σ</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
 
             <span class="c1"># for logging</span>
             <span class="n">s</span><span class="o">.</span><span class="n">accepted</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">n_accepted_proc</span>
@@ -387,9 +417,11 @@
                 <span class="n">σp</span><span class="p">,</span> <span class="n">log_prob_correction</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">transition</span><span class="p">(</span>
                     <span class="n">sampler</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">key1</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">σ</span>
                 <span class="p">)</span>
-                <span class="n">proposal_log_prob</span> <span class="o">=</span> <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">σp</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+                <span class="n">proposal_log_prob</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span> <span class="o">*</span> <span class="n">machine</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">σp</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+                <span class="p">)</span>
 
-                <span class="n">uniform</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key2</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,))</span>
+                <span class="n">uniform</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key2</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,))</span>
                 <span class="k">if</span> <span class="n">log_prob_correction</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">do_accept</span> <span class="o">=</span> <span class="n">uniform</span> <span class="o">&lt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
                         <span class="n">proposal_log_prob</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">log_prob</span> <span class="o">+</span> <span class="n">log_prob_correction</span>
@@ -409,19 +441,20 @@
                 <span class="n">rng</span><span class="o">=</span><span class="n">new_rng</span><span class="p">,</span>
                 <span class="n">σ</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">σ</span><span class="p">,</span>
                 <span class="n">n_accepted_proc</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">accepted</span><span class="p">,</span>
-                <span class="n">n_steps_proc</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">n_steps_proc</span> <span class="o">+</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_sweeps</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">,</span>
+                <span class="n">n_steps_proc</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">n_steps_proc</span>
+                <span class="o">+</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_sweeps</span> <span class="o">*</span> <span class="n">sampler</span><span class="o">.</span><span class="n">n_chains_per_rank</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">new_state</span><span class="o">.</span><span class="n">σ</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="n">sampler</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="s2">&quot;MetropolisSampler(&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">sampler</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  hilbert = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">hilbert</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  rule = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  n_chains = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  machine_power = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">)</span>
-            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  reset_chain = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">reset_chain</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  reset_chains = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">reset_chains</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  n_sweeps = </span><span class="si">{}</span><span class="s2">,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_sweeps</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  dtype = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
@@ -429,7 +462,7 @@
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="n">sampler</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="s2">&quot;MetropolisSampler(&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">sampler</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(&quot;</span>
             <span class="o">+</span> <span class="s2">&quot;rule = </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">rule</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;n_chains = </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">n_chains</span><span class="p">)</span>
             <span class="o">+</span> <span class="s2">&quot;machine_power = </span><span class="si">{}</span><span class="s2">, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sampler</span><span class="o">.</span><span class="n">machine_pow</span><span class="p">)</span>
@@ -438,21 +471,14 @@
         <span class="p">)</span></div>
 
 
-<span class="kn">from</span> <span class="nn">netket.utils</span> <span class="kn">import</span> <span class="n">wraps_legacy</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.machine</span> <span class="kn">import</span> <span class="n">AbstractMachine</span>
-
-<span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">LocalRule</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="n">MetropolisLocal</span> <span class="k">as</span> <span class="n">LegacyMetropolisLocal</span>
-
-
 <div class="viewcode-block" id="MetropolisLocal"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisLocal.html#netket.sampler.MetropolisLocal">[docs]</a><span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">LegacyMetropolisLocal</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">MetropolisLocal</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MetropolisSampler</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sampler acting on one local degree of freedom.</span>
 
 <span class="sd">    This sampler acts locally only on one local degree of freedom :math:`s_i`,</span>
 <span class="sd">    and proposes a new state: :math:`s_1 \dots s^\prime_i \dots s_N`,</span>
-<span class="sd">    where :math:`s^\prime_i \\neq s_i`.</span>
+<span class="sd">    where :math:`s^\prime_i \neq s_i`.</span>
 
 <span class="sd">    The transition probability associated to this</span>
 <span class="sd">    sampler can be decomposed into two steps:</span>
@@ -481,11 +507,9 @@
 <span class="sd">        machine_pow: The power to which the machine should be exponentiated to generate the pdf (default = 2).</span>
 <span class="sd">        dtype: The dtype of the statees sampled (default = np.float32).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">LocalRule</span>
+
     <span class="k">return</span> <span class="n">MetropolisSampler</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">LocalRule</span><span class="p">(),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">ExchangeRule</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="n">MetropolisExchange</span> <span class="k">as</span> <span class="n">LegacyMetropolisExchange</span>
 
 
 <div class="viewcode-block" id="MetropolisExchange"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisExchange.html#netket.sampler.MetropolisExchange">[docs]</a><span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">LegacyMetropolisExchange</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
@@ -530,27 +554,22 @@
 
 <span class="sd">    Examples:</span>
 <span class="sd">          Sampling from a RBM machine in a 1D lattice of spin 1/2, using</span>
-<span class="sd">          nearest-neighbours exchanges.</span>
+<span class="sd">          nearest-neighbor exchanges.</span>
 
 <span class="sd">          &gt;&gt;&gt; import netket as nk</span>
 <span class="sd">          &gt;&gt;&gt;</span>
 <span class="sd">          &gt;&gt;&gt; g=nk.graph.Hypercube(length=10,n_dim=2,pbc=True)</span>
-<span class="sd">          &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5,graph=g)</span>
-<span class="sd">          &gt;&gt;&gt;</span>
-<span class="sd">          &gt;&gt;&gt; # RBM Spin Machine</span>
-<span class="sd">          &gt;&gt;&gt; ma = nk.machine.RbmSpin(alpha=1, hilbert=hi)</span>
+<span class="sd">          &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5, N=g.n_nodes)</span>
 <span class="sd">          &gt;&gt;&gt;</span>
 <span class="sd">          &gt;&gt;&gt; # Construct a MetropolisExchange Sampler</span>
-<span class="sd">          &gt;&gt;&gt; sa = nk.sampler.MetropolisExchange(machine=ma)</span>
-<span class="sd">          &gt;&gt;&gt; print(sa.machine.hilbert.size)</span>
-<span class="sd">          100</span>
+<span class="sd">          &gt;&gt;&gt; sa = nk.sampler.MetropolisExchange(hi, graph=g)</span>
+<span class="sd">          &gt;&gt;&gt; print(sa)</span>
+<span class="sd">          MetropolisSampler(rule = ExchangeRule(# of clusters: 200), n_chains = 16, machine_power = 2, n_sweeps = 100, dtype = &lt;class &#39;numpy.float64&#39;&gt;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">ExchangeRule</span>
+
     <span class="n">rule</span> <span class="o">=</span> <span class="n">ExchangeRule</span><span class="p">(</span><span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">d_max</span><span class="o">=</span><span class="n">d_max</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MetropolisSampler</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-<span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">HamiltonianRule</span>
-<span class="kn">from</span> <span class="nn">netket.legacy.sampler</span> <span class="kn">import</span> <span class="n">MetropolisHamiltonian</span> <span class="k">as</span> <span class="n">LegacyMetropolisHamiltonian</span>
 
 
 <div class="viewcode-block" id="MetropolisHamiltonian"><a class="viewcode-back" href="../../../docs/_generated/samplers/netket.sampler.MetropolisHamiltonian.html#netket.sampler.MetropolisHamiltonian">[docs]</a><span class="nd">@wraps_legacy</span><span class="p">(</span><span class="n">LegacyMetropolisHamiltonian</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="n">AbstractMachine</span><span class="p">)</span>
@@ -590,17 +609,18 @@
 <span class="sd">       &gt;&gt;&gt; import netket as nk</span>
 <span class="sd">       &gt;&gt;&gt;</span>
 <span class="sd">       &gt;&gt;&gt; g=nk.graph.Hypercube(length=10,n_dim=2,pbc=True)</span>
-<span class="sd">       &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5,graph=g)</span>
-<span class="sd">       &gt;&gt;&gt;</span>
-<span class="sd">       &gt;&gt;&gt; # RBM Spin Machine</span>
-<span class="sd">       &gt;&gt;&gt; ma = nk.machine.RbmSpin(alpha=1, hilbert=hi)</span>
+<span class="sd">       &gt;&gt;&gt; hi=nk.hilbert.Spin(s=0.5, N=g.n_nodes)</span>
 <span class="sd">       &gt;&gt;&gt;</span>
 <span class="sd">       &gt;&gt;&gt; # Transverse-field Ising Hamiltonian</span>
-<span class="sd">       &gt;&gt;&gt; ha = nk.operator.Ising(hilbert=hi, h=1.0)</span>
+<span class="sd">       &gt;&gt;&gt; ha = nk.operator.Ising(hilbert=hi, h=1.0, graph=g)</span>
 <span class="sd">       &gt;&gt;&gt;</span>
-<span class="sd">       &gt;&gt;&gt; # Construct a MetropolisHamiltonian Sampler</span>
-<span class="sd">       &gt;&gt;&gt; sa = nk.sampler.MetropolisHamiltonian(machine=ma,hamiltonian=ha)</span>
+<span class="sd">       &gt;&gt;&gt; # Construct a MetropolisExchange Sampler</span>
+<span class="sd">       &gt;&gt;&gt; sa = nk.sampler.MetropolisHamiltonian(hi, hamiltonian=ha)</span>
+<span class="sd">       &gt;&gt;&gt; print(sa)</span>
+<span class="sd">       MetropolisSampler(rule = HamiltonianRule(Ising(J=1.0, h=1.0; dim=100)), n_chains = 16, machine_power = 2, n_sweeps = 100, dtype = &lt;class &#39;numpy.float64&#39;&gt;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.rules</span> <span class="kn">import</span> <span class="n">HamiltonianRule</span>
+
     <span class="n">rule</span> <span class="o">=</span> <span class="n">HamiltonianRule</span><span class="p">(</span><span class="n">hamiltonian</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">MetropolisSampler</span><span class="p">(</span><span class="n">hilbert</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </pre></div>
@@ -618,7 +638,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

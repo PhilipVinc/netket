@@ -10,10 +10,15 @@
 
    
       
+   .. rst-class:: class-dl-groups
+
+   Attributes
+      .. autoattribute:: HashableArray.shape
    
       
    .. rst-class:: class-dl-groups
 
    Methods
+      .. automethod:: HashableArray.replace
 
    

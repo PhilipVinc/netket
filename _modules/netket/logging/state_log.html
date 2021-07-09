@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.logging.state_log &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,18 +110,13 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">dataclasses</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span> <span class="k">as</span> <span class="n">_path</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">jax</span>
 
 <span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">serialization</span>
 
@@ -142,9 +137,9 @@
 <span class="sd">    A logger which serializes the variables of the variational state during a run.</span>
 
 <span class="sd">    The data is saved either to a directory or tar archive in a sequence of files named</span>
-<span class="sd">    `[0.mpack, 1.mpack, ...]` where the filename is incremented every time the logger is called.</span>
-<span class="sd">    The tar file inside is not flushed to disk (closed) until this object is deleted or python</span>
-<span class="sd">    is shut down.</span>
+<span class="sd">    `[0.mpack, 1.mpack, ...]` where the filename is incremented every time the logger is</span>
+<span class="sd">    called. The tar file inside is not flushed to disk (closed) until this object is</span>
+<span class="sd">    deleted or python is shut down.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="StateLog.__init__"><a class="viewcode-back" href="../../../docs/_generated/driver/netket.logging.StateLog.html#netket.logging.StateLog.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -158,12 +153,16 @@
 <span class="sd">        Initialize the :code:`StateLogger`.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            output_prefix: the name of the output file before the extension (if tar=True) or of the</span>
-<span class="sd">                output folder.</span>
-<span class="sd">            save_every: every how many iterations the variables should be saved. (default 1)</span>
-<span class="sd">            mode: Specify the behaviour in case the file already exists at this output_prefix. Options are</span>
-<span class="sd">                - `[w]rite`: (default) overwrites file/delete the folder if it already exists;</span>
-<span class="sd">                - `[a]ppend`: appends to the file/folder if it exists, overwise creates a new file;</span>
+<span class="sd">            output_prefix: the name of the output file before the extension (if</span>
+<span class="sd">                tar=True) or of the output folder.</span>
+<span class="sd">            save_every: every how many iterations the variables should be saved.</span>
+<span class="sd">                (default 1)</span>
+<span class="sd">            mode: Specify the behaviour in case the file already exists at this</span>
+<span class="sd">                output_prefix. Options are</span>
+<span class="sd">                - `[w]rite`: (default) overwrites file/delete the folder if</span>
+<span class="sd">                  it already exists;</span>
+<span class="sd">                - `[a]ppend`: appends to the file/folder if it exists, overwise</span>
+<span class="sd">                  creates a new file;</span>
 <span class="sd">                - `[x]` or `fail`: fails if file/folder already exists;</span>
 <span class="sd">            tar: if True creates a tar archive instead of a folder.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -179,7 +178,8 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;write&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;append&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;fail&quot;</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Mode not recognized: should be one of `[w]rite`, `[a]ppend` or `[x]`(fail).&quot;</span>
+                <span class="s2">&quot;Mode not recognized: should be one of `[w]rite`, `[a]ppend` or &quot;</span>
+                <span class="s2">&quot;`[x]`(fail).&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">tar</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -191,7 +191,8 @@
 
         <span class="k">if</span> <span class="n">file_exists</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;fail&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Output file/folder already exists. Either delete it manually or change `output_prefix`.&quot;</span>
+                <span class="s2">&quot;Output file/folder already exists. Either delete it manually or &quot;</span>
+                <span class="s2">&quot;change `output_prefix`.&quot;</span>
             <span class="p">)</span>
 
         <span class="n">dir_name</span> <span class="o">=</span> <span class="n">_path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">output_prefix</span><span class="p">)</span>
@@ -302,7 +303,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

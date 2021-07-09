@@ -1,0 +1,6 @@
+﻿netket.nn.log\_cosh
+===================
+
+.. currentmodule:: netket.nn
+
+.. autofunction:: log_cosh

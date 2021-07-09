@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>The preconditioner interface &#8212; netket v3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jumbo-style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/rtd_theme.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/rtd_theme.js"></script>
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing to NetKet" href="contributing.html" />
+    <link rel="prev" title="Defining Custom Models" href="custom_models.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logonav.png"></span>
+          NetKet</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../getting_started.html">Get Started</a></li>
+                <li><a href="getting_started.html">Documentation</a></li>
+                <li><a href="../tutorials.html">Tutorials</a></li>
+                <li><a href="../citing.html">Citing NetKet</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="https://github.com/netket/netket"><i class="fab fa-github" aria-hidden="true"></i></a></li>
+                <li><a href="https://twitter.com/NetKetOrg"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><div class="sidenav-header">
+  <div class="h4"> 
+    Netket 3.0 Documentation
+  </div>
+
+  <!---
+  	<div role="search">
+  <form id="rtd-search-form" class="wy-form"  action="../search.html" method="get">
+    <input type="text" name="q" class="form-control" placeholder="Search" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+  ---->
+</div>
+
+<p class="caption"><span class="caption-text">Reference Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation-and-requirements">Installation and requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting_started.html#mpi">MPI</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#jax-flax-extensions">Jax/Flax extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#legacy-api-support-api-before-2021">Legacy API support (API before 2021)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#commented-example">Commented Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#netket-3-0b4-unreleased">NetKet 3.0b4 (unreleased)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#new-features">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#breaking-changes">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#internal-changes">Internal Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#bug-fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#netket-3-0b3-published-on-9-july-2021">NetKet 3.0b3 (published on 9 july 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id1">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id2">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id3">Internal Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id4">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#netket-3-0b2-published-on-31-may-2021">NetKet 3.0b2 (published on 31 May 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id5">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id6">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#id7">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#netket-3-0b1-published-beta-release">NetKet 3.0b1 (published beta release)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="changelog.html#api-changes">API Changes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="superop.html">The Lindblad Master Equation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="superop.html#the-density-matrix-and-the-liouvillian">The Density Matrix and the Liouvillian</a></li>
+<li class="toctree-l2"><a class="reference internal" href="superop.html#computing-observables">Computing Observables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="varstate.html">The Variational State Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="varstate.html#constructing-a-variational-state">Constructing a Variational State</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="varstate.html#defining-models-flax">Defining models: Flax</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varstate.html#mcstate">MCState</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="varstate.html#using-a-monte-carlo-variational-state">Using a Monte Carlo Variational State</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="varstate.html#expectation-values">Expectation values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varstate.html#sampling">Sampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varstate.html#collecting-the-state-vector">Collecting the state-vector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="varstate.html#manipulating-the-parameters">Manipulating the parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="varstate.html#saving-and-loading-a-variational-state">Saving and Loading a Variational State</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sr.html">Quantum Geometric Tensor and Stochastic Reconfiguration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sr.html#stochastic-reconfiguration">Stochastic Reconfiguration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sr.html#using-stochastic-reconfiguration">Using stochastic reconfiguration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">The Drivers API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="drivers.html#constructing-a-driver">Constructing a driver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="drivers.html#running-the-optimisation">Running the optimisation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sharp-bits.html#parallelization">Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sharp-bits.html#running-on-cpu-when-gpus-are-present">Running on CPU when GPUs are present</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sharp-bits.html#using-gpus">Using GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sharp-bits.html#nans-in-training-and-loss-of-precision">NaNs in training and loss of precision</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Extending NetKet</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="custom_models.html">Defining Custom Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="custom_models.html#commonalities">Commonalities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="custom_models.html#defining-models-init-and-apply-functions">Defining models: init and apply functions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-flax-linen">Using Flax Linen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-jax-stax">Using Jax/Stax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_models.html#using-haiku">Using Haiku</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The preconditioner interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-linearpreconditioner-interface">The LinearPreconditioner interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bare-interface">Bare interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linearoperator-interface">LinearOperator interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-preconditioner-function-api">The preconditioner function API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to NetKet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#contributing-code-using-pull-requests">Contributing code using pull requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#netket-pull-request-checklist">NetKet pull request checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#single-change-commits-and-pull-requests">Single-change commits and pull requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#python-coding-style">Python coding style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#docstrings-and-type-hints">Docstrings and Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#visibility-of-public-api">Visibility of public API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="contributing.html#full-github-test-suite">Full GitHub test suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing-tests.html">Writing Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writing-tests.html#test-structure-and-common-files">Test structure and common files.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-tests.html#tests-and-mpi">Tests and MPI</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Public API: netket package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#graph">Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.AbstractGraph.html">netket.graph.AbstractGraph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Graph.html">netket.graph.Graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Edgeless.html">netket.graph.Edgeless</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Hypercube.html">netket.graph.Hypercube</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Lattice.html">netket.graph.Lattice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.lattice.LatticeSite.html">netket.graph.lattice.LatticeSite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Chain.html">netket.graph.Chain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/graph/netket.graph.Grid.html">netket.graph.Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#hilbert">Hilbert</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/hilbert/netket.hilbert.AbstractHilbert.html">netket.hilbert.AbstractHilbert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/hilbert/netket.hilbert.CustomHilbert.html">netket.hilbert.CustomHilbert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/hilbert/netket.hilbert.DoubledHilbert.html">netket.hilbert.DoubledHilbert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/hilbert/netket.hilbert.Fock.html">netket.hilbert.Fock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/hilbert/netket.hilbert.Qubit.html">netket.hilbert.Qubit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/hilbert/netket.hilbert.Spin.html">netket.hilbert.Spin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#operators">Operators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.AbstractOperator.html">netket.operator.AbstractOperator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.BoseHubbard.html">netket.operator.BoseHubbard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.GraphOperator.html">netket.operator.GraphOperator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.LocalOperator.html">netket.operator.LocalOperator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.Ising.html">netket.operator.Ising</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.Heisenberg.html">netket.operator.Heisenberg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.PauliStrings.html">netket.operator.PauliStrings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/operator/netket.operator.LocalLiouvillian.html">netket.operator.LocalLiouvillian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#pre-defined-operators">Pre-defined operators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.boson.create.html">netket.operator.boson.create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.boson.destroy.html">netket.operator.boson.destroy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.boson.number.html">netket.operator.boson.number</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.boson.proj.html">netket.operator.boson.proj</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.spin.sigmax.html">netket.operator.spin.sigmax</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.spin.sigmay.html">netket.operator.spin.sigmay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.spin.sigmaz.html">netket.operator.spin.sigmaz</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.spin.sigmap.html">netket.operator.spin.sigmap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/hilbert/netket.operator.spin.sigmam.html">netket.operator.spin.sigmam</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#exact-solvers">Exact solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/exact/netket.exact.full_ed.html">netket.exact.full_ed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/exact/netket.exact.lanczos_ed.html">netket.exact.lanczos_ed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/exact/netket.exact.steady_state.html">netket.exact.steady_state</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#sampler">Sampler</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#generic-api">Generic API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.sampler_state.html">netket.sampler.sampler_state</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.reset.html">netket.sampler.reset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.sample_next.html">netket.sampler.sample_next</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.sample.html">netket.sampler.sample</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.samples.html">netket.sampler.samples</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#list-of-samplers">List of Samplers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.Sampler.html">netket.sampler.Sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.ExactSampler.html">netket.sampler.ExactSampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisSampler.html">netket.sampler.MetropolisSampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisSamplerNumpy.html">netket.sampler.MetropolisSamplerNumpy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisPtSampler.html">netket.sampler.MetropolisPtSampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisLocal.html">netket.sampler.MetropolisLocal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisExchange.html">netket.sampler.MetropolisExchange</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisHamiltonian.html">netket.sampler.MetropolisHamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisLocalPt.html">netket.sampler.MetropolisLocalPt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisExchangePt.html">netket.sampler.MetropolisExchangePt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.ARDirectSampler.html">netket.sampler.ARDirectSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#transition-rules">Transition Rules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisRule.html">netket.sampler.MetropolisRule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.rules.LocalRule.html">netket.sampler.rules.LocalRule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.rules.ExchangeRule.html">netket.sampler.rules.ExchangeRule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.rules.HamiltonianRule.html">netket.sampler.rules.HamiltonianRule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.rules.HamiltonianRuleNumpy.html">netket.sampler.rules.HamiltonianRuleNumpy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.rules.CustomRuleNumpy.html">netket.sampler.rules.CustomRuleNumpy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#internal-state">Internal State</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.SamplerState.html">netket.sampler.SamplerState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/samplers/netket.sampler.MetropolisSamplerState.html">netket.sampler.MetropolisSamplerState</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#pre-built-models">Pre-built models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBM.html">netket.models.RBM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMModPhase.html">netket.models.RBMModPhase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMMultiVal.html">netket.models.RBMMultiVal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.RBMSymm.html">netket.models.RBMSymm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.Jastrow.html">netket.models.Jastrow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.MPSPeriodic.html">netket.models.MPSPeriodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.NDM.html">netket.models.NDM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.GCNN.html">netket.models.GCNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.ARNN.html">netket.models.ARNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/models/netket.models.ARNNDense.html">netket.models.ARNNDense</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#model-tools">Model tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/nn/netket.nn.Module.html">netket.nn.Module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#linear-modules">Linear Modules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Dense.html">netket.nn.Dense</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseGeneral.html">netket.nn.DenseGeneral</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseSymm.html">netket.nn.DenseSymm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.DenseEquivariant.html">netket.nn.DenseEquivariant</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Conv.html">netket.nn.Conv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.Embed.html">netket.nn.Embed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.MaskedDense1D.html">netket.nn.MaskedDense1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.MaskedConv1D.html">netket.nn.MaskedConv1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.MaskedConv2D.html">netket.nn.MaskedConv2D</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#activation-functions">Activation functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.celu.html">netket.nn.celu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.elu.html">netket.nn.elu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.gelu.html">netket.nn.gelu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.glu.html">netket.nn.glu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.log_sigmoid.html">netket.nn.log_sigmoid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.log_softmax.html">netket.nn.log_softmax</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.relu.html">netket.nn.relu</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.sigmoid.html">netket.nn.sigmoid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.soft_sign.html">netket.nn.soft_sign</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.softmax.html">netket.nn.softmax</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.softplus.html">netket.nn.softplus</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.swish.html">netket.nn.swish</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/nn/netket.nn.log_cosh.html">netket.nn.log_cosh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#variational-state-interface">Variational State Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/variational/netket.vqs.VariationalState.html">netket.vqs.VariationalState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/variational/netket.vqs.MCState.html">netket.vqs.MCState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/variational/netket.vqs.MCMixedState.html">netket.vqs.MCMixedState</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#optimizer-module">Optimizer Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#optimizers">Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.Adam.html">netket.optimizer.Adam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.AdaGrad.html">netket.optimizer.AdaGrad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.Sgd.html">netket.optimizer.Sgd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.Momentum.html">netket.optimizer.Momentum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.RmsProp.html">netket.optimizer.RmsProp</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#preconditioners">Preconditioners</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.SR.html">netket.optimizer.SR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#quantum-geometric-tensor">Quantum Geometric Tensor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.qgt.QGTAuto.html">netket.optimizer.qgt.QGTAuto</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.qgt.QGTOnTheFly.html">netket.optimizer.qgt.QGTOnTheFly</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.qgt.QGTJacobianPyTree.html">netket.optimizer.qgt.QGTJacobianPyTree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.qgt.QGTJacobianDense.html">netket.optimizer.qgt.QGTJacobianDense</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#dense-solvers">Dense solvers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.solver.svd.html">netket.optimizer.solver.svd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.solver.cholesky.html">netket.optimizer.solver.cholesky</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.solver.LU.html">netket.optimizer.solver.LU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_generated/optim/netket.optimizer.solver.solve.html">netket.optimizer.solver.solve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#optimization-drivers">Optimization drivers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.driver.AbstractVariationalDriver.html">netket.driver.AbstractVariationalDriver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.driver.VMC.html">netket.driver.VMC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.driver.SteadyState.html">netket.driver.SteadyState</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#logging-output">Logging output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.RuntimeLog.html">netket.logging.RuntimeLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.JsonLog.html">netket.logging.JsonLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.StateLog.html">netket.logging.StateLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/driver/netket.logging.TBLog.html">netket.logging.TBLog</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#utils">Utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/utils/netket.utils.HashableArray.html">netket.utils.HashableArray</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#callbacks">Callbacks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_generated/callbacks/netket.callbacks.EarlyStopping.html">netket.callbacks.EarlyStopping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_generated/callbacks/netket.callbacks.Timeout.html">netket.callbacks.Timeout</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<!--- |replace("", "<span class=\"toctree-expand\Z"></span>")  --->
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <p># Defining Custom Preconditioners</p>
+<p>NetKet calls <em>gradient preconditioner</em> that class of techniques that transform the
+gradient of the cost function in order to improve convergence properties before
+passing it to an optimiser like <a class="reference internal" href="_generated/optim/netket.optimizer.Sgd.html#netket-optimizer-sgd"><span class="std std-ref">netket.optimizer.Sgd</span></a> or <a class="reference internal" href="_generated/optim/netket.optimizer.Adam.html#netket-optimizer-adam"><span class="std std-ref">netket.optimizer.Adam</span></a>.</p>
+<p>Examples of <em>gradient preconditioners</em> are the <a class="reference external" href="https://www.attaccalite.com/PhDThesis/html/node15.html">Stochastic Reconfiguration (SR)</a> method  (also known as <a class="reference external" href="https://wiseodd.github.io/techblog/2018/03/14/natural-gradient/">Natural Gradient Descent</a> in ML literature), the Linear Method or second order Hessian-based optimisation.</p>
+<p>We call those methods <em>gradient preconditioners</em> because they take as input the gradient of the cost function (e.g., the energy gradient in VMC ground state optimisation) and output a transformed gradient.</p>
+<p>In the current version, NetKet provides Stocastic Reconfiguration (<span class="xref std std-ref">netket.optimiser.SR</span>) as a built-in method.
+It is also possible to define your own method. If you implement the API as outlined in this document, you will be able to use your own preconditioner for use in NetKet optimisation driver without issues.</p>
+<p>Keep in mind that writing your own optimisation loop only requires writing about 10  lines of code and you are not forced to use NetKet’s drivers!
+We believe our design to be fairly modular and flexible and thus should be able to accommodate a wide variety of use-cases, but there will be algorithms that are hard to express within the boundaries of our API.
+Do not turn away from NetKet in those cases, but take all the pieces that you need and write your own optimisation loop!</p>
+<section id="the-preconditioner-interface">
+<h1>The preconditioner interface<a class="headerlink" href="#the-preconditioner-interface" title="Permalink to this headline">¶</a></h1>
+<p>Preconditioners must be implemented as a Callable object or function with the following signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">preconditioner</span><span class="p">(</span><span class="n">vstate</span><span class="p">:</span> <span class="n">VariationalState</span><span class="p">,</span> <span class="n">gradient</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyTree</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>The Callable must accept two (positional) inputs, where the first is the variational state itself and the latter is the current gradient, stored as a PyTree.
+The output of the preconditioner must be the transformed gradient stored as a PyTree.</p>
+<p>This general API will allow you to implement any preconditioner and use it together with NetKet Variational Drivers.
+However, note that any performance optimisation (such as calling <span class="xref std std-ref">jax.jit</span> on the code) will be your responsability.</p>
+<section id="the-linearpreconditioner-interface">
+<h2>The LinearPreconditioner interface<a class="headerlink" href="#the-linearpreconditioner-interface" title="Permalink to this headline">¶</a></h2>
+<p>Several preconditioners, including the Stochastic Reconfiguration, transform the gradient by solving a linear system of equation.
+begin{equation}
+S \bf{x} + \bf{F}
+end{equation}
+where <span class="math notranslate nohighlight">\( S \)</span> is a linear operator, <span class="math notranslate nohighlight">\( F \)</span> is the gradient and the solution <span class="math notranslate nohighlight">\(\bf{x}\)</span> is the preconditioned gradient.</p>
+<p>NetKet implements a basic interface called <span class="xref std std-ref">netket.optimizer.LinearPreconditioner</span> to make it easier to implement this kind of
+solvers. It is especially tuned for the cases where <span class="math notranslate nohighlight">\( S \)</span> is a linear operator.</p>
+<p>To construct <span class="xref std std-ref">netket.optimizer.LinearPreconditioner</span> you must supply two objects: the <code class="docutils literal notranslate"><span class="pre">lhs_constructor</span></code>, which is a function or
+closure with signature <code class="docutils literal notranslate"><span class="pre">(VariationalState)-&gt;LinearOperator</span></code> that accepts one argument, the variational state, and constructs the linear
+operator associated with it.
+The other object is a linear solver method, that must accept the linear operator and the gradient and compute the solution.
+The gradient is always provided as a PyTree.</p>
+<p>To give a clear example: in the case of the Stochastic Reconfiguration (SR) method, if we call <span class="math notranslate nohighlight">\( \vb{F} \)</span> the gradient of the energy and <span class="math notranslate nohighlight">\( S \)</span> the Quantum Geometric Tensor (also known as SR matrix), we need to solve the system of equation <span class="math notranslate nohighlight">\( S d\vb{w} = F \)</span> to compute the resulting gradient.
+The <span class="math notranslate nohighlight">\( S \)</span> matrix in this case is the <code class="docutils literal notranslate"><span class="pre">lhs</span></code> or LinearOperator of the preconditioner, while the function is any linear solver such as <code class="docutils literal notranslate"><span class="pre">cholesky</span></code>, <code class="docutils literal notranslate"><span class="pre">jnp.linalg.solve</span></code> or iterative solvers such as <code class="docutils literal notranslate"><span class="pre">scipy.sparse.linalg.cg</span></code>.</p>
+<p>As there are different ways to compute the <span class="math notranslate nohighlight">\( S \)</span> matrix, all with their different computational performance characteristics, and there are different solvers, we believe that this design makes the code more modular and easier to reason about.</p>
+<p>When defining a preconditioner object you have two options: you can implement the bare API, which gives you maximum freedom but makes you responsible for all optimisations, or you can implement the <code class="docutils literal notranslate"><span class="pre">LinearOperator</span></code> interface, which constraints you a bit but will take care of a few performance optimisations.</p>
+<section id="bare-interface">
+<h3>Bare interface<a class="headerlink" href="#bare-interface" title="Permalink to this headline">¶</a></h3>
+<p>The bare-minimum API a preconditioner <code class="docutils literal notranslate"><span class="pre">lhs</span></code> must implement:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>- It must be a class
+
+- There must be a function to build it from a variational state. This function will be called with the variational state as the first positional argument.  This function must not necessarily be a method of the class. 
+
+- This class must have a `solve(self, function, gradient, *, x0=None)` method taking as argument the gradient to be preconditioned and must not error if a keyword argument `x0` is passed to it. `x0` is the output of `solve` the last time it has been called, and might be ignored if not needed. `function` is the function computing the preconditioner.
+</pre></div>
+</div>
+<p>You can subclass the abstract base class :ref<code class="docutils literal notranslate"><span class="pre">nk.optimizer.PreconditionerObject</span></code> to be sure that you are
+implementing the correct interface, but you are not obliged to subclass it.</p>
+<p>When you implement such an interface you are left with maximum flexibility, however you will be responsible for <code class="docutils literal notranslate"><span class="pre">jax.jit</span></code>ing all computational intensive methods (most likely <code class="docutils literal notranslate"><span class="pre">solve</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="k">def</span> <span class="nf">MyObject</span><span class="p">(</span><span class="n">variational_state</span><span class="p">):</span>
+	<span class="n">stuff_a</span><span class="p">,</span> <span class="n">stuff_b</span> <span class="o">=</span> <span class="n">compute_stuff</span><span class="p">(</span><span class="n">variational_state</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">MyObjectT</span><span class="p">(</span><span class="n">stuff_a</span><span class="p">,</span> <span class="n">stuff_b</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MyObjectT</span><span class="p">:</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+		<span class="c1"># setup this object</span>
+
+	<span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preconditioner_function</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="c1"># prepare</span>
+		<span class="o">...</span>
+		<span class="c1"># compute</span>
+		<span class="k">return</span> <span class="n">solve_fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Be warned that if you want to <span class="xref std std-ref">jax.jit</span> compile the solve method, as it is usually computationally intensive, you must either specify how to flatten and unflatten to a PyTree your <code class="docutils literal notranslate"><span class="pre">MyObjectT</span></code>, or you should mark it as a <code class="docutils literal notranslate"><span class="pre">flax.struct.dataclass</span></code>, which is a frozen dataclass which does that automatically.
+Since you cannot write the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method for a frozen dataclass, we usually define a constructor function as shown above.</p>
+<p>You might be asking why each object needs a <code class="docutils literal notranslate"><span class="pre">solve</span></code> method and is passed to the preconditioner function instead of the over way around. The reason for this is to invert the control: <code class="docutils literal notranslate"><span class="pre">preconditioner_function</span></code>s must obey a certain API, but even if they do, different objects might need to perform some different initialization to compute the precondition in a more efficient way.
+This architecture allows every object to run arbitrary logic before executing the preconditioner of choice.
+Particular examples of this approach can be seen by looking at the implementation of <a class="reference internal" href="_generated/optim/netket.optimizer.qgt.QGTJacobianDense.html#netket-optimizer-qgt-qgtjacobiandense"><span class="std std-ref">netket.optimizer.qgt.QGTJacobianDense</span></a> and <a class="reference internal" href="_generated/optim/netket.optimizer.qgt.QGTJacobianPyTree.html#netket-optimizer-qgt-qgtjacobianpytree"><span class="std std-ref">netket.optimizer.qgt.QGTJacobianPyTree</span></a>.</p>
+</section>
+<section id="linearoperator-interface">
+<h3>LinearOperator interface<a class="headerlink" href="#linearoperator-interface" title="Permalink to this headline">¶</a></h3>
+<p>You can also subclass <span class="xref std std-ref">netket.optimizer.LinearOperator</span>.
+A LinearOperator must be a <a class="reference external" href="https://flax.readthedocs.io/en/latest/flax.struct.html"><code class="docutils literal notranslate"><span class="pre">flax</span></code> dataclass</a>, which is an immutable
+object (therefore after construction you cannot modify its attributes).</p>
+<p>LinearOperators have several convenience methods, and they will act as matrices: you can right-multiply them by a PyTree
+vector or a dense vector. You can obtain their dense representation, and it will automatically jit-compile all computationally
+intensive operations.</p>
+<p>To implement the LinearOperator interface you should implement the following methods:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+<span class="k">def</span> <span class="nf">MyLinearOperator</span><span class="p">(</span><span class="n">variational_state</span><span class="p">):</span>
+	<span class="n">stuff_a</span><span class="p">,</span> <span class="n">stuff_b</span> <span class="o">=</span> <span class="n">compute_stuff</span><span class="p">(</span><span class="n">variational_state</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">MyLinearOperatorT</span><span class="p">(</span><span class="n">stuff_a</span><span class="p">,</span> <span class="n">stuff_b</span><span class="p">)</span>
+
+<span class="nd">@flax</span><span class="o">.</span><span class="n">struct</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">MyLinearOperatorT</span><span class="p">(</span><span class="n">nk</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">LinearOperator</span><span class="p">):</span>
+
+	<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+	<span class="k">def</span> <span class="fm">__matmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+		<span class="c1"># prepare</span>
+		<span class="o">...</span>
+		<span class="c1"># compute</span>
+		<span class="k">return</span> <span class="n">result</span> 
+
+	<span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+	<span class="k">def</span> <span class="nf">to_dense</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="o">...</span>
+		<span class="k">return</span> <span class="n">dense_matrix</span>
+
+	<span class="c1">#optional</span>
+    <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+    <span class="k">def</span> <span class="nf">_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solve_fun</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTree</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PyTree</span><span class="p">:</span>
+    	<span class="c1">#...</span>
+    	<span class="k">return</span> <span class="n">solution</span><span class="p">,</span> <span class="n">solution_info</span>
+</pre></div>
+</div>
+<p>The bare minimum thing to implement is <code class="docutils literal notranslate"><span class="pre">__matmul__</span></code>, specifying how to multiply the linear operator by a pytree.
+You can also define a custom <code class="docutils literal notranslate"><span class="pre">_solve</span></code> method if you have some computationally intensive setup code you wish to
+run before executing a solve function (that will call matmul repeatedly).
+The <code class="docutils literal notranslate"><span class="pre">_solve</span></code> takes as first input the solve function, which is passed as a closure so it does not need to be marked
+as static (even though it is).  The x0 is an optional argument which must be accepted but can be ignored, and it is the last previous solution to the linear system.
+Optionally, one can also define the <code class="docutils literal notranslate"><span class="pre">to_dense</span></code> method.</p>
+</section>
+</section>
+<section id="the-preconditioner-function-api">
+<h2>The preconditioner function API<a class="headerlink" href="#the-preconditioner-function-api" title="Permalink to this headline">¶</a></h2>
+<p>The preconditioner function must have the following signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">preconditioner_function</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="c1">#...</span>
+	<span class="k">return</span> <span class="n">preconditioned_gradient</span><span class="p">,</span> <span class="n">x0</span>
+</pre></div>
+</div>
+<p>The object that will be passed is the selected preconditioner object, previously constructed.
+The gradient is the gradient of the loss function to precondition.
+x0 is an optional initial condition that might be ignored.</p>
+<p>The gradient might be a PyTree version or a dense ravelling of the PyTree. The result of the function should be a preconditioned gradient with the same format.
+Additional keyword argument can be present, and will in general be set through a closure or <code class="docutils literal notranslate"><span class="pre">functools.partial</span></code>, because this function will be called with the signature above.
+If you have a peculiar preconditioner, you can assume that <code class="docutils literal notranslate"><span class="pre">preconditioner_function</span></code> will be called only from your <code class="docutils literal notranslate"><span class="pre">preconditioner</span> <span class="pre">object</span></code>, but in general it is good practice respecting the interface above so that different functions can work with different objects.</p>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
+    </p>
+  </div>
+</footer>
+
+<script type="text/javascript">
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+      })
+</script>
+
+<!-- Temporary footer
+<div class="footer-wip">
+  <div class="footer-wip-content">
+    This documentation refers to an unreleased version of Netket.
+  </div>
+</div>
+-->
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-118013987-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-118013987-1');
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "url": "https://www.netket.org",
+  "name": "NetKet",
+  "founder": "Giuseppe Carleo",
+  "foundingDate": "2018-04-24",
+  "foundingLocation" : "New York",
+  "logo": "https://www.netket.org/img/logo_small.jpg",
+  "sameAs": [
+    "https://twitter.com/NetKetOrg",
+    "https://github.com/NetKet/netket"
+  ],
+  "description" : "Netket is an open-source project delivering cutting-edge
+  methods for the study of many-body quantum systems with artificial neural
+  networks and machine learning techniques."
+}
+</script>
+
+  </body>
+</html>

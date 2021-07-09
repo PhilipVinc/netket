@@ -1,0 +1,45 @@
+﻿netket.nn.MaskedConv2D
+======================
+
+.. currentmodule:: netket.nn
+
+.. autoclass:: MaskedConv2D
+   :show-inheritance:
+
+   .. automethod:: MaskedConv2D.__init__
+
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Attributes
+      .. autoattribute:: MaskedConv2D.feature_group_count
+      .. autoattribute:: MaskedConv2D.name
+      .. autoattribute:: MaskedConv2D.parent
+      .. autoattribute:: MaskedConv2D.precision
+      .. autoattribute:: MaskedConv2D.scope
+      .. autoattribute:: MaskedConv2D.use_bias
+      .. autoattribute:: MaskedConv2D.variables
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+      .. automethod:: MaskedConv2D.__call__
+      .. automethod:: MaskedConv2D.apply
+      .. automethod:: MaskedConv2D.bias_init
+      .. automethod:: MaskedConv2D.bind
+      .. automethod:: MaskedConv2D.clone
+      .. automethod:: MaskedConv2D.get_variable
+      .. automethod:: MaskedConv2D.has_variable
+      .. automethod:: MaskedConv2D.init
+      .. automethod:: MaskedConv2D.init_with_output
+      .. automethod:: MaskedConv2D.is_mutable_collection
+      .. automethod:: MaskedConv2D.kernel_init
+      .. automethod:: MaskedConv2D.make_rng
+      .. automethod:: MaskedConv2D.param
+      .. automethod:: MaskedConv2D.setup
+      .. automethod:: MaskedConv2D.sow
+      .. automethod:: MaskedConv2D.variable
+
+   

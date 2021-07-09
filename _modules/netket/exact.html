@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.exact &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -110,14 +110,12 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">_itertools</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">bicgstab</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">bicgstab</span>
 
 <span class="kn">from</span> <span class="nn">.operator</span> <span class="kn">import</span> <span class="n">AbstractOperator</span>
 
-<span class="kn">from</span> <span class="nn">._exact_dynamics</span> <span class="kn">import</span> <span class="n">PyExactTimePropagation</span>
+<span class="kn">from</span> <span class="nn">._exact_dynamics</span> <span class="kn">import</span> <span class="n">PyExactTimePropagation</span>  <span class="c1"># noqa: F401</span>
 
 
 <div class="viewcode-block" id="lanczos_ed"><a class="viewcode-back" href="../../docs/_generated/exact/netket.exact.lanczos_ed.html#netket.exact.lanczos_ed">[docs]</a><span class="k">def</span> <span class="nf">lanczos_ed</span><span class="p">(</span>
@@ -139,22 +137,23 @@
 <span class="sd">            eigenvectors has almost no performance benefits.</span>
 <span class="sd">        matrix_free: If true, matrix elements are computed on the fly.</span>
 <span class="sd">            Otherwise, the operator is first converted to a sparse matrix.</span>
-<span class="sd">        scipy_args: Additional keyword arguments passed to `scipy.sparse.linalg.eigvalsh`.</span>
-<span class="sd">            See the Scipy documentation for further information.</span>
+<span class="sd">        scipy_args: Additional keyword arguments passed to</span>
+<span class="sd">            `scipy.sparse.linalg.eigvalsh`. See the Scipy documentation for further</span>
+<span class="sd">            information.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Either `w` or the tuple `(w, v)` depending on whether `compute_eigenvectors` is True.</span>
-
-<span class="sd">        w: Array containing the lowest `first_n` eigenvalues.</span>
-
-<span class="sd">        v: Array containing the eigenvectors as columns, such that`v[:, i]` corresponds to `w[i]`.</span>
+<span class="sd">        Either `w` or the tuple `(w, v)` depending on whether `compute_eigenvectors`</span>
+<span class="sd">        is True.</span>
+<span class="sd">         - w: Array containing the lowest `first_n` eigenvalues.</span>
+<span class="sd">         - v: Array containing the eigenvectors as columns, such that`v[:, i]`</span>
+<span class="sd">            corresponds to `w[i]`.</span>
 
 <span class="sd">    Example:</span>
 <span class="sd">        Test for 1D Ising chain with 8 sites.</span>
 <span class="sd">        s</span>
 <span class="sd">        &gt;&gt;&gt; import netket as nk</span>
 <span class="sd">        &gt;&gt;&gt; hi = nk.hilbert.Spin(s=1/2)**8</span>
-<span class="sd">        &gt;&gt;&gt; hamiltonian = nk.operator.Ising(hi, h=1.0)</span>
+<span class="sd">        &gt;&gt;&gt; hamiltonian = nk.operator.Ising(hi, h=1.0, graph=nk.graph.Chain(8))</span>
 <span class="sd">        &gt;&gt;&gt; w = nk.exact.lanczos_ed(hamiltonian, k=3)</span>
 <span class="sd">        &gt;&gt;&gt; w</span>
 <span class="sd">        array([-10.25166179, -10.05467898,  -8.69093921])</span>
@@ -191,15 +190,16 @@
 <span class="sd">            of the operator.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Either `w` or the tuple `(w, v)` depending on whether `compute_eigenvectors` is True.</span>
+<span class="sd">        Either `w` or the tuple `(w, v)` depending on whether `compute_eigenvectors`</span>
+<span class="sd">        is True.</span>
 
 <span class="sd">    Example:</span>
 
 <span class="sd">        Test for 1D Ising chain with 8 sites.</span>
 
 <span class="sd">        &gt;&gt;&gt; import netket as nk</span>
-<span class="sd">        &gt;&gt;&gt; hi = nk.hilbert.Spin(nk.graph.Chain(8), s=1/2)</span>
-<span class="sd">        &gt;&gt;&gt; hamiltonian = nk.operator.Ising(hi, h=1.0)</span>
+<span class="sd">        &gt;&gt;&gt; hi = nk.hilbert.Spin(s=1/2)**8</span>
+<span class="sd">        &gt;&gt;&gt; hamiltonian = nk.operator.Ising(hi, h=1.0, graph=nk.graph.Chain(8))</span>
 <span class="sd">        &gt;&gt;&gt; w = nk.exact.full_ed(hamiltonian)</span>
 <span class="sd">        &gt;&gt;&gt; w.shape</span>
 <span class="sd">        (256,)</span>
@@ -229,7 +229,8 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        lindblad: The lindbladian encoding the master equation.</span>
-<span class="sd">        sparse: Whever to use sparse matrices (default: False for ed, True for iterative)</span>
+<span class="sd">        sparse: Whever to use sparse matrices (default: False for ed, True for</span>
+<span class="sd">            iterative)</span>
 <span class="sd">        method: &#39;ed&#39; (exact diagonalization) or &#39;iterative&#39; (iterative bicgstabl)</span>
 <span class="sd">        rho0: starting density matrix for the iterative diagonalization (default: None)</span>
 <span class="sd">        kwargs...: additional kwargs passed to bicgstabl</span>
@@ -240,14 +241,12 @@
 <span class="sd">    Keyword Args:</span>
 <span class="sd">        maxiter: maximum number of iterations for the iterative solver (default: None)</span>
 <span class="sd">        tol: The precision for the calculation (default: 1e-05)</span>
-<span class="sd">        callback: User-supplied function to call after each iteration. It is called as callback(xk),</span>
-<span class="sd">                  where xk is the current solution vector</span>
+<span class="sd">        callback: User-supplied function to call after each iteration. It is called as</span>
+<span class="sd">            callback(xk), where xk is the current solution vector</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The steady-state density matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">array</span>
-
     <span class="k">if</span> <span class="n">sparse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">sparse</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -269,14 +268,14 @@
 
             <span class="n">lind_mat</span> <span class="o">=</span> <span class="n">lindblad</span><span class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
 
-            <span class="n">ldagl</span> <span class="o">=</span> <span class="n">lind_mat</span><span class="o">.</span><span class="n">H</span> <span class="o">*</span> <span class="n">lind_mat</span>
+            <span class="n">ldagl</span> <span class="o">=</span> <span class="n">lind_mat</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span> <span class="o">*</span> <span class="n">lind_mat</span>
             <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">eigh</span><span class="p">(</span><span class="n">ldagl</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">eigsh</span>
 
             <span class="n">lind_mat</span> <span class="o">=</span> <span class="n">lindblad</span><span class="o">.</span><span class="n">to_sparse</span><span class="p">()</span>
-            <span class="n">ldagl</span> <span class="o">=</span> <span class="n">lind_mat</span><span class="o">.</span><span class="n">H</span> <span class="o">*</span> <span class="n">lind_mat</span>
+            <span class="n">ldagl</span> <span class="o">=</span> <span class="n">lind_mat</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span> <span class="o">*</span> <span class="n">lind_mat</span>
 
             <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">eigsh</span><span class="p">(</span><span class="n">ldagl</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;SM&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -334,7 +333,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

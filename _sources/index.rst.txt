@@ -107,20 +107,39 @@
 
 
 .. toctree::
-   :maxdepth: 10
+   :maxdepth: 2
+   :caption: Reference Documentation
    :hidden:
 
    docs/getting_started
-   docs/whats_new
+   docs/changelog
    docs/superop
    docs/varstate
+   docs/sr
    docs/drivers
-   docs/custom_models
    docs/sharp-bits
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Extending NetKet
+   :hidden:
+
+   docs/custom_models
+   docs/custom_preconditioners
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer Documentation
+   :hidden:
+
+   docs/contributing
+   docs/writing-tests
+
+
+.. toctree::
+   :maxdepth: 3
+   :caption: API documentation
+   :hidden:
+
    docs/api
-..
-  hidden from toctree
-   tutorials
-   citing
-
-

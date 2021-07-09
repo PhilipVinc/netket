@@ -3,26 +3,29 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>netket.graph.Lattice &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../../../_static/js/rtd_theme.js"></script>
     <link rel="author" title="About these documents" href="../../../about.html" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="netket.graph.Chain" href="netket.graph.Chain.html" />
+    <link rel="next" title="netket.graph.lattice.LatticeSite" href="netket.graph.lattice.LatticeSite.html" />
     <link rel="prev" title="netket.graph.Hypercube" href="netket.graph.Hypercube.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -111,7 +114,8 @@
   ---->
 </div>
 
-<ul class="current">
+<p class="caption"><span class="caption-text">Reference Documentation</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#installation-and-requirements">Installation and requirements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../getting_started.html#mpi">MPI</a></li>
@@ -123,8 +127,31 @@
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#commented-example">Commented Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../whats_new.html">What’s New in v3.0</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../whats_new.html#api-changes">API Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b4-unreleased">NetKet 3.0b4 (unreleased)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#new-features">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#breaking-changes">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#internal-changes">Internal Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#bug-fixes">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b3-published-on-9-july-2021">NetKet 3.0b3 (published on 9 july 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id1">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id2">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id3">Internal Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id4">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b2-published-on-31-may-2021">NetKet 3.0b2 (published on 31 May 2021)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id5">New features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id6">Breaking Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#id7">Bug Fixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../changelog.html#netket-3-0b1-published-beta-release">NetKet 3.0b1 (published beta release)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../changelog.html#api-changes">API Changes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../superop.html">The Lindblad Master Equation</a><ul>
@@ -148,11 +175,28 @@
 <li class="toctree-l2"><a class="reference internal" href="../../varstate.html#saving-and-loading-a-variational-state">Saving and Loading a Variational State</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../sr.html">Quantum Geometric Tensor and Stochastic Reconfiguration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../sr.html#stochastic-reconfiguration">Stochastic Reconfiguration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../sr.html#using-stochastic-reconfiguration">Using stochastic reconfiguration</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../drivers.html">The Drivers API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../drivers.html#constructing-a-driver">Constructing a driver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../drivers.html#running-the-optimisation">Running the optimisation</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#parallelization">Parallelization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#running-on-cpu-when-gpus-are-present">Running on CPU when GPUs are present</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#using-gpus">Using GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#nans-in-training-and-loss-of-precision">NaNs in training and loss of precision</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Extending NetKet</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../../custom_models.html">Defining Custom Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../custom_models.html#commonalities">Commonalities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../custom_models.html#defining-models-init-and-apply-functions">Defining models: init and apply functions</a></li>
@@ -163,31 +207,58 @@
 <li class="toctree-l2"><a class="reference internal" href="../../custom_models.html#using-haiku">Using Haiku</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../sharp-bits.html">🔪 The Sharp Bits 🔪</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#parallelization">Parallelization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#running-on-cpu-when-gpus-are-present">Running on CPU when GPUs are present</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#using-gpus">Using GPUs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../sharp-bits.html#nans-in-training-and-loss-of-precision">NaNs in training and loss of precision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../custom_preconditioners.html">The preconditioner interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../custom_preconditioners.html#the-linearpreconditioner-interface">The LinearPreconditioner interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../custom_preconditioners.html#bare-interface">Bare interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../custom_preconditioners.html#linearoperator-interface">LinearOperator interface</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../custom_preconditioners.html#the-preconditioner-function-api">The preconditioner function API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developer Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to NetKet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#ways-to-contribute">Ways to contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#contributing-code-using-pull-requests">Contributing code using pull requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#netket-pull-request-checklist">NetKet pull request checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#single-change-commits-and-pull-requests">Single-change commits and pull requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#python-coding-style">Python coding style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#docstrings-and-type-hints">Docstrings and Type Hints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#visibility-of-public-api">Visibility of public API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../contributing.html#full-github-test-suite">Full GitHub test suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../writing-tests.html">Writing Tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../writing-tests.html#test-structure-and-common-files">Test structure and common files.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../writing-tests.html#tests-and-mpi">Tests and MPI</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">API documentation</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../../api.html">Public API: netket package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../../api.html#graph">Graph</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="netket.graph.AbstractGraph.html">netket.graph.AbstractGraph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="netket.graph.NetworkX.html">netket.graph.NetworkX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="netket.graph.Graph.html">netket.graph.Graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="netket.graph.Edgeless.html">netket.graph.Edgeless</a></li>
 <li class="toctree-l3"><a class="reference internal" href="netket.graph.Hypercube.html">netket.graph.Hypercube</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">netket.graph.Lattice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="netket.graph.lattice.LatticeSite.html">netket.graph.lattice.LatticeSite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="netket.graph.Chain.html">netket.graph.Chain</a></li>
 <li class="toctree-l3"><a class="reference internal" href="netket.graph.Grid.html">netket.graph.Grid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="netket.graph.SymmGroup.html">netket.graph.SymmGroup</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#hilbert">Hilbert</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.AbstractHilbert.html">netket.hilbert.AbstractHilbert</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Qubit.html">netket.hilbert.Qubit</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Spin.html">netket.hilbert.Spin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.CustomHilbert.html">netket.hilbert.CustomHilbert</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.DoubledHilbert.html">netket.hilbert.DoubledHilbert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Fock.html">netket.hilbert.Fock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Qubit.html">netket.hilbert.Qubit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../hilbert/netket.hilbert.Spin.html">netket.hilbert.Spin</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#operators">Operators</a><ul>
@@ -239,6 +310,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.MetropolisHamiltonian.html">netket.sampler.MetropolisHamiltonian</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.MetropolisLocalPt.html">netket.sampler.MetropolisLocalPt</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.MetropolisExchangePt.html">netket.sampler.MetropolisExchangePt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../samplers/netket.sampler.ARDirectSampler.html">netket.sampler.ARDirectSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#transition-rules">Transition Rules</a><ul>
@@ -266,6 +338,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../models/netket.models.MPSPeriodic.html">netket.models.MPSPeriodic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../models/netket.models.NDM.html">netket.models.NDM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../models/netket.models.GCNN.html">netket.models.GCNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/netket.models.ARNN.html">netket.models.ARNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../models/netket.models.ARNNDense.html">netket.models.ARNNDense</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#model-tools">Model tools</a><ul>
@@ -277,6 +351,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.DenseEquivariant.html">netket.nn.DenseEquivariant</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.Conv.html">netket.nn.Conv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.Embed.html">netket.nn.Embed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.MaskedDense1D.html">netket.nn.MaskedDense1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.MaskedConv1D.html">netket.nn.MaskedConv1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.MaskedConv2D.html">netket.nn.MaskedConv2D</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#activation-functions">Activation functions</a><ul>
@@ -292,27 +369,44 @@
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.softmax.html">netket.nn.softmax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.softplus.html">netket.nn.softplus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.swish.html">netket.nn.swish</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.logcosh.html">netket.nn.logcosh</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nn/netket.nn.log_cosh.html">netket.nn.log_cosh</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#variational-state-interface">Variational State Interface</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../variational/netket.variational.VariationalState.html">netket.variational.VariationalState</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../variational/netket.variational.MCState.html">netket.variational.MCState</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../variational/netket.variational.MCMixedState.html">netket.variational.MCMixedState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variational/netket.vqs.VariationalState.html">netket.vqs.VariationalState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variational/netket.vqs.MCState.html">netket.vqs.MCState</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variational/netket.vqs.MCMixedState.html">netket.vqs.MCMixedState</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../api.html#optimizer">Optimizer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.SR.html">netket.optimizer.SR</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.SRLazyCG.html">netket.optimizer.SRLazyCG</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.SRLazyGMRES.html">netket.optimizer.SRLazyGMRES</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.sr.LazySMatrix.html">netket.optimizer.sr.LazySMatrix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.Adam.html">netket.optimizer.Adam</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.AdaGrad.html">netket.optimizer.AdaGrad</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.Sgd.html">netket.optimizer.Sgd</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.Momentum.html">netket.optimizer.Momentum</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optim/netket.optimizer.RmsProp.html">netket.optimizer.RmsProp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api.html#optimizer-module">Optimizer Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#optimizers">Optimizers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.Adam.html">netket.optimizer.Adam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.AdaGrad.html">netket.optimizer.AdaGrad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.Sgd.html">netket.optimizer.Sgd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.Momentum.html">netket.optimizer.Momentum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.RmsProp.html">netket.optimizer.RmsProp</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#preconditioners">Preconditioners</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.SR.html">netket.optimizer.SR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#quantum-geometric-tensor">Quantum Geometric Tensor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTAuto.html">netket.optimizer.qgt.QGTAuto</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTOnTheFly.html">netket.optimizer.qgt.QGTOnTheFly</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTJacobianPyTree.html">netket.optimizer.qgt.QGTJacobianPyTree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.qgt.QGTJacobianDense.html">netket.optimizer.qgt.QGTJacobianDense</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#dense-solvers">Dense solvers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.svd.html">netket.optimizer.solver.svd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.cholesky.html">netket.optimizer.solver.cholesky</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.LU.html">netket.optimizer.solver.LU</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../optim/netket.optimizer.solver.solve.html">netket.optimizer.solver.solve</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api.html#optimization-drivers">Optimization drivers</a><ul>
@@ -347,65 +441,176 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="netket-graph-lattice">
+  <section id="netket-graph-lattice">
 <h1>netket.graph.Lattice<a class="headerlink" href="#netket-graph-lattice" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="netket.graph.Lattice">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">netket.graph.</span></code><code class="sig-name descname"><span class="pre">Lattice</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_vectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">netket.graph.graph.NetworkX</span></code></p>
-<p>A lattice built translating a unit cell and adding edges between nearest neighbours sites.</p>
-<p>The unit cell is defined by the <code class="docutils literal notranslate"><span class="pre">basis_vectors</span></code> and it can contain an arbitrary number of atoms.
-Each atom is located at an arbitrary position and is labelled by an integer number,
-meant to distinguish between the different atoms within the unit cell.
-Periodic boundary conditions can also be imposed along the desired directions.
-There are three different ways to refer to the lattice sites. A site can be labelled
-by a simple integer number (the site index) or by its coordinates (actual position in space).</p>
-<dl class="py method">
-<dt id="netket.graph.Lattice.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_vectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs a new <code class="docutils literal notranslate"><span class="pre">Lattice</span></code> given its side length and the features of the unit cell.</p>
+<dt class="sig sig-object py" id="netket.graph.Lattice">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">netket.graph.</span></span><span class="sig-name descname"><span class="pre">Lattice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_vectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_offsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="netket.graph.Graph.html#netket.graph.Graph" title="netket.graph.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">netket.graph.graph.Graph</span></code></a></p>
+<p>A lattice built by periodic arrangement of a given unit cell.</p>
+<p>The lattice is represented as a Bravais lattice with (<code class="code docutils literal notranslate"><span class="pre">basis_vectors</span></code>)
+<span class="math notranslate nohighlight">\(\{a_d\}_{d=1}^D\)</span> (where <span class="math notranslate nohighlight">\(D = \mathtt{ndim}\)</span> is the dimension of the
+lattice) and a unit cell consisting of one or more sites,
+The positions of those sites within the unit cell can be specified by the
+<code class="code docutils literal notranslate"><span class="pre">site_offsets</span></code> parameter. The <code class="code docutils literal notranslate"><span class="pre">extent</span></code> is a array where
+<code class="code docutils literal notranslate"><span class="pre">extent[d]</span></code> specifies the number of times each unit cell is translated along
+direction <span class="math notranslate nohighlight">\(d\)</span>.
+The full lattice is then generated by placing a site at each of the points</p>
+<div class="math notranslate nohighlight">
+\[R_{rq} = \sum_{d=1}^D r_d a_d + b_q \in \mathbb R^D\]</div>
+<p>where <span class="math notranslate nohighlight">\(r_d \in \{1, \ldots, \mathtt{extent}[d]\}\)</span> and
+<span class="math notranslate nohighlight">\(b_q = \mathtt{site\_offsets}[q]\)</span>.
+We also refer to <span class="math notranslate nohighlight">\(q\)</span> as the <cite>label</cite> of the site within the unit cell.</p>
+<p>The lattice class supports three ways of addressing a specific lattice site:</p>
+<dl class="simple">
+<dt>id</dt><dd><p>An integer index that is used to identify the site in <code class="code docutils literal notranslate"><span class="pre">self.edges()</span></code> and
+also corresponds to the index of the corresponding site in sequences like
+<code class="code docutils literal notranslate"><span class="pre">self.nodes()</span></code>, <code class="code docutils literal notranslate"><span class="pre">self.positions</span></code> or <code class="code docutils literal notranslate"><span class="pre">self.basis_coords</span></code>.</p>
+</dd>
+<dt>positions</dt><dd><p>Real-space position vector <span class="math notranslate nohighlight">\(R_{rq}\)</span> as defined above, which is available
+from <a class="reference internal" href="#netket.graph.Lattice.positions" title="netket.graph.Lattice.positions"><code class="xref py py-func docutils literal notranslate"><span class="pre">positions()</span></code></a> and can be resolved into an id via
+<a class="reference internal" href="#netket.graph.Lattice.id_from_position" title="netket.graph.Lattice.id_from_position"><code class="xref py py-func docutils literal notranslate"><span class="pre">id_from_position()</span></code></a>.</p>
+</dd>
+<dt>basis coordinates</dt><dd><p>where each site is specified by a vector <code class="code docutils literal notranslate"><span class="pre">[r1,</span> <span class="pre">...,</span> <span class="pre">rD,</span> <span class="pre">q]</span></code>
+with <span class="math notranslate nohighlight">\(r\)</span> being the integer vector of length <code class="code docutils literal notranslate"><span class="pre">ndim</span></code> specifying the
+cell position as multiples of the primitive vectors and the site label <span class="math notranslate nohighlight">\(q\)</span>
+giving the number of the site within the unit cell.
+Basis coordinates are available from <a class="reference internal" href="#netket.graph.Lattice.basis_coords" title="netket.graph.Lattice.basis_coords"><code class="xref py py-func docutils literal notranslate"><span class="pre">basis_coords()</span></code></a>
+and can be resolved into an id via
+<a class="reference internal" href="#netket.graph.Lattice.id_from_basis_coords" title="netket.graph.Lattice.id_from_basis_coords"><code class="xref py py-func docutils literal notranslate"><span class="pre">id_from_basis_coords()</span></code></a>.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>basis_vectors</strong> – The basis vectors of the unit cell.</p></li>
-<li><p><strong>extent</strong> – The number of copies of the unit cell.</p></li>
-<li><p><strong>pbc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the constructed lattice
+<li><p><strong>basis_vectors</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>pbc</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>]</em><em>]</em>) – </p></li>
+<li><p><strong>site_offsets</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
+<li><p><strong>atoms_coord</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
+<li><p><strong>distance_atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – </p></li>
+<li><p><strong>point_group</strong> (<em>Optional</em><em>[</em><em>netket.utils.group._point_group.PointGroup</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_vectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_offsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_coord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a new <code class="docutils literal notranslate"><span class="pre">Lattice</span></code> given its side length and the features of the unit
+cell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basis_vectors</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – The basis vectors of the lattice. Should be an array
+of shape <cite>(ndim, ndim)</cite> where each <cite>row</cite> is a basis vector.</p></li>
+<li><p><strong>extent</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>) – The number of copies of the unit cell; needs to be an array
+of length <cite>ndim</cite>.</p></li>
+<li><p><strong>pbc</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]]) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> then the constructed lattice
 will have periodic boundary conditions, otherwise
-open boundary conditions are imposed (default=``True``).</p></li>
-<li><p><strong>atoms_coord</strong> – The coordinates of different atoms in the unit cell (default=one atom at the origin).</p></li>
-<li><p><strong>distance_atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – A KDTree algorithm finds first neighbours of the lattice, which define the edges of
-the graph. The algorithm needs to be specified some absolute tolerance for those distances,
-as sometimes floating point errors might cause some edges not to be detected.</p></li>
+open boundary conditions are imposed. Can also be an boolean sequence
+of length <cite>ndim</cite>, indicating either open or closed boundary conditions
+separately for each direction.</p></li>
+<li><p><strong>site_offsets</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – The position offsets of sites in the unit cell (one site at
+the origin by default).</p></li>
+<li><p><strong>distance_atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – Distance below which spatial points are considered equal for
+the purpose of identifying nearest neighbors.</p></li>
+<li><p><strong>point_group</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PointGroup</span></code>]) – Default <cite>PointGroup</cite> object for constructing space groups</p></li>
+<li><p><strong>atoms_coord</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>Constructs a rectangular 3X4 lattice with periodic boundary conditions.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">netket</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">netket</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Lattice</span><span class="p">(</span><span class="n">basis_vectors</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span><span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+<p>Constructs a Kagome lattice with 3 × 3 unit cells:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">netket.graph</span> <span class="kn">import</span> <span class="n">Lattice</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Hexagonal lattice basis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqrt3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sqrt3</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Kagome unit cell</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">basis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">basis</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="n">basis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">basis</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mf">2.0</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">basis_vectors</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span> <span class="n">site_offsets</span><span class="o">=</span><span class="n">cell</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">)</span>
-<span class="go">12</span>
+<span class="go">27</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">basis_coords</span><span class="p">[:</span><span class="mi">6</span><span class="p">])</span>
+<span class="go">[[0 0 0]</span>
+<span class="go"> [0 0 1]</span>
+<span class="go"> [0 0 2]</span>
+<span class="go"> [0 1 0]</span>
+<span class="go"> [0 1 1]</span>
+<span class="go"> [0 1 2]]</span>
+<span class="go"> &gt;&gt;&gt; print(g.positions[:6])</span>
+<span class="go"> [[0.5        0.        ]</span>
+<span class="go">  [0.25       0.4330127 ]</span>
+<span class="go">  [0.75       0.4330127 ]</span>
+<span class="go">  [1.         0.8660254 ]</span>
+<span class="go">  [0.75       1.29903811]</span>
+<span class="go">  [1.25       1.29903811]]</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="class-dl-groups">
 <dt>Attributes</dt><dd><dl class="py attribute">
-<dt id="netket.graph.Lattice.atoms_coord">
-<code class="sig-name descname"><span class="pre">atoms_coord</span></code><a class="headerlink" href="#netket.graph.Lattice.atoms_coord" title="Permalink to this definition">¶</a></dt>
-<dd><p>Coordinates of atoms in the unit cell.</p>
+<dt class="sig sig-object py" id="netket.graph.Lattice.atoms_coord">
+<span class="sig-name descname"><span class="pre">atoms_coord</span></span><a class="headerlink" href="#netket.graph.Lattice.atoms_coord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">site_offsets</span></code> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="netket.graph.Lattice.basis_vectors">
-<code class="sig-name descname"><span class="pre">basis_vectors</span></code><a class="headerlink" href="#netket.graph.Lattice.basis_vectors" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.basis_coords">
+<span class="sig-name descname"><span class="pre">basis_coords</span></span><a class="headerlink" href="#netket.graph.Lattice.basis_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>basis coordinates of all lattice sites</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.basis_vectors">
+<span class="sig-name descname"><span class="pre">basis_vectors</span></span><a class="headerlink" href="#netket.graph.Lattice.basis_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basis vectors of the lattice</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.coordinates">
+<span class="sig-name descname"><span class="pre">coordinates</span></span><a class="headerlink" href="#netket.graph.Lattice.coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">positions</span></code> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.edge_colors">
+<span class="sig-name descname"><span class="pre">edge_colors</span></span><a class="headerlink" href="#netket.graph.Lattice.edge_colors" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="netket.graph.Lattice.n_edges">
-<code class="sig-name descname"><span class="pre">n_edges</span></code><a class="headerlink" href="#netket.graph.Lattice.n_edges" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of edges in the graph.</p>
-<dl class="field-list simple">
+<dt class="sig sig-object py" id="netket.graph.Lattice.extent">
+<span class="sig-name descname"><span class="pre">extent</span></span><a class="headerlink" href="#netket.graph.Lattice.extent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extent of the lattice</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.n_edges">
+<span class="sig-name descname"><span class="pre">n_edges</span></span><a class="headerlink" href="#netket.graph.Lattice.n_edges" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
 </dd>
@@ -413,12 +618,52 @@ as sometimes floating point errors might cause some edges not to be detected.</p
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="netket.graph.Lattice.n_nodes">
-<code class="sig-name descname"><span class="pre">n_nodes</span></code><a class="headerlink" href="#netket.graph.Lattice.n_nodes" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of nodes (or vertices) in the graph</p>
-<dl class="field-list simple">
+<dt class="sig sig-object py" id="netket.graph.Lattice.n_nodes">
+<span class="sig-name descname"><span class="pre">n_nodes</span></span><a class="headerlink" href="#netket.graph.Lattice.n_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.ndim">
+<span class="sig-name descname"><span class="pre">ndim</span></span><a class="headerlink" href="#netket.graph.Lattice.ndim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dimension of the lattice</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.pbc">
+<span class="sig-name descname"><span class="pre">pbc</span></span><a class="headerlink" href="#netket.graph.Lattice.pbc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of bools such that <cite>pbc[d]</cite> indicates whether dimension d has
+periodic boundaries.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.positions">
+<span class="sig-name descname"><span class="pre">positions</span></span><a class="headerlink" href="#netket.graph.Lattice.positions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real-space positions of all lattice sites</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.site_offsets">
+<span class="sig-name descname"><span class="pre">site_offsets</span></span><a class="headerlink" href="#netket.graph.Lattice.site_offsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position offsets of sites in the unit cell</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="netket.graph.Lattice.sites">
+<span class="sig-name descname"><span class="pre">sites</span></span><a class="headerlink" href="#netket.graph.Lattice.sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sequence of lattice site objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference internal" href="netket.graph.lattice.LatticeSite.html#netket.graph.lattice.LatticeSite" title="netket.graph.lattice.LatticeSite"><code class="xref py py-class docutils literal notranslate"><span class="pre">LatticeSite</span></code></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -427,8 +672,8 @@ as sometimes floating point errors might cause some edges not to be detected.</p
 </dl>
 <dl class="class-dl-groups">
 <dt>Methods</dt><dd><dl class="py method">
-<dt id="netket.graph.Lattice.adjacency_list">
-<code class="sig-name descname"><span class="pre">adjacency_list</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.adjacency_list" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.adjacency_list">
+<span class="sig-name descname"><span class="pre">adjacency_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.adjacency_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>List containing the adjacency list of the graph where each node
 is represented by an integer in [0, n_nodes)</p>
 <dl class="field-list simple">
@@ -439,31 +684,35 @@ is represented by an integer in [0, n_nodes)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.atom_label">
-<code class="sig-name descname"><span class="pre">atom_label</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.atom_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.atom_label" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="netket.graph.Lattice.automorphisms">
-<code class="sig-name descname"><span class="pre">automorphisms</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.automorphisms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Symmetry group containing the automorphisms of the graph</p>
+<dt class="sig sig-object py" id="netket.graph.Lattice.atom_label">
+<span class="sig-name descname"><span class="pre">atom_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.atom_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.atom_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">basis_coords[site_id,</span> <span class="pre">-1]</span></code> instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">SymmGroup</span></code></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>site_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.coord_to_site">
-<code class="sig-name descname"><span class="pre">coord_to_site</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.coord_to_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.coord_to_site" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="netket.graph.Lattice.automorphisms">
+<span class="sig-name descname"><span class="pre">automorphisms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.automorphisms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Symmetry group containing the automorphisms of the graph</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PermutationGroup</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.distances">
-<code class="sig-name descname"><span class="pre">distances</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.distances" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.distances">
+<span class="sig-name descname"><span class="pre">distances</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.distances" title="Permalink to this definition">¶</a></dt>
 <dd><p>List containing the distances between the nodes.
-The fact that some node may not be reachable from another is represented by -1</p>
+The distance between unconnected nodes (no path exists between them) is set to -1</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>]</p>
@@ -472,8 +721,8 @@ The fact that some node may not be reachable from another is represented by -1</
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.draw">
-<code class="sig-name descname"><span class="pre">draw</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#1f78b4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curvature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.draw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.draw" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.draw">
+<span class="sig-name descname"><span class="pre">draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#1f78b4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curvature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.draw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.draw" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws the <code class="docutils literal notranslate"><span class="pre">Lattice</span></code> graph</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -483,8 +732,8 @@ The fact that some node may not be reachable from another is represented by -1</
 <li><p><strong>node_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – String with the colour of the nodes.</p></li>
 <li><p><strong>node_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Area of the nodes (as in matplotlib.pyplot.scatter).</p></li>
 <li><p><strong>edge_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – String with the colour of the edges.</p></li>
-<li><p><strong>curvature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – A Bezier curve is fit, where the “height” of the curve is <cite>curvature</cite>
-times the “length” of the curvature.</p></li>
+<li><p><strong>curvature</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – A Bezier curve is fit, where the “height” of the curve is
+<cite>curvature</cite> times the “length” of the curvature.</p></li>
 <li><p><strong>font_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – fontsize of the labels for each node.</p></li>
 <li><p><strong>font_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Colour of the font used to label nodes.</p></li>
 </ul>
@@ -496,22 +745,89 @@ times the “length” of the curvature.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.edges">
-<code class="sig-name descname"><span class="pre">edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.edges" title="Permalink to this definition">¶</a></dt>
-<dd><p>Iterator over the edges of the graph</p>
+<dt class="sig sig-object py" id="netket.graph.Lattice.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sequence of edges of the graph.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generator" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>return_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – If <code class="code docutils literal notranslate"><span class="pre">True</span></code>, return edges with added color information.</p></li>
+<li><p><strong>filter_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – If set, return only edges of the given color.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Parameters</dt>
-<dd class="field-even"><p><strong>color</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – </p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]]]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A sequence of edges as tuples <code class="code docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code> or, if <cite>return_color</cite> is
+passed, a sequence of tuples <code class="code docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j,</span> <span class="pre">c)</span></code> with <code class="code docutils literal notranslate"><span class="pre">c</span></code> indicating
+the color of the respective edge.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.is_bipartite">
-<code class="sig-name descname"><span class="pre">is_bipartite</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.is_bipartite" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.from_igraph">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_igraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.from_igraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new Graph instance from an igraph.Graph instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="netket.graph.Graph.html#netket.graph.Graph" title="netket.graph.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>graph</strong> (<em>igraph.Graph</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.from_networkx">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_networkx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.from_networkx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new Graph instance from a networkx graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="netket.graph.Graph.html#netket.graph.Graph" title="netket.graph.graph.Graph"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.id_from_basis_coords">
+<span class="sig-name descname"><span class="pre">id_from_basis_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.id_from_basis_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.id_from_basis_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the id for a site at the given basis coordinates. When passed a rank-2
+array where each row is a coordinate vector, returns an array of the
+corresponding ids. Throws an <cite>InvalidSiteError</cite> if any of the coords do
+not correspond to a site.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#jaxlib.xla_extension.DeviceArray" title="(in JAX)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceArray</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tracer</span></code>]</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>basis_coords</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.id_from_position">
+<span class="sig-name descname"><span class="pre">id_from_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.id_from_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.id_from_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the id for a site at the given position. When passed a rank-2 array
+where each row is a position, returns an array of the corresponding ids.
+Throws an <cite>InvalidSiteError</cite> if any of the positions do not correspond
+to a site.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#jaxlib.xla_extension.DeviceArray" title="(in JAX)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceArray</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tracer</span></code>]</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>position</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.is_bipartite">
+<span class="sig-name descname"><span class="pre">is_bipartite</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.is_bipartite" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the graph is bipartite</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -521,8 +837,8 @@ times the “length” of the curvature.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.is_connected">
-<code class="sig-name descname"><span class="pre">is_connected</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.is_connected" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.is_connected">
+<span class="sig-name descname"><span class="pre">is_connected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.is_connected" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the graph is connected</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -532,36 +848,222 @@ times the “length” of the curvature.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.nodes">
-<code class="sig-name descname"><span class="pre">nodes</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.nodes" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="netket.graph.Lattice.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.nodes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterator over the nodes of the graph</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Generator" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.site_to_coord">
-<code class="sig-name descname"><span class="pre">site_to_coord</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.site_to_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.site_to_coord" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="netket.graph.Lattice.point_group">
+<span class="sig-name descname"><span class="pre">point_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.point_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.point_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the action of <cite>point_group</cite> on the sites of <cite>self</cite> as a
+<cite>PermutationGroup</cite>. If no <cite>point_group</cite> is specified, uses the point group
+provided upon construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PermutationGroup</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>point_group</strong> (<em>Optional</em><em>[</em><em>netket.utils.group._point_group.PointGroup</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.site_to_vector">
-<code class="sig-name descname"><span class="pre">site_to_vector</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.site_to_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.site_to_vector" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="netket.graph.Lattice.position_from_basis_coords">
+<span class="sig-name descname"><span class="pre">position_from_basis_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_coords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.position_from_basis_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.position_from_basis_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the position of the site with given basis coordinates.
+When passed a rank-2 array where each row is a coordinate vector,
+this method returns an array of the corresponding positions.
+Throws an <cite>InvalidSiteError</cite> if no site is found for any of the coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>basis_coords</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt id="netket.graph.Lattice.vector_to_coord">
-<code class="sig-name descname"><span class="pre">vector_to_coord</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.vector_to_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.vector_to_coord" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="netket.graph.Lattice.rotation_group">
+<span class="sig-name descname"><span class="pre">rotation_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.rotation_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.rotation_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the action of rotations (i.e. symmetries with determinant +1) in
+<cite>point_group</cite> on the sites of <cite>self</cite> as a <cite>PermutationGroup</cite>.
+If no <cite>point_group</cite> is specified, uses the point group provided upon
+construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PermutationGroup</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>point_group</strong> (<em>Optional</em><em>[</em><em>netket.utils.group._point_group.PointGroup</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.site_to_coord">
+<span class="sig-name descname"><span class="pre">site_to_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.site_to_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.site_to_coord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">positions[site_id]</span></code> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>site_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.site_to_vector">
+<span class="sig-name descname"><span class="pre">site_to_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.site_to_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.site_to_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">basis_coords[site_id,</span> <span class="pre">:-1]</span></code> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>site_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.space_group">
+<span class="sig-name descname"><span class="pre">space_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.space_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.space_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the space group generated by the translation symmetries of <cite>self</cite>
+and the elements of <cite>point_group</cite> as a <cite>PermutationGroup</cite> acting on the
+sites of <cite>self</cite>.
+If no <cite>point_group</cite> is specified, uses the point group provided upon
+construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PermutationGroup</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>point_group</strong> (<em>Optional</em><em>[</em><em>netket.utils.group._point_group.PointGroup</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.space_group_builder">
+<span class="sig-name descname"><span class="pre">space_group_builder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.space_group_builder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.space_group_builder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <cite>SpaceGroupBuilder</cite> object that represents the spatial symmetries of
+<cite>self</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point_group</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">PointGroup</span></code>]) – a <cite>PointGroup</cite> object describing the point-group
+symmetries of <cite>self</cite>. Optional, if not supplied, the
+<cite>PointGroup</cite> object provded at construction is used.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>SpaceGroupBuilder</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A <cite>SpaceGroupBuilder</cite> object that generates <cite>PermutationGroup`s
+encoding the action of `point_group</cite>, the translation group of <cite>self</cite>,
+and the space group obtained as their semidirect product as
+permutations of the sites of <cite>self</cite>. It also yields space group irreps
+for symmetrising wave functions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.to_igraph">
+<span class="sig-name descname"><span class="pre">to_igraph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.to_igraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of this graph as an igraph.Graph instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.to_networkx">
+<span class="sig-name descname"><span class="pre">to_networkx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#netket.graph.Lattice.to_networkx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of this graph as an igraph.Graph instance.
+This method requires networkx to be installed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.to_reciprocal_lattice">
+<span class="sig-name descname"><span class="pre">to_reciprocal_lattice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.to_reciprocal_lattice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.to_reciprocal_lattice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts wave vectors from Cartesian axes to reciprocal lattice vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ks</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#jaxlib.xla_extension.DeviceArray" title="(in JAX)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceArray</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tracer</span></code>]) – wave vectors in Cartesian axes. Multidimensional arrays are accepted,
+the Cartesian coordinates must form the last dimension.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>, <a class="reference external" href="https://jax.readthedocs.io/en/latest/jax.numpy.html#jaxlib.xla_extension.DeviceArray" title="(in JAX)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceArray</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Tracer</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The same wave vectors in the reciprocal basis <strong>of the simulation box.</strong>
+Valid wave vector components in this basis are integers in (periodic BCs)
+or zero (in open BCs).</p>
+</dd>
+</dl>
+<p>Throws an <cite>InvalidWaveVectorError</cite> if any of the supplied wave vectors
+are not reciprocal lattice vectors of the simulation box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.translation_group">
+<span class="sig-name descname"><span class="pre">translation_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.translation_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.translation_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the group of lattice translations of <cite>self</cite> as a <cite>PermutationGroup</cite>
+acting on the sites of <cite>self</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">PermutationGroup</span></code></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>dim</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em><em>]</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.vector_to_coord">
+<span class="sig-name descname"><span class="pre">vector_to_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.vector_to_coord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.vector_to_coord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">position_from_basis_coords([*vector,</span> <span class="pre">label])</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>vector</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="netket.graph.Lattice.vector_to_site">
+<span class="sig-name descname"><span class="pre">vector_to_site</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/netket/graph/lattice.html#Lattice.vector_to_site"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#netket.graph.Lattice.vector_to_site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. please use <code class="code docutils literal notranslate"><span class="pre">id_from_basis_coords([*vector,</span> <span class="pre">0])</span></code> instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>vector</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.21)"><em>numpy.ndarray</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd>
 </dl>
 </dd></dl>
 
-</div>
+</section>
 
 
     </div>
@@ -577,7 +1079,7 @@ times the “length” of the curvature.</p></li>
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

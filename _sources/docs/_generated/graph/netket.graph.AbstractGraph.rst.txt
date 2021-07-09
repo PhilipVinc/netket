@@ -13,6 +13,7 @@
    .. rst-class:: class-dl-groups
 
    Attributes
+      .. autoattribute:: AbstractGraph.edge_colors
       .. autoattribute:: AbstractGraph.n_edges
       .. autoattribute:: AbstractGraph.n_nodes
    

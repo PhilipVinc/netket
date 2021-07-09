@@ -1,0 +1,33 @@
+﻿netket.sampler.ARDirectSampler
+==============================
+
+.. currentmodule:: netket.sampler
+
+.. autoclass:: ARDirectSampler
+   :show-inheritance:
+
+   .. automethod:: ARDirectSampler.__init__
+
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Attributes
+      .. autoattribute:: ARDirectSampler.is_exact
+      .. autoattribute:: ARDirectSampler.machine_pow
+      .. autoattribute:: ARDirectSampler.n_batches
+      .. autoattribute:: ARDirectSampler.n_chains
+      .. autoattribute:: ARDirectSampler.n_chains_per_rank
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+      .. automethod:: ARDirectSampler.init_state
+      .. automethod:: ARDirectSampler.log_pdf
+      .. automethod:: ARDirectSampler.replace
+      .. automethod:: ARDirectSampler.reset
+      .. automethod:: ARDirectSampler.sample
+      .. automethod:: ARDirectSampler.sample_next
+
+   

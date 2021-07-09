@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.models.mps &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,20 +110,19 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
+<span class="kn">import</span> <span class="nn">igraph</span> <span class="k">as</span> <span class="nn">ig</span>
+<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">linen</span> <span class="k">as</span> <span class="n">nn</span>
 <span class="kn">import</span> <span class="nn">jax</span>
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
-<span class="kn">from</span> <span class="nn">flax</span> <span class="kn">import</span> <span class="n">linen</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">netket</span> <span class="kn">import</span> <span class="n">nn</span> <span class="k">as</span> <span class="n">nknn</span>
-<span class="kn">from</span> <span class="nn">netket.nn.initializers</span> <span class="kn">import</span> <span class="n">lecun_normal</span><span class="p">,</span> <span class="n">variance_scaling</span><span class="p">,</span> <span class="n">zeros</span>
-
+<span class="kn">from</span> <span class="nn">netket.graph</span> <span class="kn">import</span> <span class="n">AbstractGraph</span><span class="p">,</span> <span class="n">Chain</span>
 <span class="kn">from</span> <span class="nn">netket.hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
-<span class="kn">from</span> <span class="nn">netket.graph</span> <span class="kn">import</span> <span class="n">AbstractGraph</span>
-<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">PRNGKeyT</span><span class="p">,</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">DType</span><span class="p">,</span> <span class="n">Array</span><span class="p">,</span> <span class="n">NNInitFunc</span>
+<span class="kn">from</span> <span class="nn">netket.nn.initializers</span> <span class="kn">import</span> <span class="n">lecun_normal</span>
+<span class="kn">from</span> <span class="nn">netket.utils.types</span> <span class="kn">import</span> <span class="n">NNInitFunc</span>
 
 <span class="n">default_kernel_init</span> <span class="o">=</span> <span class="n">lecun_normal</span><span class="p">()</span>
 
@@ -142,7 +141,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">hilbert</span><span class="p">:</span> <span class="n">AbstractHilbert</span>
-    <span class="sd">&quot;&quot;&quot;&quot;Hilbert space on which the state is defined.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Hilbert space on which the state is defined.&quot;&quot;&quot;</span>
     <span class="n">graph</span><span class="p">:</span> <span class="n">AbstractGraph</span>
     <span class="sd">&quot;&quot;&quot;The graph on which the system is defined.&quot;&quot;&quot;</span>
     <span class="n">bond_dim</span><span class="p">:</span> <span class="nb">int</span>
@@ -151,9 +150,9 @@
     <span class="sd">&quot;&quot;&quot;Whether or not to use diagonal matrices in the MPS tensors.&quot;&quot;&quot;</span>
     <span class="n">symperiod</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Periodicity in the chain of MPS tensors. </span>
+<span class="sd">    Periodicity in the chain of MPS tensors.</span>
 
-<span class="sd">    The chain of MPS tensors is constructed as a sequence of identical </span>
+<span class="sd">    The chain of MPS tensors is constructed as a sequence of identical</span>
 <span class="sd">    unit cells consisting of symperiod tensors. if None, symperiod equals the</span>
 <span class="sd">    number of physical degrees of freedom.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -183,18 +182,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_loc_vals_bias</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">local_states</span><span class="p">)</span>
 
         <span class="c1"># check whether graph is periodic chain</span>
-        <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">_nx</span>
-
-        <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span>
-        <span class="n">G</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-        <span class="n">G</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
-
-        <span class="n">G_chain</span> <span class="o">=</span> <span class="n">_nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-        <span class="n">G_chain</span><span class="o">.</span><span class="n">add_edges_from</span><span class="p">([(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">L</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">)])</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">is_isomorphic</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">G_chain</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;Warning: graph is not isomorphic to chain with periodic boundary conditions&quot;</span>
+        <span class="n">chain_graph</span> <span class="o">=</span> <span class="n">Chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">n_edges</span><span class="p">)</span><span class="o">.</span><span class="n">to_igraph</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ig</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">edges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">())</span><span class="o">.</span><span class="n">isomorphic</span><span class="p">(</span><span class="n">chain_graph</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Warning: graph is not isomorphic to chain with periodic boundary conditions&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="c1"># determine shape of unit cell</span>
@@ -297,7 +289,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

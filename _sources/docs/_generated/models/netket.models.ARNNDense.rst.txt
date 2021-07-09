@@ -1,0 +1,46 @@
+﻿netket.models.ARNNDense
+=======================
+
+.. currentmodule:: netket.models
+
+.. autoclass:: ARNNDense
+   :show-inheritance:
+
+   .. automethod:: ARNNDense.__init__
+
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Attributes
+      .. autoattribute:: ARNNDense.name
+      .. autoattribute:: ARNNDense.parent
+      .. autoattribute:: ARNNDense.precision
+      .. autoattribute:: ARNNDense.scope
+      .. autoattribute:: ARNNDense.use_bias
+      .. autoattribute:: ARNNDense.variables
+   
+      
+   .. rst-class:: class-dl-groups
+
+   Methods
+      .. automethod:: ARNNDense.__call__
+      .. automethod:: ARNNDense.activation
+      .. automethod:: ARNNDense.apply
+      .. automethod:: ARNNDense.bias_init
+      .. automethod:: ARNNDense.bind
+      .. automethod:: ARNNDense.clone
+      .. automethod:: ARNNDense.conditionals
+      .. automethod:: ARNNDense.get_variable
+      .. automethod:: ARNNDense.has_variable
+      .. automethod:: ARNNDense.init
+      .. automethod:: ARNNDense.init_with_output
+      .. automethod:: ARNNDense.is_mutable_collection
+      .. automethod:: ARNNDense.kernel_init
+      .. automethod:: ARNNDense.make_rng
+      .. automethod:: ARNNDense.param
+      .. automethod:: ARNNDense.setup
+      .. automethod:: ARNNDense.sow
+      .. automethod:: ARNNDense.variable
+
+   

@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>netket.hilbert.doubled_hilbert &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -110,16 +110,17 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_hilbert</span> <span class="kn">import</span> <span class="n">AbstractHilbert</span>
+<span class="kn">from</span> <span class="nn">netket.utils.dispatch</span> <span class="kn">import</span> <span class="n">parametric</span>
+
+<span class="kn">from</span> <span class="nn">.discrete_hilbert</span> <span class="kn">import</span> <span class="n">DiscreteHilbert</span>
 
 
-<div class="viewcode-block" id="DoubledHilbert"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.hilbert.DoubledHilbert.html#netket.hilbert.DoubledHilbert">[docs]</a><span class="k">class</span> <span class="nc">DoubledHilbert</span><span class="p">(</span><span class="n">AbstractHilbert</span><span class="p">):</span>
+<div class="viewcode-block" id="DoubledHilbert"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.hilbert.DoubledHilbert.html#netket.hilbert.DoubledHilbert">[docs]</a><span class="nd">@parametric</span>
+<span class="k">class</span> <span class="nc">DoubledHilbert</span><span class="p">(</span><span class="n">DiscreteHilbert</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Superoperatorial hilbert space for states living in the</span>
 <span class="sd">    tensorised state H\otimes H, encoded according to Choi&#39;s isomorphism.&quot;&quot;&quot;</span>
 
@@ -133,18 +134,17 @@
 <span class="sd">        Examples:</span>
 <span class="sd">            Simple superoperatorial hilbert space for few spins.</span>
 
-<span class="sd">           &gt;&gt;&gt; from netket.hilbert import Spin, DoubledHilbert</span>
-<span class="sd">           &gt;&gt;&gt; g = Hypercube(length=5,n_dim=2,pbc=True)</span>
-<span class="sd">           &gt;&gt;&gt; hi = Spin(N=3, s=0.5)</span>
-<span class="sd">           &gt;&gt;&gt; hi2 = DoubledHilbert(hi)</span>
+<span class="sd">           &gt;&gt;&gt; import netket as nk</span>
+<span class="sd">           &gt;&gt;&gt; g = nk.graph.Hypercube(length=5,n_dim=2,pbc=True)</span>
+<span class="sd">           &gt;&gt;&gt; hi = nk.hilbert.Spin(N=3, s=0.5)</span>
+<span class="sd">           &gt;&gt;&gt; hi2 = nk.hilbert.DoubledHilbert(hi)</span>
 <span class="sd">           &gt;&gt;&gt; print(hi2.size)</span>
-<span class="sd">           50</span>
+<span class="sd">           6</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">physical</span> <span class="o">=</span> <span class="n">hilb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">hilb</span><span class="o">.</span><span class="n">size</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">hilb</span><span class="o">.</span><span class="n">shape</span> <span class="o">*</span> <span class="mi">2</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">hilb</span><span class="o">.</span><span class="n">shape</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -153,10 +153,6 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">is_discrete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">is_discrete</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_finite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -170,17 +166,17 @@
     <span class="k">def</span> <span class="nf">local_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">local_states</span>
 
-<div class="viewcode-block" id="DoubledHilbert.size_at_index"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.hilbert.DoubledHilbert.html#netket.hilbert.DoubledHilbert.size_at_index">[docs]</a>    <span class="k">def</span> <span class="nf">size_at_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">size_at_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">size_at_index</span><span class="p">(</span>
             <span class="n">i</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">size</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
-<div class="viewcode-block" id="DoubledHilbert.states_at_index"><a class="viewcode-back" href="../../../docs/_generated/hilbert/netket.hilbert.DoubledHilbert.html#netket.hilbert.DoubledHilbert.states_at_index">[docs]</a>    <span class="k">def</span> <span class="nf">states_at_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">states_at_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;A list of discrete local quantum numbers at the site i.</span>
 <span class="sd">        If the local states are infinitely many, None is returned.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">states_at_index</span><span class="p">(</span>
             <span class="n">i</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="n">i</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">size</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size_physical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -262,7 +258,7 @@
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>

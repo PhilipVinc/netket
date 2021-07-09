@@ -3,23 +3,24 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Variational Monte Carlo with Neural Networks &#8212; netket v3.0 documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/jumbo-style.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/rtd_theme.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script src="../_static/js/rtd_theme.js"></script>
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
@@ -345,14 +346,14 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="section" id="Variational-Monte-Carlo-with-Neural-Networks">
+<section id="Variational-Monte-Carlo-with-Neural-Networks">
 <h1>Variational Monte Carlo with Neural Networks<a class="headerlink" href="#Variational-Monte-Carlo-with-Neural-Networks" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial we will use NetKet to obtain the ground state of the J1-J2 model in one-dimension with periodic boundary conditions, using a Neural Network variational wave-function. The Hamiltonian of the model is given by:</p>
 <div class="math notranslate nohighlight">
 \[H = \sum_{i=1}^{L} J_{1}\vec{\sigma}_{i} \cdot \vec{\sigma}_{i+1} + J_{2} \vec{\sigma}_{i} \cdot \vec{\sigma}_{i+2}\]</div>
 <p>where the sum is over sites of the 1-D chain. Here <span class="math notranslate nohighlight">\(\vec{\sigma}=(\sigma^x,\sigma^y,\sigma^z)\)</span> is the vector of Pauli matrices.</p>
 <p>We will also explore some useful functionalities provided by the package.</p>
-<div class="section" id="Objectives:">
+<section id="Objectives:">
 <h2>Objectives:<a class="headerlink" href="#Objectives:" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1. Defining custom Hamiltonians
 2. Defining the machine (variational ansatz)
@@ -363,12 +364,16 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <p>Let’s start.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span># Import netket library
+<span></span># ensure we run on the CPU
+import os
+os.environ[&quot;JAX_PLATFORM_NAME&quot;] = &quot;cpu&quot;
+
+# Import netket library
 import netket as nk
 
 # Helper libraries
@@ -377,16 +382,8 @@ import matplotlib.pyplot as plt
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-WARNING:absl:No GPU/TPU found, falling back to CPU. (Set TF_CPP_MIN_LOG_LEVEL=0 and rerun for more info.)
-</pre></div></div>
-</div>
-</div>
-<div class="section" id="1)-Defining-a-Custom-Hamiltonian">
+</section>
+<section id="1)-Defining-a-Custom-Hamiltonian">
 <h2>1) Defining a Custom Hamiltonian<a class="headerlink" href="#1)-Defining-a-Custom-Hamiltonian" title="Permalink to this headline">¶</a></h2>
 <p>The first thing to do is to define the graph (lattice) on which to specify the Hamiltonian. Here we would like to build a one-dimensional graph with both nearest and next nearest neighbour bonds. The graph is created in the <code class="docutils literal notranslate"><span class="pre">nk.graph.CustomGraph</span></code> class. To initialise the class we simply provide a list of edges in the <code class="docutils literal notranslate"><span class="pre">[[site_i,</span> <span class="pre">site_j,</span> <span class="pre">edge_color],</span> <span class="pre">...]</span></code></p>
 <div class="nbinput nblast docutils container">
@@ -465,8 +462,8 @@ op = nk.operator.GraphOperator(hi, graph=g, bond_ops=bond_operator, bond_ops_col
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="2)-Defining-the-Machine">
+</section>
+<section id="2)-Defining-the-Machine">
 <h2>2) Defining the Machine<a class="headerlink" href="#2)-Defining-the-Machine" title="Permalink to this headline">¶</a></h2>
 <p>For this tutorial, we shall use the most common type of neural network: fully connected feedforward neural network <code class="docutils literal notranslate"><span class="pre">nk.machine.FFNN</span></code>. Other types of neural networks available will be discussed in other tutorials.</p>
 <div class="nbinput nblast docutils container">
@@ -481,7 +478,7 @@ class FFNN(nknn.Module):
     @nknn.compact
     def __call__(self, x):
         x = nknn.Dense(features=2*x.shape[-1], use_bias=True, dtype=np.complex128, kernel_init=nknn.initializers.normal(stddev=0.01), bias_init=nknn.initializers.normal(stddev=0.01))(x)
-        x = nknn.logcosh(x)
+        x = nknn.log_cosh(x)
         x = jnp.sum(x, axis=-1)
         return x
 
@@ -489,8 +486,8 @@ model = FFNN()
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="3)-Variational-Monte-Carlo-Optimisation">
+</section>
+<section id="3)-Variational-Monte-Carlo-Optimisation">
 <h2>3) Variational Monte Carlo Optimisation<a class="headerlink" href="#3)-Variational-Monte-Carlo-Optimisation" title="Permalink to this headline">¶</a></h2>
 <p>We have now set up our model (Hamiltonian, Graph, Hilbert Space) and can proceed to optimise the variational ansatz we chose, namely the <code class="docutils literal notranslate"><span class="pre">ffnn</span></code> machine.</p>
 <p>To setup the variational Monte Carlo optimisation tool, we have to provide a sampler <code class="docutils literal notranslate"><span class="pre">nk.sampler</span></code> and an optimizer <code class="docutils literal notranslate"><span class="pre">nk.optimizer</span></code>.</p>
@@ -514,12 +511,12 @@ sr = nk.optimizer.SR(diag_shift=0.01)
 # We can then specify a Variational Monte Carlo object, using the Hamiltonian, sampler and optimizers chosen.
 # Note that we also specify the method to learn the parameters of the wave-function: here we choose the efficient
 # Stochastic reconfiguration (Sr), here in an iterative setup
-gs = nk.Vmc(hamiltonian=op, optimizer=opt, variational_state=vs, sr=sr)
+gs = nk.VMC(hamiltonian=op, optimizer=opt, variational_state=vs, preconditioner=sr)
 </pre></div>
 </div>
 </div>
-</div>
-<div class="section" id="4)-Measuring-Observables">
+</section>
+<section id="4)-Measuring-Observables">
 <h2>4) Measuring Observables<a class="headerlink" href="#4)-Measuring-Observables" title="Permalink to this headline">¶</a></h2>
 <p>Before running the optimization, it can be helpful to add some observables to keep track off during the optimization. For our purpose, let us measure the antiferromagnetic structure factor, defined as:</p>
 <div class="math notranslate nohighlight">
@@ -555,16 +552,28 @@ gs.run(out=&#39;test&#39;, n_iter=600, obs={&#39;Structure Factor&#39;: structur
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|██████████| 600/600 [01:16&lt;00:00,  7.82it/s, Energy=-23.0614-0.0001j ± 0.0037 [σ²=0.0136, R̂=1.0024]]
+100%|██████████| 600/600 [01:38&lt;00:00,  6.11it/s, Energy=-23.0617-0.0024j ± 0.0037 [σ²=0.0139, R̂=0.9974]]
 </pre></div></div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
 </div>
-<div class="section" id="5)-Data-Visualisation">
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(JsonLog(&#39;test&#39;, mode=write, autoflush_cost=0.005)
+   Runtime cost:
+        Log:    0.33330416679382324
+        Params: 0.003678560256958008,)
+</pre></div></div>
+</div>
+</section>
+<section id="5)-Data-Visualisation">
 <h2>5) Data Visualisation<a class="headerlink" href="#5)-Data-Visualisation" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have optimized our machine to find the ground state of the <span class="math notranslate nohighlight">\(J_1-J_2\)</span> model, let’s look at what we have. The relevant data are stored in the “.log” file while the optimized parameters are in the “.wf” file. The files are all in json format.</p>
 <p>We shall extract the energy as well as specified observables (antiferromagnetic structure factor in our case) from the “.log” file.</p>
@@ -578,16 +587,18 @@ import json
 
 data=json.load(open(&quot;test.log&quot;))
 
-# Extract the relevant information
-
-iters=[]
-energy=[]
-sf=[]
-
-for iteration in data[&quot;Output&quot;]:
-    iters.append(iteration[&quot;Iteration&quot;])
-    energy.append(iteration[&quot;Energy&quot;][&quot;Mean&quot;])
-    sf.append(iteration[&quot;Structure Factor&quot;][&quot;Mean&quot;])
+iters = data[&#39;Energy&#39;][&#39;iters&#39;]
+energy=data[&#39;Energy&#39;][&#39;Mean&#39;][&#39;real&#39;]
+sf=data[&#39;Structure Factor&#39;][&#39;Mean&#39;][&#39;real&#39;]
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span>
 </pre></div>
 </div>
 </div>
@@ -613,7 +624,7 @@ plt.show()
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_j1j2_23_0.png" src="../_images/tutorials_j1j2_23_0.png" />
+<img alt="../_images/tutorials_j1j2_24_0.png" src="../_images/tutorials_j1j2_24_0.png" />
 </div>
 </div>
 <p>Let’s also compute the average of those quantities (energy and neel order) over the last 50 iterations where the optimization seems to have converged.</p>
@@ -633,12 +644,12 @@ print(r&quot;Energy = {0:.3f}({1:.3f})&quot;.format(np.mean(energy[-50:]), np.st
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Structure factor = 3.875(0.035)
+Structure factor = 3.827(0.038)
 Energy = -23.062(0.001)
 </pre></div></div>
 </div>
-</div>
-<div class="section" id="6)-Sanity-Check:-Exact-Diagonalisation">
+</section>
+<section id="6)-Sanity-Check:-Exact-Diagonalisation">
 <h2>6) Sanity Check: Exact Diagonalisation<a class="headerlink" href="#6)-Sanity-Check:-Exact-Diagonalisation" title="Permalink to this headline">¶</a></h2>
 <p>Now that we have obtained some results using VMC, it is a good time to check the quality of our results (at least for small system sizes). For this purpose, Netket provides exact diagonalisation tools.</p>
 <div class="nbinput nblast docutils container">
@@ -672,8 +683,8 @@ Exact ground state energy = -23.064
 </pre></div></div>
 </div>
 <p>So we see that the both energy and the structure factor we obtained is in agreement with the value obtained via exact diagonalisation.</p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -689,7 +700,7 @@ Exact ground state energy = -23.064
     </p>
     <p>
         &copy; Copyright 2019-2021, The Netket authors - All rights reserved.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.3.<br/>
     </p>
   </div>
 </footer>
