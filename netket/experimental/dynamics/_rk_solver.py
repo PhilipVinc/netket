@@ -37,7 +37,7 @@ args_adaptive_docstring = """
             changed in the :ref:`netket.experimental.TDVP` driver. (Defaults to 1e-7)
         dt_limits: A length-2 tuple of minimum and maximum timesteps considered by
             adaptive time-stepping. A value of None signals that there is no bound.
-            Defaults to :code:`(None, 10*dt)`.
+            Defaults to :code:`(0.01*dt, 10*dt)`.
 """
 
 
