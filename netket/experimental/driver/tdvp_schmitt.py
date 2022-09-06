@@ -228,6 +228,17 @@ def _impl(parameters, n_samples, E_loc, S, rhs_coeff, num_tol, svd_tol, snr_tol)
         y, reassemble = vec_to_real(y)
 
     update = update if jnp.iscomplexobj(y) else update.real
+
+    # tdvp error
+    F_c = rhs_coeff * F
+    tdvp_err = jnp.abs(
+        1.0
+        + jnp.real(
+            update.conj().dot(Sd.dot(update) - F_c) - jnp.dot(F_c.conj(), update)
+        )
+        / E.variance
+    )
+
     if split_complex_params:
         update = reassemble(update)
     update_tree = unravel(update)
@@ -239,7 +250,7 @@ def _impl(parameters, n_samples, E_loc, S, rhs_coeff, num_tol, svd_tol, snr_tol)
         parameters,
     )
 
-    return E, dw, rmd, snr
+    return E, dw, rmd, snr, tdvp_err
 
 
 @odefun.dispatch
@@ -259,9 +270,8 @@ def odefun_schmitt(state: MCState, self: TDVPSchmitt, t, w, *, stage=0):  # noqa
         holomorphic=self.holomorphic,
         rescale_shift=self.rescale_shift,
     )
-    self._loss_stats
 
-    self._loss_stats, self._dw, self._rmd, self._snr = _impl(
+    self._loss_stats, self._dw, self._rmd, self._snr, tdvp_err = _impl(
         state.parameters,
         state.n_samples,
         E_loc,
@@ -274,6 +284,7 @@ def odefun_schmitt(state: MCState, self: TDVPSchmitt, t, w, *, stage=0):  # noqa
 
     if stage == 0:  # TODO: This does not work with FSAL.
         self._last_qgt = self._S
+        self._tdvp_err = tdvp_err
 
     return self._dw
 

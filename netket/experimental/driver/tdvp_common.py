@@ -24,7 +24,7 @@ import netket as nk
 from netket import config
 from netket.driver import AbstractVariationalDriver
 from netket.driver.abstract_variational_driver import _to_iterable
-from netket.jax import HashablePartial
+from netket.jax import HashablePartial, tree_dot, tree_conj
 from netket.logging.json_log import JsonLog
 from netket.operator import AbstractOperator
 from netket.utils import mpi, pure_callback
@@ -361,6 +361,7 @@ class TDVPBaseDriver(AbstractVariationalDriver):
                         }
                     )
                     log_data[self._loss_name] = self._loss_stats
+                    log_data["tdvp_error"] = self._tdvp_err
                 pbar.set_postfix(self._postfix)
 
                 # Execute callbacks before loggers because they can append to log_data
@@ -455,8 +456,19 @@ def qgt_norm(driver: TDVPBaseDriver, x: PyTree):
     Computes the norm induced by the QGT :math:`S`, i.e, :math:`x^\\dagger S x`.
     """
     y = driver._last_qgt @ x  # pylint: disable=protected-access
-    xc_dot_y = nk.jax.tree_dot(nk.jax.tree_conj(x), y)
+    xc_dot_y = nk.jax.tree_dot(tree_conj(x), y)
     return jnp.sqrt(jnp.real(xc_dot_y))
+
+
+def tdvp_error(S, dw, F, Evar):
+    return jnp.abs(
+        1.0
+        + jnp.real(
+            tree_dot(tree_conj(dw), jax.tree_map(lambda x, y: x - y, S @ dw, F))
+            - tree_dot(tree_conj(F), dw)
+        )
+        / Evar
+    )
 
 
 @dispatch

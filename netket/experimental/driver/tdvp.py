@@ -27,7 +27,7 @@ from netket.vqs import VariationalState, VariationalMixedState, MCState, ExactSt
 
 from netket.experimental.dynamics import RKIntegratorConfig
 
-from .tdvp_common import TDVPBaseDriver, odefun
+from .tdvp_common import TDVPBaseDriver, odefun, tdvp_error
 
 
 class TDVP(TDVPBaseDriver):
@@ -156,8 +156,6 @@ def odefun_tdvp(  # noqa: F811
     )
 
     qgt = driver.qgt(driver.state)
-    if stage == 0:  # TODO: This does not work with FSAL.
-        driver._last_qgt = qgt
 
     initial_dw = None if driver.linear_solver_restart else driver._dw
     driver._dw, _ = qgt.solve(driver.linear_solver, driver._loss_grad, x0=initial_dw)
@@ -168,6 +166,12 @@ def odefun_tdvp(  # noqa: F811
         driver._dw,
         state.parameters,
     )
+
+    if stage == 0:  # TODO: This does not work with FSAL.
+        driver._last_qgt = qgt
+        driver._tdvp_err = tdvp_error(
+            qgt, driver._dw, driver._loss_grad, driver._loss_stats.variance
+        )
 
     return driver._dw
 
