@@ -18,6 +18,8 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
+from flax import serialization
+
 import netket as nk
 from netket.driver.vmc_common import info
 from netket.operator import AbstractOperator
@@ -193,3 +195,51 @@ def _map_parameters(forces, parameters, loss_grad_factor, propagation_type, stat
     )
 
     return forces
+
+
+
+def serialize_TDVP(driver):
+    state_dict = {
+        "state": serialization.to_state_dict(driver.state),
+        "_loss_stats": serialization.to_state_dict(driver._loss_stats),
+        "_step_count": driver._step_count,
+        "_mpi_nodes": driver._mpi_nodes,
+        "_integrator": serialization.to_state_dict(driver._integrator),
+        "_stop_count": driver._stop_count,
+    }
+    return state_dict
+
+
+def deserialize_TDVP(driver, state_dict):
+    import copy
+
+    new_driver = copy.copy(driver)
+
+    new_driver._variational_state = serialization.from_state_dict(
+        driver.state, state_dict["state"]
+    )
+    new_driver._loss_stats = serialization.from_state_dict(
+        driver._loss_stats, state_dict["_loss_stats"]
+    )
+    new_driver._step_count = state_dict["_step_count"]
+
+    new_driver._integrator = serialization.from_state_dict(
+        driver._integrator, state_dict["_integrator"]
+    )
+    new_driver._stop_count = state_dict["_stop_count"]
+
+    if driver._mpi_nodes != driver._mpi_nodes:
+        warnings.warn(
+            "The serialized driver had {state_dict['_mpi_nodes']} MPI nodes, but "
+            "the current session has only {driver._mpi_nodes} MPI nodes. \n\n"
+            "The state of the driver and variational state was correctly restored, but"
+            "the mismatch in MPI nodes will lead to a different result."
+        )
+    return new_driver
+
+
+serialization.register_serialization_state(
+    TDVP,
+    serialize_TDVP,
+    deserialize_TDVP,
+)

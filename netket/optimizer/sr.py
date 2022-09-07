@@ -19,13 +19,14 @@ import jax
 from dataclasses import dataclass
 
 from netket.vqs import VariationalState
+from netket.utils import struct, warn_deprecation
 from netket.utils.types import Scalar, ScalarOrSchedule
 
 from .qgt import QGTAuto
 from .preconditioner import AbstractLinearPreconditioner
 
 
-@dataclass
+@struct.dataclass(_frozen=False)
 class SR(AbstractLinearPreconditioner):
     r"""
     Stochastic Reconfiguration or Natural Gradient preconditioner for the gradient.

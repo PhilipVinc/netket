@@ -15,11 +15,10 @@
 from typing import Callable, Optional, Any
 
 import abc
-from dataclasses import dataclass
 from textwrap import dedent
 
 from netket.utils.types import PyTree, Scalar
-from netket.utils import warn_deprecation
+from netket.utils import struct, warn_deprecation
 from netket.vqs import VariationalState
 
 from .linear_operator import LinearOperator, SolverT
@@ -39,7 +38,7 @@ def identity_preconditioner(
     return gradient
 
 
-@dataclass
+@struct.dataclass(_frozen=False)
 class AbstractLinearPreconditioner:
     """Base class for a Linear Preconditioner solving a system :math:`Sx = F`.
 
@@ -62,7 +61,7 @@ class AbstractLinearPreconditioner:
 
     """
 
-    solver: SolverT
+    solver: SolverT = struct.field(pytree_node=False)
     """Function used to solve the linear system."""
 
     solver_restart: bool = False
