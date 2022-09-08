@@ -58,6 +58,7 @@ class TDVP(TDVPBaseDriver):
         linear_solver=nk.optimizer.solver.svd,
         linear_solver_restart: bool = False,
         error_norm: Union[str, Callable] = "euclidean",
+        constant_samples: bool = False,
     ):
         r"""
         Initializes the time evolution driver.
@@ -117,7 +118,12 @@ class TDVP(TDVPBaseDriver):
         self.linear_solver_restart = linear_solver_restart
 
         super().__init__(
-            operator, variational_state, integrator, t0=t0, error_norm=error_norm
+            operator,
+            variational_state,
+            integrator,
+            t0=t0,
+            error_norm=error_norm,
+            constant_samples=constant_samples,
         )
 
     def info(self, depth=0):
@@ -138,9 +144,14 @@ def odefun_tdvp(  # noqa: F811
     state: Union[MCState, ExactState], driver: TDVP, t, w, *, stage=0
 ):
     # pylint: disable=protected-access
-
-    state.parameters = w
-    state.reset()
+    if stage == 0 or not driver.constant_samples:
+        state.parameters = w
+        state.reset()
+    else:
+        samples = state._samples
+        state.parameters = w
+        state.reset()
+        state._samples = samples
 
     op_t = driver.generator(t)
 

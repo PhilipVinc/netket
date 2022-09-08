@@ -63,6 +63,7 @@ class TDVPBaseDriver(AbstractVariationalDriver):
         *,
         t0: float = 0.0,
         error_norm: Union[str, Callable] = "qgt",
+        constant_samples: bool = False,
     ):
         r"""
         Initializes the time evolution driver.
@@ -111,6 +112,8 @@ class TDVPBaseDriver(AbstractVariationalDriver):
 
         self._stop_count = 0
         self._postfix = {}
+
+        self.constant_samples = constant_samples
 
     @property
     def integrator(self):

@@ -101,6 +101,7 @@ class TDVPSchmitt(TDVPBaseDriver):
         num_tol: float = 1e-14,
         svd_tol: float = 1e-8,
         snr_tol: float = 1,
+        constant_samples: bool = False,
     ):
         r"""
         Initializes the time evolution driver.
@@ -157,7 +158,12 @@ class TDVPSchmitt(TDVPBaseDriver):
         self.rescale_shift = rescale_shift
 
         super().__init__(
-            operator, variational_state, integrator, t0=t0, error_norm=error_norm
+            operator,
+            variational_state,
+            integrator,
+            t0=t0,
+            error_norm=error_norm,
+            constant_samples=constant_samples,
         )
 
     def info(self, depth=0):
@@ -257,8 +263,14 @@ def _impl(parameters, n_samples, E_loc, S, rhs_coeff, num_tol, svd_tol, snr_tol)
 def odefun_schmitt(state: MCState, self: TDVPSchmitt, t, w, *, stage=0):  # noqa: F811
     # pylint: disable=protected-access
 
-    state.parameters = w
-    state.reset()
+    if stage == 0 or not self.constant_samples:
+        state.parameters = w
+        state.reset()
+    else:
+        samples = state._samples
+        state.parameters = w
+        state.reset()
+        state._samples = samples
 
     op_t = self.generator(t)
 
