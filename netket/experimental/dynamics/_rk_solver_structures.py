@@ -131,6 +131,8 @@ class RungeKuttaState:
     """Current time."""
     y: Array
     """Solution at current time."""
+    y_tm1: Array
+    """Solution at current time."""
     dt: float
     """Current step size."""
     last_norm: Optional[float] = None
@@ -251,6 +253,7 @@ def general_time_step_adaptive(
             step_no=rk_state.step_no + 1,
             step_no_total=rk_state.step_no_total + 1,
             y=y_tp1,
+            y_tm1=rk_state.y,
             t=rk_state.t + actual_dt,
             dt=jax.lax.cond(
                 actual_dt == rk_state.dt,
@@ -291,6 +294,7 @@ def general_time_step_fixed(
         step_no_total=rk_state.step_no_total + 1,
         t=rk_state.t + actual_dt,
         y=y_tp1,
+        y_tm1=rk_state.y,
         flags=SolverFlags.INFO_STEP_ACCEPTED,
     )
 
@@ -333,6 +337,7 @@ class RungeKuttaIntegrator:
             step_no_total=0,
             t=nk.utils.KahanSum(self.t0),
             y=self.y0,
+            y_tm1=self.y0,
             dt=self.initial_dt,
             last_norm=0.0 if self.use_adaptive else None,
             last_scaled_error=0.0 if self.use_adaptive else None,
