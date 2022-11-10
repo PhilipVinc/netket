@@ -18,7 +18,7 @@ from typing import Any, Callable, Iterable, Tuple, Union
 from jax import numpy as jnp
 from jax.nn.initializers import zeros
 
-from netket.models.autoreg import ARNNSequential, _normalize
+from netket.models.autoreg import ARNNSequential, _get_feature_list, _normalize
 from netket.nn import FastMaskedConv1D, FastMaskedConv2D, FastMaskedDense1D
 from netket.nn import activation as nkactivation
 from netket.nn.masked_linear import default_kernel_init
@@ -42,17 +42,24 @@ class FastARNNSequential(ARNNSequential):
         if inputs.ndim == 1:
             inputs = jnp.expand_dims(inputs, axis=0)
 
-        # When `index = 0`, it doesn't matter which site we take
-        x = inputs[:, index - 1, None]
+        x = jnp.expand_dims(inputs, axis=-1)
+        x = self.take_prev_site(x, index)
 
         for i in range(len(self._layers)):
-            if i > 0:
+            if i > 0 and hasattr(self, "activation"):
                 x = self.activation(x)
             x = self._layers[i].update_site(x, index)
 
         log_psi = _normalize(x, self.machine_pow)
         p = jnp.exp(self.machine_pow * log_psi.real)
         return p
+
+    def take_prev_site(self, inputs: Array, index: int) -> Array:
+        """
+        Takes the previous site in the autoregressive order.
+        """
+        # When `index = 0`, it doesn't matter which site we take
+        return inputs[:, index - 1]
 
 
 @deprecate_dtype
@@ -87,13 +94,7 @@ class FastARNNDense(FastARNNSequential):
     """exponent to normalize the outputs of `__call__`."""
 
     def setup(self):
-        if isinstance(self.features, int):
-            features = [self.features] * (self.layers - 1) + [self.hilbert.local_size]
-        else:
-            features = self.features
-        assert len(features) == self.layers
-        assert features[-1] == self.hilbert.local_size
-
+        features = _get_feature_list(self)
         self._layers = [
             FastMaskedDense1D(
                 size=self.hilbert.size,
@@ -142,13 +143,7 @@ class FastARNNConv1D(FastARNNSequential):
     """exponent to normalize the outputs of `__call__`."""
 
     def setup(self):
-        if isinstance(self.features, int):
-            features = [self.features] * (self.layers - 1) + [self.hilbert.local_size]
-        else:
-            features = self.features
-        assert len(features) == self.layers
-        assert features[-1] == self.hilbert.local_size
-
+        features = _get_feature_list(self)
         self._layers = [
             FastMaskedConv1D(
                 features=features[i],
@@ -201,13 +196,7 @@ class FastARNNConv2D(FastARNNSequential):
         self.L = int(sqrt(self.hilbert.size))
         assert self.L**2 == self.hilbert.size
 
-        if isinstance(self.features, int):
-            features = [self.features] * (self.layers - 1) + [self.hilbert.local_size]
-        else:
-            features = self.features
-        assert len(features) == self.layers
-        assert features[-1] == self.hilbert.local_size
-
+        features = _get_feature_list(self)
         self._layers = [
             FastMaskedConv2D(
                 L=self.L,

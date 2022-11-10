@@ -34,7 +34,7 @@ class AbstractARNN(nn.Module):
     Base class for autoregressive neural networks.
 
     Subclasses must implement the method `conditionals_log_psi`, or override the methods
-    `__call__` and `conditional` if desired.
+    `__call__` and `conditionals` if desired.
 
     They can override `conditional` to implement the caching for fast autoregressive sampling.
     See :class:`netket.nn.FastARNNConv1D` for example.
@@ -148,6 +148,25 @@ class AbstractARNN(nn.Module):
         log_psi = log_psi.reshape((inputs.shape[0], -1)).sum(axis=1)
         return log_psi
 
+    def reorder(self, inputs: Array, axis: int = 0) -> Array:
+        """
+        Transforms an array from unordered to ordered.
+
+        We call a 1D array 'unordered' if we need non-trivial indexing to access
+        its elements in the autoregressive order, e.g., `a[0], a[1], a[3], a[2]`
+        for the snake ordering. Otherwise, we call it 'ordered'.
+
+        The inputs of `conditionals_log_psi`, `conditionals`, `conditional`, and
+        `__call__` are assumed to have unordered layout.
+        """
+        return inputs
+
+    def inverse_reorder(self, inputs: Array, axis: int = 0) -> Array:
+        """
+        Transforms an array from ordered to unordered. See `reorder`.
+        """
+        return inputs
+
 
 class ARNNSequential(AbstractARNN):
     """
@@ -173,7 +192,7 @@ class ARNNSequential(AbstractARNN):
         x = jnp.expand_dims(inputs, axis=-1)
 
         for i in range(len(self._layers)):
-            if i > 0:
+            if i > 0 and hasattr(self, "activation"):
                 x = self.activation(x)
             x = self._layers[i](x)
 
@@ -187,6 +206,16 @@ class ARNNSequential(AbstractARNN):
         before sending them to the ARNN layers.
         """
         return inputs
+
+
+def _get_feature_list(model):
+    if isinstance(model.features, int):
+        features = [model.features] * (model.layers - 1) + [model.hilbert.local_size]
+    else:
+        features = model.features
+    assert len(features) == model.layers
+    assert features[-1] == model.hilbert.local_size
+    return features
 
 
 @deprecate_dtype
@@ -214,13 +243,7 @@ class ARNNDense(ARNNSequential):
     """exponent to normalize the outputs of `__call__`."""
 
     def setup(self):
-        if isinstance(self.features, int):
-            features = [self.features] * (self.layers - 1) + [self.hilbert.local_size]
-        else:
-            features = self.features
-        assert len(features) == self.layers
-        assert features[-1] == self.hilbert.local_size
-
+        features = _get_feature_list(self)
         self._layers = [
             MaskedDense1D(
                 features=features[i],
@@ -264,13 +287,7 @@ class ARNNConv1D(ARNNSequential):
     """exponent to normalize the outputs of `__call__`."""
 
     def setup(self):
-        if isinstance(self.features, int):
-            features = [self.features] * (self.layers - 1) + [self.hilbert.local_size]
-        else:
-            features = self.features
-        assert len(features) == self.layers
-        assert features[-1] == self.hilbert.local_size
-
+        features = _get_feature_list(self)
         self._layers = [
             MaskedConv1D(
                 features=features[i],
@@ -319,13 +336,7 @@ class ARNNConv2D(ARNNSequential):
         self.L = int(sqrt(self.hilbert.size))
         assert self.L**2 == self.hilbert.size
 
-        if isinstance(self.features, int):
-            features = [self.features] * (self.layers - 1) + [self.hilbert.local_size]
-        else:
-            features = self.features
-        assert len(features) == self.layers
-        assert features[-1] == self.hilbert.local_size
-
+        features = _get_feature_list(self)
         self._layers = [
             MaskedConv2D(
                 features=features[i],

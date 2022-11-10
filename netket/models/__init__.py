@@ -27,6 +27,8 @@ from .fast_autoreg import (
     FastARNNConv2D as _FastARNNConv2D,
 )
 from .mlp import MLP
+from .rnn import LSTMNet, GRUNet1D
+from .fast_rnn import FastLSTMNet, FastGRUNet1D
 from .utils import update_GCNN_parity
 
 

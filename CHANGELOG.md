@@ -5,6 +5,9 @@
 
 ## NetKet 3.7 (⚙️ In development)
 
+### New features
+* Recurrent neural networks and layers have been added to `models` and `nn` [#1305](https://github.com/netket/netket/pull/1305).
+
 ### Improvements
 * The underlying extension API for Autoregressive models that can be used with Ancestral/Autoregressive samplers has been simplified and stabilized and will be documented as part of the public API. For most models, you should now inherit from `AbstractARNN` and define `conditionals_log_psi`. For additional performance, implementers can also redefine `__call__` and `conditional` but this should not be needed in general. This will cause some breaking changes if you were relying on the old undocumented interface [#1361](https://github.com/netket/netket/pull/1361).
 
@@ -22,7 +25,7 @@
 * Added a new experimental {class}`~netket.experimental.driver.TDVPSchmitt` driver, implementing the signal-to-noise ratio TDVP regularisation by Schmitt and Heyl [#1306](https://github.com/netket/netket/pull/1306).
 * QGT classes accept a `chunk_size` parameter that overrides the `chunk_size` set by the variational state object [#1347](https://github.com/netket/netket/pull/1347).
 * {func}`~netket.optimizer.qgt.QGTJacobianPyTree` and {func}`~netket.optimizer.qgt.QGTJacobianDense` support diagonal entry regularisation with constant and scale-invariant contributions. They accept a new `diag_scale` argument to pass the scale-invariant component [#1352](https://github.com/netket/netket/pull/1352).
-* {func}`~netket.optimizer.SR` preconditioner now supports scheduling of the diagonal shift and scale regularisations [#1364](https://github.com/netket/netket/pull/1364). 
+* {func}`~netket.optimizer.SR` preconditioner now supports scheduling of the diagonal shift and scale regularisations [#1364](https://github.com/netket/netket/pull/1364).
 
 ### Improvements
 * {meth}`~netket.vqs.ExactState.expect_and_grad` now returns a `nk.stats.Stats` object that also contains the variance, as `MCState` does [#1325](https://github.com/netket/netket/pull/1325).
@@ -91,7 +94,7 @@ A new, more accurate, estimation of the autocorrelation time has been introduced
 ### Deprecations
 
 * `nk.nn.Module` and `nk.nn.compact` have been deprecated. Please use the {class}`flax.linen.Module` and {func}`flax.linen.compact` instead.
-* `nk.nn.Dense(dtype=mydtype)` and related Modules (`Conv`, `DenseGeneral` and `ConvGeneral`) are deprecated. Please use `flax.linen.***(param_dtype=mydtype)` instead. Before flax v0.5 they did not support complex numbers properly within their modules, but starting with flax 0.5 they now do so we have removed our linear module wrappers and encourage you to use them. Please notice that the `dtype` argument previously used by netket should be changed to `param_dtype` to maintain the same effect. [#...](https://github.com/netket/netket/pull/...)  
+* `nk.nn.Dense(dtype=mydtype)` and related Modules (`Conv`, `DenseGeneral` and `ConvGeneral`) are deprecated. Please use `flax.linen.***(param_dtype=mydtype)` instead. Before flax v0.5 they did not support complex numbers properly within their modules, but starting with flax 0.5 they now do so we have removed our linear module wrappers and encourage you to use them. Please notice that the `dtype` argument previously used by netket should be changed to `param_dtype` to maintain the same effect. [#...](https://github.com/netket/netket/pull/...)
 
 ### Bug Fixes
 * Fixed bug where a `nk.operator.LocalOperator` representing the identity would lead to a crash. [#1197](https://github.com/netket/netket/pull/1197)
@@ -162,7 +165,7 @@ A new, more accurate, estimation of the autocorrelation time has been introduced
 * The minimum [optax](https://github.com/deepmind/optax) version is now `0.1.1`, which finally correctly supports complex numbers. The internal implementation of Adam which was introduced in 3.3 ([#1069](https://github.com/netket/netket/pull/1069)) has been removed. If an older version of `optax` is detected, an import error is thrown to avoid providing wrong numerical results. Please update your optax version! [#1097](https://github.com/netket/netket/pull/1097)
 
 ### Bug Fixes
-* Allow `LazyOperator@densevector` for operators such as lazy `Adjoint`, `Transpose` and `Squared`. [#1068](https://github.com/netket/netket/pull/1068) 
+* Allow `LazyOperator@densevector` for operators such as lazy `Adjoint`, `Transpose` and `Squared`. [#1068](https://github.com/netket/netket/pull/1068)
 * The logic to update the progress bar in {class}`nk.experimental.TDVP` has been improved, and it should now display updates even if there are very sparse `save_steps`. [#1084](https://github.com/netket/netket/pull/1084)
 * The `nk.logging.TensorBoardLog` is now lazily initialized to better work in an MPI environment. [#1086](https://github.com/netket/netket/pull/1086)
 * Converting a `nk.operator.BoseHubbard` to a `nk.operator.LocalOperator` multiplied by 2 the nonlinearity `U`. This has now been fixed. [#1102](https://github.com/netket/netket/pull/1102)
@@ -175,7 +178,7 @@ A new, more accurate, estimation of the autocorrelation time has been introduced
 * Initialisation of all implementations of `DenseSymm`, `DenseEquivariant`, `GCNN` now defaults to truncated normals with Lecun variance scaling. For layers without masking, there should be no noticeable change in behaviour. For masked layers, the same variance scaling now works correctly. [#1045](https://github.com/netket/netket/pull/1045)
 * Fix bug that prevented gradients of non-hermitian operators to be computed. The feature is still marked as experimental but will now run (we do not guarantee that results are correct). [#1053](https://github.com/netket/netket/pull/1053)
 * Common lattice constructors such as `Honeycomb` now accepts the same keyword arguments as `Lattice`. [#1046](https://github.com/netket/netket/pull/1046)
-* Multiplying a `QGTOnTheFly` representing the real part of the QGT (showing up when the ansatz has real parameters) with a complex vector now throws an error. Previously the result would be wrong, as the imaginary part [was casted away](https://github.com/netket/netket/issues/789#issuecomment-871145119). [#885](https://github.com/netket/netket/pull/885) 
+* Multiplying a `QGTOnTheFly` representing the real part of the QGT (showing up when the ansatz has real parameters) with a complex vector now throws an error. Previously the result would be wrong, as the imaginary part [was casted away](https://github.com/netket/netket/issues/789#issuecomment-871145119). [#885](https://github.com/netket/netket/pull/885)
 
 
 ## NetKet 3.3 (🎁 20 December 2021)

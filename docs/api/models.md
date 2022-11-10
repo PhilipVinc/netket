@@ -24,12 +24,19 @@ neural quantum states.
    MPSPeriodic
    NDM
    GCNN
+
    AbstractARNN
    ARNNDense
    ARNNConv1D
    ARNNConv2D
    FastARNNConv1D
    FastARNNConv2D
+
+   LSTMNet
+   GRUNet1D
+   FastLSTMNet
+   FastGRUNet1D
+
    DeepSetMLP
    DeepSetRelDistance
    MLP
