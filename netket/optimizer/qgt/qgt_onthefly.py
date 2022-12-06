@@ -18,9 +18,11 @@ from functools import partial
 import jax
 from jax import numpy as jnp
 from flax import struct
+from flax.jax_utils import replicate
 
 import netket.jax as nkjax
 from netket.utils.types import PyTree
+from netket.utils import config
 
 from netket.nn import split_array_mpi
 
@@ -86,6 +88,14 @@ def QGTOnTheFly(vstate=None, *, chunk_size=None, **kwargs) -> "QGTOnTheFlyT":
         mv_factory = mat_vec_chunked_factory
         chunking = True
 
+    if config.netket_experimental_pmap:
+        diag_shift = kwargs.get("diag_shift", 0.0)
+        if diag_shift is not None:
+            kwargs["diag_shift"] = replicate(diag_shift)
+        #diag_scale = kwargs.get("diag_scale", None)
+        #if diag_scale is not None:
+        #    kwargs["diag_scale"] = replicate(diag_scale)
+
     mat_vec = mv_factory(
         forward_fn=vstate._apply_fun,
         params=vstate.parameters,
@@ -144,7 +154,7 @@ class QGTOnTheFlyT(LinearOperator):
         return f"QGTOnTheFly(diag_shift={self.diag_shift})"
 
 
-@jax.jit
+@nkjax.pmap
 def onthefly_mat_treevec(
     S: QGTOnTheFly, vec: Union[PyTree, jnp.ndarray]
 ) -> Union[PyTree, jnp.ndarray]:
@@ -183,7 +193,7 @@ def onthefly_mat_treevec(
     return res
 
 
-@jax.jit
+@nkjax.pmap
 def _solve(
     self: QGTOnTheFlyT, solve_fun, y: PyTree, *, x0: Optional[PyTree], **kwargs
 ) -> PyTree:
@@ -200,7 +210,7 @@ def _solve(
     return out, info
 
 
-@jax.jit
+@nkjax.pmap
 def _to_dense(self: QGTOnTheFlyT) -> jnp.ndarray:
     """
     Convert the lazy matrix representation to a dense matrix representation

@@ -17,7 +17,7 @@ from jax.tree_util import Partial
 from functools import partial
 from netket.stats import subtract_mean
 from netket.utils import mpi
-from netket.jax import tree_conj, tree_axpy
+from netket.jax import tree_conj, tree_axpy, pmap
 from netket.jax import (
     scanmap,
     scan_reduce,
@@ -57,7 +57,7 @@ def _mat_vec(jvp_fn, v, diag_shift, pdf=None):
     return tree_axpy(diag_shift, v, res)  # res + diag_shift * v
 
 
-@partial(jax.jit, static_argnums=0)
+@partial(pmap, static_broadcasted_argnums=0)
 def mat_vec_factory(forward_fn, params, model_state, samples, pdf=None):
     """
     Prepare a function which computes the regularized SR matrix-vector product

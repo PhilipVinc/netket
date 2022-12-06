@@ -19,6 +19,7 @@ import math
 import jax
 import jax.numpy as jnp
 
+from netket import jax as nkjax
 from netket.stats import subtract_mean, sum as sum_mpi
 from netket.utils import mpi
 from netket.utils.types import Array, Callable, PyTree
@@ -32,7 +33,9 @@ from . import jacobian_pytree
 
 
 @partial(
-    jax.jit, static_argnames=("apply_fun", "mode", "chunk_size", "center", "dense")
+    nkjax.pmap, 
+    static_broadcasted_argnums=(0,4,6,7,8)
+    #static_argnames=("apply_fun", "mode", "chunk_size", "center", "dense")
 )
 def jacobian(
     apply_fun: Callable,
