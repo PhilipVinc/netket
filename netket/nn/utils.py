@@ -20,7 +20,6 @@ import jax
 from jax import numpy as jnp
 import numpy as np
 
-from netket import jax as nkjax
 from netket.utils import get_afun_if_module, mpi, module_version
 from netket.utils.types import Array
 from netket.hilbert import DiscreteHilbert
@@ -93,7 +92,7 @@ def _to_array_rank(apply_fun, variables, σ_rank, n_states, normalize, allgather
     """
     
     if chunk_size is not None:
-        apply_fun = nkjax.apply_chunked(apply_fun, in_axes=(None, 0), chunk_size=chunk_size)
+        apply_fun = nk.jax.apply_chunked(apply_fun, in_axes=(None, 0), chunk_size=chunk_size)
 
     
     # number of 'fake' states, in the last rank.
