@@ -21,7 +21,7 @@ from jax import numpy as jnp
 from flax import struct
 
 import netket.jax as nkjax
-from netket.utils.types import PyTree
+from netket.utils.types import Array, PyTree
 
 from netket.errors import (
     IllegalHolomorphicDeclarationForRealParametersError,
@@ -176,10 +176,8 @@ class QGTOnTheFlyT(LinearOperator):
 
     def to_dense(self) -> jnp.ndarray:
         """
-        Convert the lazy matrix representation to a dense matrix representation.
-
-        Returns:
-            A dense matrix representation of this S matrix.
+        Perform the lazy mat-vec product, where vec is either a tree with the same structure as
+        params or a ravelled vector
         """
         # This condition will be true if the user specified `holomorphic=False` and
         # if the parameters are complex. If the parameters are real and the user
@@ -193,86 +191,59 @@ class QGTOnTheFlyT(LinearOperator):
 
         return _to_dense(self)
 
+            _, unravel = nkjax.tree_ravel(self._params)
+            vec = unravel(vec)
+            ravel_result = True
+        else:
+            ravel_result = False
+
+        check_valid_vector_type(self._params, vec)
+
+        vec = nkjax.tree_cast(vec, self._params)
+
+        res = self._mat_vec(vec, self.diag_shift)
+
+        if ravel_result:
+            res, _ = nkjax.tree_ravel(res)
+
+        return res
+
+    @jax.jit
+    def _solve(self, solve_fun, y: PyTree, *, x0: Optional[PyTree], **kwargs) -> PyTree:
+        check_valid_vector_type(self._params, y)
+
+        y = nkjax.tree_cast(y, self._params)
+
+        # we could cache this...
+        if x0 is None:
+            x0 = jax.tree_map(jnp.zeros_like, y)
+
+        out, info = solve_fun(self, y, x0=x0)
+        return out, info
+
+    @jax.jit
+    def _to_dense(self) -> Array:
+        """
+        Convert the lazy matrix representation to a dense matrix representation.
+
+        Returns:
+            A dense matrix representation of this S matrix.
+        """
+        Npars = nkjax.tree_size(self._params)
+        I = jax.numpy.eye(Npars)
+
+        if self._chunking:
+            # the linear_call in mat_vec_chunked does currently not have a jax batching rule,
+            # so it cannot be vmapped but we can use scan
+            # which is better for reducing the memory consumption anyway
+            _, out = jax.lax.scan(lambda _, x: (None, self @ x), None, I)
+        else:
+            out = jax.vmap(lambda x: self @ x, in_axes=0)(I)
+
+        if jnp.iscomplexobj(out):
+            out = out.T
+
+        return out
+
     def __repr__(self):
         return f"QGTOnTheFly(diag_shift={self.diag_shift})"
-
-
-@jax.jit
-def onthefly_mat_treevec(
-    S: QGTOnTheFly, vec: Union[PyTree, jnp.ndarray]
-) -> Union[PyTree, jnp.ndarray]:
-    """
-    Perform the lazy mat-vec product, where vec is either a tree with the same structure as
-    params or a ravelled vector
-    """
-
-    # if has a ndim it's an array and not a pytree
-    if hasattr(vec, "ndim"):
-        if not vec.ndim == 1:
-            raise ValueError("Unsupported mat-vec for chunks of vectors")
-        # If the input is a vector
-        if not nkjax.tree_size(S._params) == vec.size:
-            raise ValueError(
-                """Size mismatch between number of parameters ({nkjax.tree_size(S.params)})
-                                and vector size {vec.size}.
-                             """
-            )
-
-        _, unravel = nkjax.tree_ravel(S._params)
-        vec = unravel(vec)
-        ravel_result = True
-    else:
-        ravel_result = False
-
-    check_valid_vector_type(S._params, vec)
-
-    vec = nkjax.tree_cast(vec, S._params)
-
-    res = S._mat_vec(vec, S.diag_shift)
-
-    if ravel_result:
-        res, _ = nkjax.tree_ravel(res)
-
-    return res
-
-
-@jax.jit
-def _solve(
-    self: QGTOnTheFlyT, solve_fun, y: PyTree, *, x0: Optional[PyTree], **kwargs
-) -> PyTree:
-
-    check_valid_vector_type(self._params, y)
-
-    y = nkjax.tree_cast(y, self._params)
-
-    # we could cache this...
-    if x0 is None:
-        x0 = jax.tree_map(jnp.zeros_like, y)
-
-    out, info = solve_fun(self, y, x0=x0)
-    return out, info
-
-
-@jax.jit
-def _to_dense(self: QGTOnTheFlyT) -> jnp.ndarray:
-    """
-    Convert the lazy matrix representation to a dense matrix representation
-
-    Returns:
-        A dense matrix representation of this S matrix.
-    """
-    Npars = nkjax.tree_size(self._params)
-    I = jax.numpy.eye(Npars)
-
-    if self._chunking:
-        # the linear_call in mat_vec_chunked does currently not have a jax batching rule,
-        # so it cannot be vmapped but we can use scan
-        # which is better for reducing the memory consumption anyway
-        _, out = jax.lax.scan(lambda _, x: (None, self @ x), None, I)
-    else:
-        out = jax.vmap(lambda x: self @ x, in_axes=0)(I)
-
-    if jnp.iscomplexobj(out):
-        out = out.T
-
-    return out
