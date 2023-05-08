@@ -14,6 +14,9 @@
 
 from . import solver
 from . import qgt
+from . import ntk
+
+from . import solver
 
 from .linear_operator import LinearOperator
 from .preconditioner import (
