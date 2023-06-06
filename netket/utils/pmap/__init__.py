@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .variables import n_devices as n_nodes
+from .variables import n_devices, n_nodes
 from .variables import rank
 
 from .utils import PRNGKey, split_key
+from .utils import sharding, broadcast, scatter
+from .utils import global_size
 
-from .primitives import sum_jax, mean_jax, max_jax
+from .primitives import sum_jax, mean_jax, max_jax, sharding, make_array_from_callback
 
 #    rank,
 
