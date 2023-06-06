@@ -117,7 +117,7 @@ def expect(vstate: MCState, Ô: AbstractOperator) -> Stats:  # noqa: F811
     )
 
 
-@partial(nkjax.pmap, static_broadcasted_argnums=(0, 1))
+@partial(nkjax.pmap, static_argnums=(0, 1))
 def _expect(
     local_value_kernel: Callable,
     model_apply_fun: Callable,
@@ -151,9 +151,7 @@ def _expect(
 
     L_σ = local_value_kernel(logpsi, parameters, σ, local_value_args)
     L_σ = L_σ.reshape((σ_shape[0], -1))
-    print(L_σ.shape)
-    L_2 = jax.lax.psum(L_σ.T, 'mpi')
-    print(f"{L_2.shape=}")
+    L2 = jnp.sum(L_σ.T, axis=0)
     Ō_stats = mpi_statistics(L_σ.T)
 
     return Ō_stats

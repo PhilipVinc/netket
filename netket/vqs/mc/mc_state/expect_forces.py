@@ -65,7 +65,7 @@ def expect_and_forces(  # noqa: F811
 
 
 #@partial(jax.jit, static_argnums=(0, 1, 2))
-@partial(nkjax.pmap, static_broadcasted_argnums=(0, 1, 2))
+@partial(nkjax.pmap, static_argnums=(0, 1, 2))
 def forces_expect_hermitian(
     local_value_kernel: Callable,
     model_apply_fun: Callable,

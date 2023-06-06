@@ -57,7 +57,7 @@ def _mat_vec(jvp_fn, v, diag_shift, pdf=None):
     return tree_axpy(diag_shift, v, res)  # res + diag_shift * v
 
 
-@partial(pmap, static_broadcasted_argnums=0)
+@partial(pmap, static_argnums=0)
 def mat_vec_factory(forward_fn, params, model_state, samples, pdf=None):
     """
     Prepare a function which computes the regularized SR matrix-vector product

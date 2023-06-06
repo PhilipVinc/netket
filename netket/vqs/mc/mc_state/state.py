@@ -269,11 +269,14 @@ class MCState(VariationalState):
             dtype = self.sampler.dtype
 
         key = nkjax.PRNGKey(seed)
+        #key = flax.jax_utils.replicate(key)
 
-        dummy_input = jnp.zeros((1, self.hilbert.size), dtype=dtype)
+        dummy_input = jnp.zeros((distributed.n_devices, self.hilbert.size), dtype=dtype)
+        dummy_input = distributed.scatter(dummy_input)
 
         variables = jit_evaluate(self._init_fun, {"params": key}, dummy_input)
-        self.variables = flax.jax_utils.replicate(variables)
+        variables = distributed.broadcast(variables)
+        self.variables = variables#flax.jax_utils.replicate(variables)
 
     @property
     def model(self) -> Optional[Any]:
