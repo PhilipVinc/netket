@@ -129,10 +129,6 @@ class Sampler(abc.ABC):
                 "reference at https://netket.readthedocs.io/en/latest/api/sampler.html"
                 "\n"
             )
-
-        if config.netket_experimental_pmap:
-            if isinstance(self.machine_pow, int):
-                object.__setattr__(self, "machine_pow", jax_utils.replicate(self.machine_pow))
         
         # workaround Jax bug under pmap
         # might be removed in the future
@@ -149,7 +145,7 @@ class Sampler(abc.ABC):
 
         If you are not using MPI, this is equal to :attr:`~Sampler.n_chains_per_rank`.
         """
-        return self.n_chains_per_rank * distributed.n_nodes
+        return self.n_chains_per_rank * distributed.n_devices
 
     @property
     def n_batches(self) -> int:

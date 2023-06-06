@@ -20,6 +20,8 @@ import jax
 from flax import linen as nn
 from jax import numpy as jnp
 
+import numpy as np
+
 from netket.hilbert import AbstractHilbert, ContinuousHilbert
 
 from netket.utils import distributed, wrap_afun
@@ -75,12 +77,14 @@ class MetropolisSamplerState(SamplerState):
     @property
     def n_steps(self) -> int:
         """Total number of moves performed across all processes since the last reset."""
-        return distributed.sum_jax(self.n_steps_proc)[0]
+        return self.n_steps_proc
+        #return distributed.sum_jax(self.n_steps_proc)[0]
 
     @property
     def n_accepted(self) -> int:
         """Total number of moves accepted across all processes since the last reset."""
-        return distributed.sum_jax(self.n_accepted_proc)[0]
+        return self.n_accepted_proc
+        #return distributed.sum_jax(self.n_accepted_proc)[0]
 
     def __repr__(self):
         if self.n_steps > 0:
@@ -237,13 +241,24 @@ class MetropolisSampler(Sampler):
 
         return sampler._sample_next(wrap_afun(machine), parameters, state)
 
-    @partial(nkjax.pmap, static_broadcasted_argnums=(1,))
+    @partial(nkjax.pmap, static_argnames=("machine",))
     def _init_state(sampler, machine, params, key):
         key_state, key_rule = jax.random.split(key, 2)
         rule_state = sampler.rule.init_state(sampler, machine, params, key_rule)
+
+        def _σ_cb(indices):
+            assert len(indices) == 2
+            indices = indices[0]
+            shape = (len(np.arange(indices.start, indices.stop, indices.step)), sampler.hilbert.size)
+            return jnp.zeros(shape, dtype=sampler.dtype)
+
+        #σ = distributed.make_array_from_callback(
+        #    (sampler.n_chains,sampler.hilbert.size),
+        #    _σ_cb)
         σ = jnp.zeros(
-            (sampler.n_chains_per_rank, sampler.hilbert.size), dtype=sampler.dtype
+            (sampler.n_chains, sampler.hilbert.size), dtype=sampler.dtype
         )
+        #print(σ.shape, σ.sharding)
 
         state = MetropolisSamplerState(σ=σ, rng=key_state, rule_state=rule_state)
 
@@ -262,7 +277,7 @@ class MetropolisSampler(Sampler):
 
         return state
 
-    @partial(nkjax.pmap, static_broadcasted_argnums=(1,))
+    @partial(nkjax.pmap, static_argnums=(1,))
     def _reset(sampler, machine, parameters, state):
         new_rng, rng = jax.random.split(state.rng)
 
@@ -349,7 +364,7 @@ class MetropolisSampler(Sampler):
         return new_state, new_state.σ
 
     #@partial(jax.jit, static_argnums=(1, 4))
-    @partial(nkjax.pmap, static_broadcasted_argnums=(1, 4))
+    @partial(nkjax.pmap, static_argnums=(1, 4))
     def _sample_chain(sampler, machine, parameters, state, chain_length):
         """
         Samples `chain_length` batches of samples along the chains.
