@@ -21,7 +21,7 @@ from jax import numpy as jnp
 import numpy as np
 
 from netket import jax as nkjax
-from netket.utils import get_afun_if_module, mpi
+from netket.utils import get_afun_if_module, mpi, distributed
 from netket.utils.types import Array, PyTree
 from netket.hilbert import DiscreteHilbert
 
@@ -51,6 +51,12 @@ def split_array_mpi(array: Array) -> Array:
 
     return array[states_per_rank[mpi.rank]]
 
+def _create_states_cb(hilbert, indices):
+    assert len(indices) == 2
+    indices = indices[0]
+    states_n = np.arange(indices.start, indices.stop, indices.step)
+    states_n = np.mod(states_n, hilbert.n_states)
+    return hilbert.numbers_to_states(states_n)
 
 def to_array(
     hilbert: DiscreteHilbert,
@@ -80,21 +86,19 @@ def to_array(
     # mpi4jax does not have (yet) allgatherv so we need to be creative
     # could be made easier if we update mpi4jax
     n_states = hilbert.n_states
-    n_states_padded = int(np.ceil(n_states / mpi.n_nodes)) * mpi.n_nodes
-    states_n = np.arange(n_states)
-    fake_states_n = np.arange(n_states_padded - n_states)
+    n_states_per_dev, n_fake_states = divmod(n_states, distributed.n_devices)
+    n_states_padded = n_states + n_fake_states
 
-    # divide the hilbert space in chunks for each node
-    states_per_rank = np.split(np.concatenate([states_n, fake_states_n]), mpi.n_nodes)
-
-    xs = hilbert.numbers_to_states(states_per_rank[mpi.rank])
-
+    shape = (n_states_padded, hilbert.size)
+    xs = distributed.make_array_from_callback(shape, partial(_create_states_cb, hilbert))
+    #xs = hilbert.numbers_to_states(states_per_rank[distributed.rank])
+    print(xs)
     return _to_array_rank(
         apply_fun, variables, xs, n_states, normalize, allgather, chunk_size
     )
 
 
-@partial(jax.jit, static_argnums=(0, 3, 4, 5, 6))
+#@partial(jax.jit, static_argnums=(0, 3, 4, 5, 6))
 def _to_array_rank(
     apply_fun, variables, σ_rank, n_states, normalize, allgather, chunk_size
 ):
@@ -113,29 +117,37 @@ def _to_array_rank(
         )
 
     # number of 'fake' states, in the last rank.
-    n_fake_states = σ_rank.shape[0] * mpi.n_nodes - n_states
+    # n_fake_states = distributed.global_size(σ_rank.shape[0]) - n_states
 
     log_psi_local = apply_fun(variables, σ_rank)
 
     # last rank, get rid of fake elements
-    if mpi.rank == mpi.n_nodes - 1 and n_fake_states > 0:
-        log_psi_local = log_psi_local.at[-n_fake_states:].set(-jnp.inf)
+    log_psi_local = log_psi_local.at[n_states:].set(-jnp.inf)
+    #if mpi.rank == mpi.n_nodes - 1 and n_fake_states > 0:
+    #    log_psi_local = log_psi_local.at[-n_fake_states:].set(-jnp.inf)
+    print("log_psi_local", log_psi_local)
 
     if normalize:
         # subtract logmax for better numerical stability
-        logmax, _ = mpi.mpi_max_jax(log_psi_local.real.max())
+        #logmax, _ = distributed.max_jax(log_psi_local.real.max())
+        logmax = log_psi_local.real.max()
         log_psi_local -= logmax
 
     psi_local = jnp.exp(log_psi_local)
+    print("psi_local", psi_local)
 
     if normalize:
         # compute normalization
+        #norm2 = jnp.linalg.norm(psi_local) ** 2
+        #norm2, _ = mpi.mpi_sum_jax(norm2)
         norm2 = jnp.linalg.norm(psi_local) ** 2
-        norm2, _ = mpi.mpi_sum_jax(norm2)
         psi_local /= jnp.sqrt(norm2)
+    psi_local = jnp.exp(log_psi_local)
+    print("psi_local", psi_local)
 
     if allgather:
-        psi, _ = mpi.mpi_allgather_jax(psi_local)
+        #psi, _ = mpi.mpi_allgather_jax(psi_local)
+        psi = psi_local
     else:
         psi = psi_local
 
