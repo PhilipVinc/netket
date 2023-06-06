@@ -15,29 +15,19 @@
 from typing import Callable, Optional, Any, Sequence, Iterable, Tuple, Union
 
 import jax
+from jax.experimental import pjit
+from jax.experimental import maps
+from jax.experimental import mesh_utils
+
+from jax.sharding import PositionalSharding
 
 from netket import config
 
-AxisName = Any
-
 def pmap(fun: Callable,
     *,
-    in_axes=0,
-    out_axes=0,
-    static_broadcasted_argnums: Union[int, Iterable[int]] = (),
-    devices = None,  # noqa: F811
-    backend: Optional[str] = None,
-    axis_size: Optional[int] = None,
+    static_argnums: Union[int, Iterable[int]] = None,
+    static_argnames = None,
     donate_argnums: Union[int, Iterable[int]] = (),
-    global_arg_shapes: Optional[Tuple[Tuple[int, ...], ...]] = None,
     ):
 
-    axis_name = "mpi"
-
-    if config.netket_experimental_pmap:
-        return jax.pmap(fun, axis_name, in_axes=in_axes, 
-            out_axes=out_axes, static_broadcasted_argnums=static_broadcasted_argnums, devices=devices,
-            backend=backend, axis_size=axis_size, donate_argnums=donate_argnums, global_arg_shapes=global_arg_shapes)
-
-    else:
-        return jax.jit(fun, static_argnums=static_broadcasted_argnums)
+    return jax.jit(fun, static_argnums=static_argnums, static_argnames=static_argnames)

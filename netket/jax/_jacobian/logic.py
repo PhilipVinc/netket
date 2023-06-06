@@ -34,8 +34,7 @@ from . import jacobian_pytree
 
 @partial(
     nkjax.pmap, 
-    static_broadcasted_argnums=(0,4,6,7,8)
-    #static_argnames=("apply_fun", "mode", "chunk_size", "center", "dense")
+    static_argnames=("apply_fun", "mode", "chunk_size", "center", "dense")
 )
 def jacobian(
     apply_fun: Callable,
