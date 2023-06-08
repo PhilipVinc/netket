@@ -44,11 +44,15 @@ def PRNGKey(
     key = jax.device_put(key, sharding.replicate(axis=0, keepdims=True))
     return key
 
-def broadcast(x):
-    return jax.device_put(x, sharding.replicate(axis=0, keepdims=True))
+def broadcast(x, axis=0):
+    return jax.device_put(x, sharding.replicate(axis=axis, keepdims=True))
 
-def scatter(x):
-    return jax.tree_map(lambda v: jax.device_put(v, sharding.reshape(-1, *(1 for _ in range(v.ndim-1)))), x)
+def _scatter_shape(ndims, scatter_axis):
+    return tuple(1 if i!=scatter_axis else -1 for i in range(ndims-1))
+
+def scatter(x, axis=0):
+    return jax.tree_map(lambda v: jax.device_put(v, sharding.reshape(_scatter_shape(v.ndim, axis))), x)
 
 def global_size(x):
     return x
+

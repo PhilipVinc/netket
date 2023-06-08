@@ -13,6 +13,7 @@ from functools import partial
 hi = nk.hilbert.Spin(0.5, 3)
 ma = nk.models.RBM()
 sa = nk.sampler.MetropolisLocal(hi)
+#sa = nk.sampler.ExactSampler(hi)
 
 pars = ma.init(jax.random.PRNGKey(1), hi.all_states())
 sa_state = sa.init_state(ma, pars)

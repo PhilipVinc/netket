@@ -8,6 +8,7 @@ from scipy.sparse import csr_matrix as _csr_matrix
 
 from netket.hilbert import DiscreteHilbert
 from netket.operator import AbstractOperator
+from netket.utils import distributed
 
 
 class DiscreteOperator(AbstractOperator):
@@ -62,7 +63,12 @@ class DiscreteOperator(AbstractOperator):
         x_primes_r = x_primes.reshape(*x.shape[:-1], n_primes, n_visible)
         mels_r = mels.reshape(*x.shape[:-1], n_primes)
 
+        if hasattr(x, "sharding") and x.sharding.shape != (1,):
+            distributed.make_array_from_callback(
+            )
+
         return x_primes_r, mels_r
+
 
     @abc.abstractmethod
     def get_conn_flattened(

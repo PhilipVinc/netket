@@ -6,22 +6,13 @@ import jaxlib
 from jax.sharding import PositionalSharding
 
 def sum_jax(arr):
-    if isinstance(arr, jaxlib.xla_extension.pmap_lib.ShardedDeviceArray):
-        return jnp.sum(arr, axis=0), None
-    else:
-        return jax.lax.psum(arr, 'mpi'), None
+    return jnp.sum(arr, axis=0), None
 
 def mean_jax(arr):
-    if isinstance(arr, jaxlib.xla_extension.pmap_lib.ShardedDeviceArray):
-        return jnp.mean(arr, axis=0), None
-    else:
-        return jax.lax.pmean(arr, 'mpi'), None
+    return jnp.mean(arr, axis=0), None
 
 def max_jax(arr):
-    if isinstance(arr, jaxlib.xla_extension.pmap_lib.ShardedDeviceArray):
-        return jnp.max(arr, axis=0), None
-    else:
-        return jax.lax.pmax(arr, 'mpi'), None
+    return jnp.max(arr, axis=0), None
 
 sharding = PositionalSharding(jax.devices())
 

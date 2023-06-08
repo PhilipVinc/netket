@@ -142,5 +142,5 @@ class MetropolisRule(abc.ABC):
             key: The PRNGKey to use to generate the random state.
         """
         return sampler.hilbert.random_state(
-            key, size=sampler.n_batches, dtype=sampler.dtype
+            key, size=sampler.n_chains, dtype=sampler.dtype
         )

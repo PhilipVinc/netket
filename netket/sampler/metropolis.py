@@ -246,30 +246,41 @@ class MetropolisSampler(Sampler):
         key_state, key_rule = jax.random.split(key, 2)
         rule_state = sampler.rule.init_state(sampler, machine, params, key_rule)
 
-        def _σ_cb(indices):
-            assert len(indices) == 2
-            indices = indices[0]
-            shape = (len(np.arange(indices.start, indices.stop, indices.step)), sampler.hilbert.size)
-            return jnp.zeros(shape, dtype=sampler.dtype)
-
+        #def _σ_cb(indices):
+        #    assert len(indices) == 2
+        #    indices = indices[0]
+        #    print("indices", indices)
+        #    shape = (len(np.arange(indices.start, indices.stop, indices.step)), sampler.hilbert.size)
+        #    print("shape", shape)
+        #    r = np.zeros(shape, dtype=sampler.dtype)
+        #    print(r.shape)
+        #    print(type(r))
+        #    return r
+        #
+        #print("sampler.n_chains", sampler.n_chains)
         #σ = distributed.make_array_from_callback(
         #    (sampler.n_chains,sampler.hilbert.size),
         #    _σ_cb)
         σ = jnp.zeros(
             (sampler.n_chains, sampler.hilbert.size), dtype=sampler.dtype
         )
-        #print(σ.shape, σ.sharding)
+        σ = distributed.scatter(σ)
+        print("σ.shape", σ.shape)
 
         state = MetropolisSamplerState(σ=σ, rng=key_state, rule_state=rule_state)
 
         # If we don't reset the chain at every sampling iteration, then reset it
         # now.
         if not sampler.reset_chains:
+            print(key_state.shape)
             key_state, rng = jax.random.split(key_state)
-            σ = sampler.rule.random_state(sampler, machine, params, state, rng)
+            σ = jax.lax.with_sharding_constraint(
+                sampler.rule.random_state(sampler, machine, params, state, rng),
+                distributed.sharding.reshape(-1,1))
+
             _assert_good_sample_shape(
                 σ,
-                (sampler.n_chains_per_rank, sampler.hilbert.size),
+                (sampler.n_chains, sampler.hilbert.size),
                 sampler.dtype,
                 f"{sampler.rule}.random_state",
             )
@@ -315,16 +326,16 @@ class MetropolisSampler(Sampler):
             )
             _assert_good_sample_shape(
                 σp,
-                (sampler.n_chains_per_rank, sampler.hilbert.size),
+                (sampler.n_chains, sampler.hilbert.size),
                 sampler.dtype,
                 f"{sampler.rule}.transition",
             )
             proposal_log_prob = sampler.machine_pow * machine.apply(parameters, σp).real
             _assert_good_log_prob_shape(
-                proposal_log_prob, sampler.n_chains_per_rank, machine
+                proposal_log_prob, sampler.n_chains, machine
             )
 
-            uniform = jax.random.uniform(key2, shape=(sampler.n_chains_per_rank,))
+            uniform = jax.random.uniform(key2, shape=(sampler.n_chains,))
             if log_prob_correction is not None:
                 do_accept = uniform < jnp.exp(
                     proposal_log_prob - s["log_prob"] + log_prob_correction
