@@ -47,11 +47,13 @@ def PRNGKey(
 def broadcast(x, axis=0):
     return jax.device_put(x, sharding.replicate(axis=axis, keepdims=True))
 
-def _scatter_shape(ndims, scatter_axis):
-    return tuple(1 if i!=scatter_axis else -1 for i in range(ndims-1))
+def _scatter_array(v, axis=0):
+    sharding_shape = tuple(1 if i!=axis else -1 for i in range(v.ndim))
+    res = jax.device_put(v, sharding.reshape(sharding_shape))
+    return res
 
 def scatter(x, axis=0):
-    return jax.tree_map(lambda v: jax.device_put(v, sharding.reshape(_scatter_shape(v.ndim, axis))), x)
+    return jax.tree_map(partial(_scatter_array, axis=axis), x)
 
 def global_size(x):
     return x
