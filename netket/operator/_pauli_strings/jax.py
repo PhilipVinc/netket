@@ -45,14 +45,6 @@ from .base import PauliStringsBase
 # TODO eventually add version with sparse jax arrays (achieving the same as indexing)
 
 
-# duplicated from ising
-def _ising_conn_states_jax(x, cond, local_states):
-    was_state_0 = x == local_states[0]
-    state_0 = jnp.asarray(local_states[0], dtype=x.dtype)
-    state_1 = jnp.asarray(local_states[1], dtype=x.dtype)
-    return jnp.where(cond ^ was_state_0, state_0, state_1)
-
-
 def pack_internals(operators, weights, cutoff=0):
 
     # here we group together operators with same final state
@@ -258,7 +250,9 @@ def _pauli_strings_mels_jax(local_states, z_data, x):
 @jax.jit
 def _pauli_strings_kernel_jax(local_states, x_flip_masks_all, z_data, x):
     # can re-use function from Ising
-    x_prime = _ising_conn_states_jax(x[..., None, :], x_flip_masks_all, local_states)
+    x_prime = jnp.where(
+        x_flip_masks_all, local_states.flip_state(x[..., None, :]), x[..., None, :]
+    )
     mels = _pauli_strings_mels_jax(local_states, z_data, x)
     # TODO do we want a cutoff?
     return x_prime, mels
@@ -306,7 +300,6 @@ class PauliStringsJax(PauliStringsBase, DiscreteJaxOperator):
         # private variable for setting the mode
         # depending on performance tests we might expose or remove it
         self._mode = "mask"
-        self._hi_local_states = tuple(self.hilbert.local_states)
         self._initialized = False
 
     @property
@@ -338,7 +331,7 @@ class PauliStringsJax(PauliStringsBase, DiscreteJaxOperator):
     def get_conn_padded(self, x):
         self._setup()
         return _pauli_strings_kernel_jax(
-            self._hi_local_states,
+            self.hilbert.local_states,
             self._x_flip_masks_stacked,
             self._z_data,
             x,
