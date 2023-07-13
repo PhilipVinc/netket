@@ -16,9 +16,10 @@ import numpy as np
 from numba.experimental import jitclass
 from numba import int64, float64
 
+from netket.utils.static_range import _RangeNumba
 
 spec = [
-    ("_local_states", float64[:]),
+    ("_local_states", _RangeNumba[float64, float64]),
     ("_local_size", int64),
     ("_size", int64),
     ("_basis", int64[:]),
@@ -28,7 +29,7 @@ spec = [
 @jitclass(spec)
 class HilbertIndex:
     def __init__(self, local_states, size):
-        self._local_states = np.sort(local_states)
+        self._local_states = local_states
         self._local_size = len(self._local_states)
         self._size = size
 
@@ -37,9 +38,6 @@ class HilbertIndex:
         for s in range(size):
             self._basis[s] = ba
             ba *= self._local_size
-
-    def _local_state_number(self, x):
-        return np.searchsorted(self.local_states, x)
 
     @property
     def n_states(self):
@@ -58,7 +56,8 @@ class HilbertIndex:
 
         for i in range(self._size):
             number += (
-                self._local_state_number(state[self._size - i - 1]) * self._basis[i]
+                self._local_states.basis_to_index(state[self._size - i - 1])
+                * self._basis[i]
             )
 
         return number
@@ -94,7 +93,7 @@ class HilbertIndex:
             out[i] = 0
             for j in range(self._size):
                 out[i] += (
-                    self._local_state_number(states[i, self._size - j - 1])
+                    self._local_states.basis_to_index(states[i, self._size - j - 1])
                     * self._basis[j]
                 )
         return out

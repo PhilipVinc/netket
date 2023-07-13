@@ -413,11 +413,11 @@ def test_inhomogeneous_fock():
 
     for i in range(0, 40):
         assert hi.size_at_index(i) == 8
-        assert hi.states_at_index(i) == list(range(8))
+        np.testing.assert_allclose(hi.states_at_index(i), range(8))
 
     for i in range(40, 80):
         assert hi.size_at_index(i) == 3
-        assert hi.states_at_index(i) == list(range(3))
+        np.testing.assert_allclose(hi.states_at_index(i), range(3))
 
 
 def test_fermions():

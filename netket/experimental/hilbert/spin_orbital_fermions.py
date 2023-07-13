@@ -17,6 +17,7 @@ from collections.abc import Iterable
 import numpy as np
 from fractions import Fraction
 
+from netket.utils import StaticRange
 from netket.hilbert.fock import Fock
 from netket.hilbert.tensor_hilbert_discrete import TensorDiscreteHilbert
 from netket.hilbert.homogeneous import HomogeneousHilbert
@@ -97,7 +98,7 @@ class SpinOrbitalFermions(HomogeneousHilbert):
         self._fock = hilbert
         """Internal representation of this Hilbert space (Fock or TensorHilbert)."""
         # local states are the occupation numbers (0, 1)
-        local_states = np.array((0.0, 1.0))
+        local_states = StaticRange(0.0, 1.0, 2)
 
         # we use the constraints from the Fock spaces, and override is_constrained later
         super().__init__(local_states, N=total_size, constraint_fn=None)

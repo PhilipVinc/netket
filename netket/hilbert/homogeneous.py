@@ -19,6 +19,8 @@ from numbers import Real
 
 import numpy as np
 
+from netket.utils import StaticRange
+
 from .discrete_hilbert import DiscreteHilbert
 from .hilbert_index import HilbertIndex
 
@@ -82,16 +84,21 @@ class HomogeneousHilbert(DiscreteHilbert):
 
         self._is_finite = local_states is not None
 
-        if self._is_finite:
-            self._local_states = np.asarray(local_states)
-            assert self._local_states.ndim == 1
-            self._local_size = self._local_states.shape[0]
-            self._local_states = self._local_states.tolist()
-            self._local_states_frozen = frozenset(self._local_states)
+        if isinstance(local_states, StaticRange):
+            self._local_states = local_states
+            self._local_size = len(local_states)
+            self._local_states_frozen = local_states
         else:
-            self._local_states = None
-            self._local_states_frozen = None
-            self._local_size = np.iinfo(np.intp).max
+            if self._is_finite:
+                self._local_states = np.asarray(local_states)
+                assert self._local_states.ndim == 1
+                self._local_size = self._local_states.shape[0]
+                self._local_states = self._local_states.tolist()
+                self._local_states_frozen = frozenset(self._local_states)
+            else:
+                self._local_states = None
+                self._local_states_frozen = None
+                self._local_size = np.iinfo(np.intp).max
 
         self._constraint_fn = constraint_fn
 
@@ -183,9 +190,7 @@ class HomogeneousHilbert(DiscreteHilbert):
             if not self.is_indexable:
                 raise RuntimeError("The hilbert space is too large to be indexed.")
 
-            self.__hilbert_index = HilbertIndex(
-                np.asarray(self.local_states, dtype=np.float64), self.size
-            )
+            self.__hilbert_index = HilbertIndex(self.local_states, self.size)
 
         return self.__hilbert_index
 
