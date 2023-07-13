@@ -157,7 +157,7 @@ class PauliStrings(PauliStringsBase):
             self._x_prime_max = np.empty((self._n_operators, self.hilbert.size))
             self._mels_max = np.empty((self._n_operators), dtype=self.dtype)
 
-            self._local_states = np.array(self.hilbert.states_at_index(0))
+            self._local_states = self.hilbert.states_at_index(0)
             self._initialized = True
 
     @staticmethod
@@ -180,7 +180,7 @@ class PauliStrings(PauliStringsBase):
     ):
         x_prime = np.empty((x.shape[0] * max_conn, x_prime.shape[1]), dtype=x.dtype)
         mels = np.zeros((x.shape[0] * max_conn), dtype=mels.dtype)
-        state_1 = local_states[-1]
+        state_1 = local_states[1]
 
         n_c = 0
         for b in range(x.shape[0]):
@@ -205,8 +205,7 @@ class PauliStrings(PauliStringsBase):
                     x_prime[n_c] = np.copy(xb)
                     # now flip all the sites in the X string
                     for site in sites[i, : ns[i]]:
-                        new_state_idx = int(x_prime[n_c, site] == local_states[0])
-                        x_prime[n_c, site] = local_states[new_state_idx]
+                        x_prime[n_c, site] = local_states.flip_state(x_prime[n_c, site])
                     mels[n_c] = mel
                     n_c += 1
 
