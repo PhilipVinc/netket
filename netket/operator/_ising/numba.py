@@ -83,7 +83,7 @@ class Ising(IsingBase):
 
     @staticmethod
     @jit(nopython=True)
-    def _flattened_kernel(x, sections, edges, h, J):  # pragma: no cover
+    def _flattened_kernel(x, sections, edges, h, J, local_states):  # pragma: no cover
         n_sites = x.shape[1]
         n_conn = n_sites + 1
 
@@ -104,7 +104,9 @@ class Ising(IsingBase):
             x_prime[diag_ind : (diag_ind + n_conn)] = np.copy(x[i])
 
             for j in range(n_sites):
-                x_prime[j + odiag_ind][j] *= -1.0
+                x_prime[j + odiag_ind][j] = local_states.flip_state(
+                    x_prime[j + odiag_ind][j]
+                )
 
             diag_ind += n_conn
 
@@ -142,15 +144,18 @@ class Ising(IsingBase):
             self,
         )
 
-        return self._flattened_kernel(x, sections, self.edges, self._h, self._J)
+        return self._flattened_kernel(
+            x, sections, self.edges, self._h, self._J, self.hilbert.local_states
+        )
 
     def _get_conn_flattened_closure(self):
         _edges = self._edges
         _h = self._h
         _J = self._J
+        _local_states = self.hilbert.local_states
         fun = self._flattened_kernel
 
         def gccf_fun(x, sections):  # pragma: no cover
-            return fun(x, sections, _edges, _h, _J)
+            return fun(x, sections, _edges, _h, _J, _local_states)
 
         return jit(nopython=True)(gccf_fun)
