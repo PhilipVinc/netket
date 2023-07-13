@@ -19,6 +19,7 @@ operators.
 
 import numpy as np
 import numba
+from numba.typed import List
 from scipy import sparse
 
 from netket.hilbert import AbstractHilbert
@@ -52,22 +53,16 @@ def pack_internals(
     # Support empty LocalOperators such as the identity.
     if len(acting_size) > 0:
         max_acting_on_sz = np.max(acting_size)
-        max_local_hilbert_size = max(
-            [max(map(hilbert.size_at_index, aon)) for aon in op_acting_on]
-        )
+        max([max(map(hilbert.size_at_index, aon)) for aon in op_acting_on])
         max_op_size = max(map(lambda x: x.shape[0], operators))
     else:
         max_acting_on_sz = 0
-        max_local_hilbert_size = 0
         max_op_size = 0
 
     acting_on = np.full((n_operators, max_acting_on_sz), -1, dtype=np.intp)
     for (i, aon) in enumerate(op_acting_on):
         acting_on[i][: len(aon)] = aon
 
-    local_states = np.full(
-        (n_operators, max_acting_on_sz, max_local_hilbert_size), np.nan
-    )
     basis = np.full((n_operators, max_acting_on_sz), 1e10, dtype=np.int64)
 
     diag_mels = np.full((n_operators, max_op_size), np.nan, dtype=dtype)
@@ -80,22 +75,16 @@ def pack_internals(
         np.nan,
         dtype=dtype,
     )
-    x_prime = np.full(
+    x_prime_indx = np.full(
         (n_operators, max_op_size, max_op_size_offdiag, max_acting_on_sz),
         -1,
-        dtype=np.float64,
+        dtype=np.int32,
     )
     n_conns = np.full((n_operators, max_op_size), -1, dtype=np.intp)
 
     for (i, (aon, op)) in enumerate(operators_dict.items()):
         aon_size = len(aon)
         n_local_states_per_site = np.asarray([hilbert.size_at_index(i) for i in aon])
-
-        ## add an operator to local_states
-        for (j, site) in enumerate(aon):
-            local_states[i, j, : hilbert.shape[site]] = np.asarray(
-                hilbert.states_at_index(site)
-            )
 
         ba = 1
         for s in range(aon_size):
@@ -111,10 +100,9 @@ def pack_internals(
             op,
             diag_mels[i],
             mels[i],
-            x_prime[i],
+            x_prime_indx[i],
             n_conns[i],
             aon_size,
-            local_states[i],
             mel_cutoff,
             n_local_states_per_site,
         )
@@ -133,14 +121,16 @@ def pack_internals(
         nnz_rows = np.sum(nnz_mat, axis=1)
         max_conn_size += np.max(nnz_rows)
 
+    local_states = List([hilbert.states_at_index(i) for i in range(hilbert.size)])
+
     return {
         "acting_on": acting_on,
         "acting_size": acting_size,
         "diag_mels": diag_mels,
-        "mels": mels,
-        "x_prime": x_prime,
-        "n_conns": n_conns,
         "local_states": local_states,
+        "mels": mels,
+        "x_prime_indx": x_prime_indx,
+        "n_conns": n_conns,
         "basis": basis,
         "nonzero_diagonal": nonzero_diagonal,
         "max_conn_size": max_conn_size,
@@ -152,10 +142,9 @@ def _append_matrix(
     operator,
     diag_mels,
     mels,
-    x_prime,
+    x_prime_indx,
     n_conns,
     acting_size,
-    local_states_per_site,
     epsilon,
     hilb_size_per_site,
 ):
@@ -171,23 +160,22 @@ def _append_matrix(
                 _number_to_state(
                     j,
                     hilb_size_per_site,
-                    local_states_per_site[:acting_size, :],
-                    x_prime[i, k_conn, :acting_size],
+                    x_prime_indx[i, k_conn, :acting_size],
                 )
                 n_conns[i] += 1
 
 
 @numba.jit(nopython=True)
-def _number_to_state(number, hilbert_size_per_site, local_states_per_site, out):
+def _number_to_state(number, hilbert_size_per_site, out):
 
-    out[:] = local_states_per_site[:, 0]
     size = out.shape[0]
+    out[:] = 0
 
     ip = number
     k = size - 1
     while ip > 0:
         local_size = hilbert_size_per_site[k]
-        out[k] = local_states_per_site[k, ip % local_size]
+        out[k] = ip % local_size
         ip = ip // local_size
         k -= 1
 

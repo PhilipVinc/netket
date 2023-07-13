@@ -419,7 +419,7 @@ class LocalOperator(DiscreteOperator):
             self._acting_size = data["acting_size"]
             self._diag_mels = data["diag_mels"]
             self._mels = data["mels"]
-            self._x_prime = data["x_prime"]
+            self._x_prime_indx = data["x_prime_indx"]
             self._n_conns = data["n_conns"]
             self._local_states = data["local_states"]
             self._basis = data["basis"]
@@ -473,7 +473,7 @@ class LocalOperator(DiscreteOperator):
             self._diag_mels,
             self._n_conns,
             self._mels,
-            self._x_prime,
+            self._x_prime_indx,
             self._acting_on,
             self._acting_size,
             self._nonzero_diagonal,
@@ -488,7 +488,7 @@ class LocalOperator(DiscreteOperator):
         _diag_mels = self._diag_mels
         _n_conns = self._n_conns
         _mels = self._mels
-        _x_prime = self._x_prime
+        _x_prime_indx = self._x_prime_indx
         _acting_on = self._acting_on
         _acting_size = self._acting_size
         # workaround my painfully discovered Numba#6979 (cannot use numpy bools in closures)
@@ -506,7 +506,7 @@ class LocalOperator(DiscreteOperator):
                 _diag_mels,
                 _n_conns,
                 _mels,
-                _x_prime,
+                _x_prime_indx,
                 _acting_on,
                 _acting_size,
                 _nonzero_diagonal,
@@ -525,7 +525,7 @@ class LocalOperator(DiscreteOperator):
         diag_mels,
         n_conns,
         all_mels,
-        all_x_prime,
+        all_x_prime_indx,
         acting_on,
         acting_size,
         nonzero_diagonal,
@@ -560,10 +560,9 @@ class LocalOperator(DiscreteOperator):
                 x_i = x_b[acting_on[i, :acting_size_i]]
                 for k in range(acting_size_i):
                     xs_n[b, i] += (
-                        np.searchsorted(
-                            local_states[i, acting_size_i - k - 1],
-                            x_i[acting_size_i - k - 1],
-                        )
+                        local_states[
+                            acting_on[i, acting_size_i - k - 1]
+                        ].basis_to_index(x_i[acting_size_i - k - 1])
                         * basis[i, k]
                     )
 
@@ -606,9 +605,12 @@ class LocalOperator(DiscreteOperator):
                         x_prime[c + cc] = np.copy(x_batch)
 
                         for k in range(acting_size_i):
-                            x_prime[c + cc, sites[k]] = all_x_prime[
-                                i, xs_n[b, i], cc, k
-                            ]
+                            x_prime[c + cc, sites[k]] = local_states[
+                                sites[k]
+                            ].index_to_basis(all_x_prime_indx[i, xs_n[b, i], cc, k])
+                            # x_prime[c + cc, sites[k]] = all_x_prime[
+                            #    i, xs_n[b, i], cc, k
+                            # ]
                     c += n_conn_i
 
             if pad:
@@ -661,7 +663,7 @@ class LocalOperator(DiscreteOperator):
             self._diag_mels,
             self._n_conns,
             self._mels,
-            self._x_prime,
+            self._x_prime_indx,
             self._acting_on,
             self._acting_size,
             filters,
@@ -678,7 +680,7 @@ class LocalOperator(DiscreteOperator):
         diag_mels,
         n_conns,
         all_mels,
-        all_x_prime,
+        all_x_prime_indx,
         acting_on,
         acting_size,
         filters,
@@ -714,9 +716,8 @@ class LocalOperator(DiscreteOperator):
             x_i = x_b[acting_on[i, :acting_size_i]]
             for k in range(acting_size_i):
                 xs_n[b, i] += (
-                    np.searchsorted(
-                        local_states[i, acting_size_i - k - 1],
-                        x_i[acting_size_i - k - 1],
+                    local_states[acting_on[i, acting_size_i - k - 1]].basis_to_index(
+                        x_i[acting_size_i - k - 1]
                     )
                     * basis[i, k]
                 )
@@ -749,7 +750,9 @@ class LocalOperator(DiscreteOperator):
                     x_prime[c + cc] = np.copy(x_batch)
 
                     for k in range(acting_size_i):
-                        x_prime[c + cc, sites[k]] = all_x_prime[i, xs_n[b, i], cc, k]
+                        x_prime[c + cc, sites[k]] = local_states[
+                            sites[k]
+                        ].index_to_basis(all_x_prime_indx[i, xs_n[b, i], cc, k])
                 c += n_conn_i
 
         return x_prime, mels
