@@ -11,46 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Optional, Callable, Union
+from typing import Callable, Iterable, Optional, Union
 from functools import partial
+from typing import Iterable, Optional, Union
 
 import numpy as np
 
 import jax
 import jax.numpy as jnp
 
-from netket.utils.types import DType, PyTree, Array
-import netket.jax as nkjax
+from netket.utils.types import DType
+from netket.utils.numbers import is_scalar
 from netket.hilbert import AbstractHilbert
-from netket.operator import ContinuousOperator
-from netket.utils import HashableArray
+
+from ._laplacian import Laplacian
 
 
-def jacrev(f):
-    def jacfun(x):
-        y, vjp_fun = nkjax.vjp(f, x)
-        if y.size == 1:
-            eye = jnp.eye(y.size, dtype=x.dtype)[0]
-            J = jax.vmap(vjp_fun, in_axes=0)(eye)
-        else:
-            eye = jnp.eye(y.size, dtype=x.dtype)
-            J = jax.vmap(vjp_fun, in_axes=0)(eye)
-        return J
-
-    return jacfun
-
-
-def jacfwd(f):
-    def jacfun(x):
-        jvp_fun = lambda s: jax.jvp(f, (x,), (s,))[1]
-        eye = jnp.eye(len(x), dtype=x.dtype)
-        J = jax.vmap(jvp_fun, in_axes=0)(eye)
-        return J
-
-    return jacfun
-
-
-class KineticEnergy(ContinuousOperator):
+class KineticEnergy(Laplacian):
     r"""This is the kinetic energy operator (hbar = 1). The local value is given by:
     :math:`E_{kin} = -1/2 ( \sum_i \frac{1}{m_i} (\log(\psi))'^2 + (\log(\psi))'' )`
     """
@@ -58,57 +35,53 @@ class KineticEnergy(ContinuousOperator):
     def __init__(
         self,
         hilbert: AbstractHilbert,
-        mass: Union[float, list[float]],
+        sites: Union[int, Iterable[int]] = None,
+        *,
+        mass: Union[float, Iterable[float]] = 1,
         dtype: Optional[DType] = None,
+        algorithm: str = "bwd-fwd",
     ):
-        r"""Args:
-        hilbert: The underlying Hilbert space on which the operator is defined
-        mass: float if all masses are the same, list indicating the mass of each particle otherwise
-        dtype: Data type of the matrix elements. Defaults to `np.float64`
+        r"""
+        Constructs the Kinetic term on a given site.
+
+        Args:
+            hilbert: The underlying Hilbert space on which the operator is defined
+            mass: float if all masses are the same, list indicating the mass of each particle otherwise
+            dtype: Data type of the matrix elements. Defaults to `np.float64`
+            use_jet: (Experimental!) Compute the derivatives using Taylor Polynomials.
         """
+        if sites is None:
+            sites = range(hilbert.size)
 
-        self._mass = jnp.asarray(mass, dtype=dtype)
+        if not isinstance(sites, Iterable):
+            sites = [sites]
 
-        self._is_hermitian = np.allclose(self._mass.imag, 0.0)
-        self.__attrs = None
+        if is_scalar(mass):
+            mass = np.full((len(sites),), mass, dtype=dtype)
+        else:
+            mass = np.asarray(mass, dtype=dtype)
 
-        super().__init__(hilbert, self._mass.dtype)
+        if not all(s in range(hilbert.size) for s in sites):
+            raise ValueError("all sites should be between 0 and hilbert.size -1")
 
-    @property
-    def mass(self):
-        return self._mass
+        if len(set(sites)) != len(sites):
+            raise ValueError(
+                "There are repeated sites. There should not be repeated sites."
+            )
 
-    @property
-    def is_hermitian(self):
-        return self._is_hermitian
+        if len(mass) != len(sites):
+            raise ValueError(
+                "mass should be a scalar or have the same length of sites."
+            )
 
-    def _expect_kernel_single(
-        self, logpsi: Callable, params: PyTree, x: Array, inverse_mass: Optional[PyTree]
-    ):
-        def logpsi_x(x):
-            return logpsi(params, x)
-
-        dlogpsi_x = jacrev(logpsi_x)
-
-        dp_dx2 = jnp.diag(jacfwd(dlogpsi_x)(x)[0].reshape(x.shape[0], x.shape[0]))
-        dp_dx = dlogpsi_x(x)[0][0] ** 2
-
-        return -0.5 * jnp.sum(inverse_mass * (dp_dx2 + dp_dx), axis=-1)
-
-    @partial(jax.vmap, in_axes=(None, None, None, 0, None))
-    def _expect_kernel(
-        self, logpsi: Callable, params: PyTree, x: Array, coefficient: Optional[PyTree]
-    ):
-        return self._expect_kernel_single(logpsi, params, x, coefficient)
-
-    def _pack_arguments(self) -> PyTree:
-        return 1.0 / self._mass
+        coeffs = jnp.where(mass != 0, jnp.reciprocal(mass), 0.0)
+        super().__init__(
+            hilbert, sites, coeffs=coeffs, dtype=dtype, algorithm=algorithm
+        )
 
     @property
-    def _attrs(self):
-        if self.__attrs is None:
-            self.__attrs = (self.hilbert, self.dtype, HashableArray(self.mass))
-        return self.__attrs
+    def mass(self) -> jax.Array:
+        return jnp.where(self.coeffs != 0, jnp.reciprocal(self.coeffs), 0.0)
 
     def __repr__(self):
-        return f"KineticEnergy(m={self._mass})"
+        return f"KineticEnergy(acting_on={self.acting_on}, masses={self.mass})"

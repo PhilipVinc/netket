@@ -4,6 +4,7 @@ import jax
 import jax.numpy as jnp
 
 import netket
+import netket as nk
 
 import pytest
 
@@ -100,9 +101,12 @@ def test_potential_energy():
 
 
 def test_kinetic_energy():
+    hilb = nk.hilbert.Particle(N=1, L=jnp.inf, pbc=False)
     for dtype in (jnp.float32, jnp.float64):
+        kin1 = nk.operator.KineticEnergy(hilb, mass=20.0, dtype=dtype)
+
         x = jnp.array([[1, 2, 3], [1, 2, 3]], dtype=dtype)
-        energy1 = kin1._expect_kernel(model2, 0.0, x, kin1._pack_arguments())
+        energy1 = kin1._expect_kernel(model2, 0, x, kin1._pack_arguments())
         assert energy1.dtype == dtype
         # dtype changes here
         energy2 = kin1._expect_kernel(model3, 1.0 + 1.0j, x, kin1._pack_arguments())
@@ -110,8 +114,10 @@ def test_kinetic_energy():
         kinen2 = kinexact2(1.0 + 1.0j, x) / kin1.mass
         np.testing.assert_allclose(energy1, kinen1)
         np.testing.assert_allclose(energy2, kinen2)
-        np.testing.assert_allclose(kin1.mass * kin1._pack_arguments(), 1.0)
-        np.testing.assert_equal("KineticEnergy(m=20.0)", repr(kin1))
+        np.testing.assert_allclose(kin1.mass * kin1._pack_arguments().coeffs, 1.0)
+        np.testing.assert_equal(
+            "KineticEnergy(acting_on=(0,), masses=[20.])", repr(kin1)
+        )
 
 
 def test_sumoperator():

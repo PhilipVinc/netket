@@ -19,6 +19,7 @@ from netket.utils.types import DType, PyTree, Array
 
 from netket.hilbert import AbstractHilbert
 from netket.operator import AbstractOperator
+from netket.utils.numbers import is_scalar
 
 
 class ContinuousOperator(AbstractOperator):
@@ -94,13 +95,13 @@ class ContinuousOperator(AbstractOperator):
             return NotImplemented  # pragma: no cover
 
     def __rmul__(self, other):
-        if isinstance(self, ContinuousOperator) and isinstance(other, float):
+        if isinstance(self, ContinuousOperator) and is_scalar(other):
             return self * other
         else:
             return NotImplemented  # pragma: no cover
 
     def __mul__(self, other):
-        if isinstance(self, ContinuousOperator) and isinstance(other, float):
+        if isinstance(self, ContinuousOperator) and is_scalar(other):
             from netket.operator import SumOperator
 
             return SumOperator(self, coefficients=other)
