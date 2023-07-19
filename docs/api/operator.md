@@ -87,6 +87,7 @@ This is a list of operators that you can define on {class}`~netket.hilbert.Conti
    KineticEnergy
    PotentialEnergy
    SumOperator
+   Laplacian
 ```
 
 
