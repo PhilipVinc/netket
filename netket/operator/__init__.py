@@ -29,6 +29,7 @@ from ._abstract_super_operator import AbstractSuperOperator
 from ._local_liouvillian import LocalLiouvillian
 
 from ._continuous_operator import ContinuousOperator
+from ._laplacian import Laplacian
 from ._kinetic import KineticEnergy
 from ._potential import PotentialEnergy
 from ._sumoperators import SumOperator
