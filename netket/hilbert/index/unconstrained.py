@@ -12,20 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 import numpy as np
-from numba.experimental import jitclass
-from numba import int64, float64
+import numba
+
+from netket.utils.types import Array, DType
 
 
-spec = [
-    ("_local_states", float64[:]),
-    ("_local_size", int64),
-    ("_size", int64),
-    ("_basis", int64[:]),
-]
-
-
-@jitclass(spec)
 class UnconstrainedHilbertIndex:
     def __init__(self, local_states, size):
         self._local_states = np.sort(local_states).astype(np.float64)
@@ -57,60 +51,63 @@ class UnconstrainedHilbertIndex:
     def local_size(self) -> int:
         return self._local_size
 
-    def number_to_state(self, number, out=None):
-
-        if out is None:
-            out = np.empty(self._size)
-        # else:
-        #     assert out.size == self._size
-
-        out.fill(self._local_states[0])
-
-        ip = number
-        k = self._size - 1
-        while ip > 0:
-            out[k] = self._local_states[ip % self._local_size]
-            ip = ip // self._local_size
-            k -= 1
-
-        return out
-
-    def states_to_numbers(self, states, out=None):
+    def states_to_numbers(
+        self, states, out: Optional[Array] = None, dtype: DType = np.int32
+    ):
         if states.ndim != 2:
             raise RuntimeError("Invalid input shape, expecting a 2d array.")
 
         if out is None:
-            out = np.empty(states.shape[0], np.int64)
+            out = np.empty(states.shape[0], dtype)
         # else:
         #     assert out.size == states.shape[0]
 
-        for i in range(states.shape[0]):
-            out[i] = 0
-            for j in range(self._size):
-                out[i] += (
-                    self._local_state_number(states[i, self._size - j - 1])
-                    * self._basis[j]
-                )
+        # Broadcasting to avoid inner loop
+        state_numbers = self._local_state_number(states[:, ::-1])
+        np.sum(state_numbers * self._basis, axis=-1, out=out)
         return out
 
-    def numbers_to_states(self, numbers, out=None):
+    def numbers_to_states(
+        self, numbers, out: Optional[Array] = None, dtype: DType = None
+    ):
         if numbers.ndim != 1:
             raise RuntimeError("Invalid input shape, expecting a 1d array.")
 
         if out is None:
-            out = np.empty((numbers.shape[0], self._size))
+            out = np.empty((numbers.shape[0], self._size), dtype=dtype)
         # else:
         #     assert out.shape == (numbers.shape[0], self._size)
 
-        for i, n in enumerate(numbers):
-            out[i] = self.number_to_state(n)
+        _numbers_to_states(
+            numbers, out, self._local_states, self._size, self._local_size
+        )
 
         return out
 
-    def all_states(self, out=None):
+    def all_states(self, out: Optional[Array] = None, dtype: DType = None):
         if out is None:
-            out = np.empty((self.n_states, self._size))
+            out = np.full(
+                (self.n_states, self._size), self._local_states[0], dtype=dtype
+            )
 
-        for i in range(self.n_states):
-            self.number_to_state(i, out[i])
-        return out
+        return self.numbers_to_states(np.arange(self.n_states), out)
+
+
+# TODO: Remove Numba and rewrite in numpy/jax
+# This function is the last one that sill uses numba. Hopefully we
+# can remove it one day
+
+
+@numba.njit
+def _numbers_to_states(numbers, out, _local_states, _size, _local_size):
+    out.fill(_local_states[0])
+
+    for i, number in enumerate(numbers):
+        # _number_to_state(number, out[i], _local_states, _size, _local_size)
+        out_i = out[i]
+        ip = number
+        k = _size - 1
+        while ip > 0:
+            out_i[k] = _local_states[ip % _local_size]
+            ip = ip // _local_size
+            k -= 1

@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
 from functools import lru_cache
 
-from .unconstrained import UnconstrainedHilbertIndex
-
 import numpy as np
+
+from netket.utils.types import Array, DType
+
+from .unconstrained import UnconstrainedHilbertIndex
 
 
 # This function has exponential runtime in self.size, so we cache it in order to
@@ -87,9 +90,10 @@ class ConstrainedHilbertIndex:
 
         return self.__bare_numbers
 
-    def states_to_numbers(self, states, out=None):
-
-        self._unconstrained_index.states_to_numbers(states, out)
+    def states_to_numbers(
+        self, states, out: Optional[Array] = None, dtype: DType = np.int32
+    ):
+        self._unconstrained_index.states_to_numbers(states, out, dtype)
 
         out[:] = np.searchsorted(self._bare_numbers, out)
 
@@ -100,7 +104,9 @@ class ConstrainedHilbertIndex:
 
         return out
 
-    def numbers_to_states(self, numbers, out=None):
+    def numbers_to_states(
+        self, numbers, out: Optional[Array] = None, dtype: DType = None
+    ):
         if numbers.ndim != 1:
             raise RuntimeError("Invalid input shape, expecting a 1d array.")
 
@@ -108,12 +114,11 @@ class ConstrainedHilbertIndex:
         numbers = self._bare_numbers[numbers]
 
         if out is None:
-            out = np.empty((numbers.shape[0], self.size))
+            out = np.empty((numbers.shape[0], self.size), dtype=dtype)
 
-        for i in range(numbers.shape[0]):
-            out[i] = self._unconstrained_index.number_to_state(numbers[i])
+        self._unconstrained_index.numbers_to_states(numbers, out)
 
         return out
 
-    def all_states(self, out=None):
-        return self.numbers_to_states(np.arange(self.n_states), out=out)
+    def all_states(self, out: Optional[Array] = None, dtype: DType = None):
+        return self.numbers_to_states(np.arange(self.n_states), out=out, dtype=dtype)
