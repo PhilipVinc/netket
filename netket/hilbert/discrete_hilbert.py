@@ -18,7 +18,7 @@ from functools import reduce
 
 import numpy as np
 
-from netket.utils.types import Array
+from netket.utils.types import Array, DType
 from netket.utils.numbers import is_scalar
 from netket.errors import HilbertIndexingDuringTracingError, concrete_or_error
 
@@ -110,7 +110,10 @@ class DiscreteHilbert(AbstractHilbert):
         raise NotImplementedError()  # pragma: no cover
 
     def numbers_to_states(
-        self, numbers: Union[int, np.ndarray], out: Optional[np.ndarray] = None
+        self,
+        numbers: Union[int, np.ndarray],
+        out: Optional[np.ndarray] = None,
+        dtype: DType = None,
     ) -> np.ndarray:
         r"""Returns the quantum numbers corresponding to the n-th basis state
         for input n. n is an array of integer indices such that
@@ -128,7 +131,7 @@ class DiscreteHilbert(AbstractHilbert):
         )
 
         if out is None:
-            out = np.empty((np.atleast_1d(numbers).shape[0], self.size))
+            out = np.empty((np.atleast_1d(numbers).shape[0], self.size), dtype=dtype)
 
         if np.any(numbers >= self.n_states):
             raise ValueError("numbers outside the range of allowed states")
@@ -139,7 +142,10 @@ class DiscreteHilbert(AbstractHilbert):
             return self._numbers_to_states(numbers, out=out)
 
     def states_to_numbers(
-        self, states: np.ndarray, out: Optional[np.ndarray] = None
+        self,
+        states: np.ndarray,
+        out: Optional[np.ndarray] = None,
+        dtype: DType = None,
     ) -> Union[int, np.ndarray]:
         r"""Returns the basis state number corresponding to given quantum states.
         The states are given in a batch, such that states[k] has shape (hilbert.size).
@@ -166,7 +172,9 @@ class DiscreteHilbert(AbstractHilbert):
         states_r = np.asarray(np.reshape(states, (-1, states.shape[-1])))
 
         if out is None:
-            out = np.empty(states_r.shape[:-1], dtype=np.int64)
+            if dtype is None:
+                dtype = np.int32
+            out = np.empty(states_r.shape[:-1], dtype=dtype)
 
         out = self._states_to_numbers(states_r, out=out.reshape(-1))
 
@@ -185,7 +193,9 @@ class DiscreteHilbert(AbstractHilbert):
         for i in range(self.n_states):
             yield self.numbers_to_states(i).reshape(-1)
 
-    def all_states(self, out: Optional[np.ndarray] = None) -> np.ndarray:
+    def all_states(
+        self, out: Optional[np.ndarray] = None, dtype: DType = None
+    ) -> np.ndarray:
         r"""Returns all valid states of the Hilbert space.
 
         Throws an exception if the space is not indexable.
@@ -197,9 +207,9 @@ class DiscreteHilbert(AbstractHilbert):
             A (n_states x size) batch of states. this corresponds
             to the pre-allocated array if it was passed.
         """
-        numbers = np.arange(0, self.n_states, dtype=np.int64)
+        numbers = np.arange(0, self.n_states, dtype=np.int32)
 
-        return self.numbers_to_states(numbers, out)
+        return self.numbers_to_states(numbers, out, dtype=dtype)
 
     def states_to_local_indices(self, x: Array):
         r"""Returns a tensor with the same shape of `x`, where all local

@@ -18,6 +18,8 @@ from numbers import Real
 
 import numpy as np
 
+from netket.utils.types import DType
+
 from .discrete_hilbert import DiscreteHilbert
 from .index import HilbertIndex, UnconstrainedHilbertIndex, ConstrainedHilbertIndex
 
@@ -145,7 +147,9 @@ class HomogeneousHilbert(DiscreteHilbert):
 
         return out
 
-    def all_states(self, out: Optional[np.ndarray] = None) -> np.ndarray:
+    def all_states(
+        self, out: Optional[np.ndarray] = None, dtype: DType = None
+    ) -> np.ndarray:
         r"""Returns all valid states of the Hilbert space.
 
         Throws an exception if the space is not indexable.
@@ -157,7 +161,7 @@ class HomogeneousHilbert(DiscreteHilbert):
             A (n_states x size) batch of states. this corresponds
             to the pre-allocated array if it was passed.
         """
-        return self._hilbert_index.all_states(out)
+        return self._hilbert_index.all_states(out, dtype)
 
     @property
     def _hilbert_index(self) -> HilbertIndex:
