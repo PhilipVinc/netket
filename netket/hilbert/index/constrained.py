@@ -121,4 +121,6 @@ class ConstrainedHilbertIndex:
         return out
 
     def all_states(self, out: Optional[Array] = None, dtype: DType = None):
-        return self.numbers_to_states(np.arange(self.n_states), out=out, dtype=dtype)
+        return self.numbers_to_states(
+            np.arange(self.n_states, dtype=np.int32), out=out, dtype=dtype
+        )

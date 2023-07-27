@@ -90,7 +90,7 @@ class Fock(HomogeneousHilbert):
 
         if self._n_max is not None:
             # assert self._n_max > 0
-            local_states = np.arange(self._n_max + 1)
+            local_states = np.arange(self._n_max + 1, dtype=np.int32)
         else:
             self._n_max = FOCK_MAX
             local_states = None

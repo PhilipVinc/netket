@@ -90,7 +90,7 @@ class UnconstrainedHilbertIndex:
                 (self.n_states, self._size), self._local_states[0], dtype=dtype
             )
 
-        return self.numbers_to_states(np.arange(self.n_states), out)
+        return self.numbers_to_states(np.arange(self.n_states, dtype=np.int32), out)
 
 
 # TODO: Remove Numba and rewrite in numpy/jax
