@@ -19,6 +19,7 @@ from functools import reduce
 
 import numpy as np
 
+from netket.utils import dtypes
 from netket.utils.types import Array
 from netket.utils.numbers import is_scalar
 from netket.errors import HilbertIndexingDuringTracingError, concrete_or_error
@@ -129,7 +130,10 @@ class DiscreteHilbert(AbstractHilbert):
         )
 
         if out is None:
-            out = np.empty((np.atleast_1d(numbers).shape[0], self.size))
+            out = np.empty(
+                (np.atleast_1d(numbers).shape[0], self.size),
+                dtype=dtypes.default_dtype_floating(),
+            )
 
         if np.any(numbers >= self.n_states):
             raise ValueError("numbers outside the range of allowed states")
@@ -167,7 +171,7 @@ class DiscreteHilbert(AbstractHilbert):
         states_r = np.asarray(np.reshape(states, (-1, states.shape[-1])))
 
         if out is None:
-            out = np.empty(states_r.shape[:-1], dtype=np.int64)
+            out = np.empty(states_r.shape[:-1], dtype=dtypes.default_dtype_integer())
 
         out = self._states_to_numbers(states_r, out=out.reshape(-1))
 
@@ -198,7 +202,7 @@ class DiscreteHilbert(AbstractHilbert):
             A (n_states x size) batch of states. this corresponds
             to the pre-allocated array if it was passed.
         """
-        numbers = np.arange(0, self.n_states, dtype=np.int64)
+        numbers = np.arange(0, self.n_states, dtype=dtypes.default_dtype_integer())
 
         return self.numbers_to_states(numbers, out)
 

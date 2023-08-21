@@ -14,9 +14,11 @@
 
 from functools import lru_cache
 
-from .unconstrained import UnconstrainedHilbertIndex
-
 import numpy as np
+
+from netket.utils import dtypes
+
+from .unconstrained import UnconstrainedHilbertIndex
 
 
 # This function has exponential runtime in self.size, so we cache it in order to
@@ -108,7 +110,9 @@ class ConstrainedHilbertIndex:
         numbers = self._bare_numbers[numbers]
 
         if out is None:
-            out = np.empty((numbers.shape[0], self.size))
+            out = np.empty(
+                (numbers.shape[0], self.size), dtype=dtypes.default_dtype_floating()
+            )
 
         for i in range(numbers.shape[0]):
             out[i] = self._unconstrained_index.number_to_state(numbers[i])

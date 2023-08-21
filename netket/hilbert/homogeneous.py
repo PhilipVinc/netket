@@ -18,6 +18,8 @@ from numbers import Real
 
 import numpy as np
 
+from netket.utils import dtypes
+
 from .discrete_hilbert import DiscreteHilbert
 from .index import HilbertIndex, UnconstrainedHilbertIndex, ConstrainedHilbertIndex
 
@@ -171,13 +173,16 @@ class HomogeneousHilbert(DiscreteHilbert):
 
             if self.constrained:
                 self.__hilbert_index = ConstrainedHilbertIndex(
-                    np.asarray(self.local_states, dtype=np.float64),
+                    np.asarray(
+                        self.local_states, dtype=dtypes.default_dtype_floating()
+                    ),
                     self.size,
                     self._constraint_fn,
                 )
             else:
                 self.__hilbert_index = UnconstrainedHilbertIndex(
-                    np.asarray(self.local_states, dtype=np.float64), self.size
+                    self.local_states,
+                    self.size,
                 )
 
         return self.__hilbert_index

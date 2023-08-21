@@ -14,25 +14,28 @@
 
 import numpy as np
 from numba.experimental import jitclass
-from numba import int64, float64
+from numba import float32, int32, int64, float64
+
+from netket import config
+from netket.utils import dtypes
 
 
-spec = [
-    ("_local_states", float64[:]),
-    ("_local_size", int64),
-    ("_size", int64),
-    ("_basis", int64[:]),
-]
+# spec = [
+#    ("_local_states", float64[:]),
+#    ("_local_size", int64),
+#    ("_size", int64),
+#    ("_basis", int64[:]),
+# ]
 
 
-@jitclass(spec)
-class UnconstrainedHilbertIndex:
+# @jitclass(spec)
+class _UnconstrainedHilbertIndex:
     def __init__(self, local_states, size):
-        self._local_states = np.sort(local_states).astype(np.float64)
+        self._local_states = np.sort(local_states)
         self._local_size = len(self._local_states)
         self._size = size
 
-        self._basis = np.zeros(size, dtype=np.int64)
+        self._basis = np.zeros(size, dtype=np.array(self._size).dtype)
         ba = 1
         for s in range(size):
             self._basis[s] = ba
@@ -60,7 +63,7 @@ class UnconstrainedHilbertIndex:
     def number_to_state(self, number, out=None):
 
         if out is None:
-            out = np.empty(self._size)
+            out = np.empty(self._size, dtype=self._local_states.dtype)
         # else:
         #     assert out.size == self._size
 
@@ -80,7 +83,7 @@ class UnconstrainedHilbertIndex:
             raise RuntimeError("Invalid input shape, expecting a 2d array.")
 
         if out is None:
-            out = np.empty(states.shape[0], np.int64)
+            out = np.empty(states.shape[0], dtype=self._basis.dtype)
         # else:
         #     assert out.size == states.shape[0]
 
@@ -98,7 +101,9 @@ class UnconstrainedHilbertIndex:
             raise RuntimeError("Invalid input shape, expecting a 1d array.")
 
         if out is None:
-            out = np.empty((numbers.shape[0], self._size))
+            out = np.empty(
+                (numbers.shape[0], self._size), dtype=self._local_states.dtype
+            )
         # else:
         #     assert out.shape == (numbers.shape[0], self._size)
 
@@ -109,8 +114,32 @@ class UnconstrainedHilbertIndex:
 
     def all_states(self, out=None):
         if out is None:
-            out = np.empty((self.n_states, self._size))
+            out = np.empty((self.n_states, self._size), dtype=self._local_states.dtype)
 
         for i in range(self.n_states):
             self.number_to_state(i, out[i])
         return out
+
+
+spec32 = [
+    ("_local_states", float32[:]),
+    ("_local_size", int32),
+    ("_size", int32),
+    ("_basis", int32[:]),
+]
+spec64 = [
+    ("_local_states", float64[:]),
+    ("_local_size", int64),
+    ("_size", int64),
+    ("_basis", int64[:]),
+]
+UnconstrainedHilbertIndex32 = jitclass(spec32)(_UnconstrainedHilbertIndex)
+UnconstrainedHilbertIndex64 = jitclass(spec64)(_UnconstrainedHilbertIndex)
+
+
+def UnconstrainedHilbertIndex(local_states, size):
+    local_states = np.asarray(local_states, dtype=dtypes.default_dtype_floating())
+    if config.netket_default_dtype_bits == 32:
+        return UnconstrainedHilbertIndex32(local_states, size)
+    else:
+        return UnconstrainedHilbertIndex64(local_states, size)
