@@ -25,6 +25,7 @@ from . import struct
 from . import numbers
 from . import types
 from . import float
+from . import dtypes
 
 from .array import HashableArray
 from .partial import HashablePartial
