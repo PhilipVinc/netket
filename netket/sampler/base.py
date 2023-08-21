@@ -18,6 +18,7 @@ from collections.abc import Iterator
 
 import numpy as np
 from flax import linen as nn
+import jax
 from jax import numpy as jnp
 
 from netket import jax as nkjax
@@ -26,9 +27,7 @@ from netket.utils import mpi, get_afun_if_module, wrap_afun
 from netket.utils.deprecation import deprecated
 from netket.utils.types import PyTree, DType, SeedT
 from netket.jax import HashablePartial
-from netket.utils import struct, numbers
-
-fancy = []
+from netket.utils import struct, numbers, dtypes
 
 
 @struct.dataclass
@@ -68,7 +67,7 @@ class Sampler(abc.ABC):
     machine_pow: int = struct.field(default=2)
     """The power to which the machine should be exponentiated to generate the pdf."""
 
-    dtype: DType = struct.field(pytree_node=False, default=float)
+    dtype: DType = struct.field(pytree_node=False, default=None)
     """The dtype of the states sampled."""
 
     def __pre_init__(
@@ -112,6 +111,12 @@ class Sampler(abc.ABC):
                         )
 
             kwargs["n_chains_per_rank"] = n_chains_per_rank
+
+        dtype = kwargs.get("dtype", None)
+        if dtype is None:
+            dtype = dtypes.default_dtype_floating()
+
+        kwargs["dtype"] = jax.dtypes.canonicalize_dtype(dtype)
 
         return (hilbert,), kwargs
 
