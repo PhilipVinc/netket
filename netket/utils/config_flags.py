@@ -258,6 +258,31 @@ config.define(
 )
 
 
+def _validate_default_bits(value):
+    if isinstance(value, int):
+        if value not in [32, 64]:
+            raise ValueError("Only 32 and 64 are supported.")
+    elif isinstance(value, str):
+        if value not in ["32", "64"]:
+            raise ValueError("Only 32 and 64 are supported.")
+    else:
+        raise TypeError("Only integer 32 and 64 are supported")
+
+
+config.define(
+    "NETKET_DEFAULT_DTYPE_BITS",
+    int,
+    default=True,
+    help=dedent(
+        """
+        Sets double-precision as default for NetKet.
+        """
+    ),
+    runtime=False,
+    callback=_validate_default_bits,
+)
+
+
 config.define(
     "NETKET_SPHINX_BUILD",
     bool,
