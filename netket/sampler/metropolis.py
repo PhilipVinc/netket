@@ -23,16 +23,15 @@ from jax import numpy as jnp
 from netket.hilbert import AbstractHilbert, ContinuousHilbert
 
 from netket.utils import mpi, wrap_afun
-from netket.utils.types import PyTree
+from netket.utils.types import PyTree, DType
 
 from netket.utils.deprecation import deprecated
 from netket.utils import struct
 
-from .base import Sampler, SamplerState
+from .base import Sampler, SamplerState, compute_n_chains_per_rank
 from .rules import MetropolisRule
 
 
-@struct.dataclass
 class MetropolisSamplerState(SamplerState):
     """
     State for a Metropolis sampler.
@@ -48,18 +47,19 @@ class MetropolisSamplerState(SamplerState):
     rule_state: Optional[Any]
     """Optional state of the transition rule."""
 
-    # those are initialised to 0. We want to initialise them to zero arrays because they can
-    # be passed to jax jitted functions that require type invariance to avoid recompilation
     n_steps_proc: int = struct.field(default_factory=lambda: jnp.zeros((), dtype=int))
     """Number of moves performed along the chains in this process since the last reset."""
-    n_accepted_proc: jnp.ndarray = None
+    n_accepted_proc: jnp.ndarray
     """Number of accepted transitions among the chains in this process since the last reset."""
 
-    def __post_init__(self):
-        if self.n_accepted_proc is None:
-            object.__setattr__(
-                self, "n_accepted_proc", jnp.zeros(self.σ.shape[0], dtype=int)
-            )
+    def __init__(self, σ: jnp.ndarray, rng: jnp.ndarray, rule_state: Optional[Any]):
+        self.σ = σ
+        self.rng = rng
+        self.rule_state = rule_state
+
+        self.n_accepted_proc = jnp.zeros(σ.shape[0], dtype=int)
+        self.n_steps_proc = jnp.zeros((), dtype=int)
+        super().__init__()
 
     @property
     def acceptance(self) -> float:
@@ -135,7 +135,6 @@ def _assert_good_log_prob_shape(log_prob, n_chains_per_rank, machine):
         )
 
 
-@struct.dataclass
 class MetropolisSampler(Sampler):
     r"""
     Metropolis-Hastings sampler for a Hilbert space according to a specific transition rule.
@@ -162,7 +161,18 @@ class MetropolisSampler(Sampler):
     reset_chains: bool = struct.field(pytree_node=False, default=False)
     """If True, resets the chain state when `reset` is called on every new sampling."""
 
-    def __pre_init__(self, hilbert: AbstractHilbert, rule: MetropolisRule, **kwargs):
+    def __init__(
+        self,
+        hilbert: AbstractHilbert,
+        rule: MetropolisRule,
+        *,
+        n_sweeps: int = None,
+        reset_chains: bool = False,
+        n_chains: Optional[int] = None,
+        n_chains_per_rank: Optional[int] = None,
+        machine_pow: int = 2,
+        dtype: DType = float,
+    ):
         """
         Constructs a Metropolis Sampler.
 
@@ -192,25 +202,26 @@ class MetropolisSampler(Sampler):
                 f"`type(rule)={type(rule)}`."
             )
 
-        if "n_chains" not in kwargs and "n_chains_per_rank" not in kwargs:
-            kwargs["n_chains_per_rank"] = 16
-
-        # process arguments in the base
-        args, kwargs = super().__pre_init__(hilbert=hilbert, **kwargs)
-
-        kwargs["rule"] = rule
-
-        return args, kwargs
-
-    def __post_init__(self):
-        super().__post_init__()
-
-        if not isinstance(self.reset_chains, bool):
+        if not isinstance(reset_chains, bool):
             raise TypeError("reset_chains must be a boolean.")
 
-        # Default value of n_sweeps
-        if self.n_sweeps is None:
-            object.__setattr__(self, "n_sweeps", self.hilbert.size)
+        if n_sweeps is None:
+            n_sweeps = hilbert.size
+
+        n_chains_per_rank = compute_n_chains_per_rank(
+            n_chains_per_rank=n_chains_per_rank, n_chains=n_chains, default=16
+        )
+
+        super().__init__(
+            hilbert=hilbert,
+            machine_pow=machine_pow,
+            n_chains_per_rank=n_chains_per_rank,
+            dtype=dtype,
+        )
+
+        self.reset_chains = reset_chains
+        self.rule = rule
+        self.n_sweeps = n_sweeps
 
     def sample_next(
         sampler,

@@ -15,6 +15,7 @@
 import abc
 from typing import Optional, Union, Callable
 from collections.abc import Iterator
+import warnings
 
 import numpy as np
 from flax import linen as nn
@@ -28,18 +29,45 @@ from netket.utils.types import PyTree, DType, SeedT
 from netket.jax import HashablePartial
 from netket.utils import struct, numbers
 
-fancy = []
+
+def compute_n_chains_per_rank(
+    n_chains_per_rank: Optional[int] = None, n_chains: Optional[int] = None, default=1
+) -> int:
+    """
+    Compute the number of chains per rank given either n_chains_per_rank
+    and n_chains
+    """
+    if n_chains_per_rank is not None and n_chains is not None:
+        raise ValueError("Cannot specify both `n_chains` and `n_chains_per_rank`")
+    elif n_chains is not None:
+        n_chains_per_rank = max(int(np.ceil(n_chains / mpi.n_nodes)), 1)
+        if mpi.n_nodes > 1 and mpi.rank == 0:
+            if n_chains_per_rank * mpi.n_nodes != n_chains:
+                warnings.warn(
+                    f"Using {n_chains_per_rank} chains per rank among {mpi.n_nodes} ranks "
+                    f"(total={n_chains_per_rank * mpi.n_nodes} instead of n_chains={n_chains}). "
+                    f"To directly control the number of chains on every rank, specify "
+                    f"`n_chains_per_rank` when constructing the sampler. "
+                    f"To silence this warning, either use `n_chains_per_rank` or use `n_chains` "
+                    f"that is a multiple of the number of MPI ranks.",
+                    category=UserWarning,
+                    stacklevel=2,
+                )
+    elif n_chains_per_rank is not None:
+        pass
+    else:
+        # Default value
+        n_chains_per_rank = default
+    return n_chains_per_rank
 
 
-@struct.dataclass
-class SamplerState(abc.ABC):
+class SamplerState(struct.Pytree):
     """
     Base class holding the state of a sampler.
     """
 
 
-@struct.dataclass
-class Sampler(abc.ABC):
+class Sampler(struct.Pytree):
     """
     Abstract base class for all samplers.
 
@@ -69,8 +97,13 @@ class Sampler(abc.ABC):
     dtype: DType = struct.field(pytree_node=False, default=float)
     """The dtype of the states sampled."""
 
-    def __pre_init__(
-        self, hilbert: AbstractHilbert, n_chains: Optional[int] = None, **kwargs
+    def __init__(
+        self,
+        hilbert: AbstractHilbert,
+        *,
+        n_chains_per_rank: Optional[int] = None,
+        machine_pow: int = 2,
+        dtype: DType = float,
     ):
         """
         Construct a Monte Carlo sampler.
@@ -82,44 +115,12 @@ class Sampler(abc.ABC):
             machine_pow: The power to which the machine should be exponentiated to generate the pdf (default = 2).
             dtype: The dtype of the states sampled (default = np.float64).
         """
-
-        if "n_chains_per_rank" in kwargs:
-            if n_chains is not None:
-                raise ValueError(
-                    "Cannot specify both `n_chains` and `n_chains_per_rank`"
-                )
-        else:
-            if n_chains is None:
-                # Default value
-                n_chains_per_rank = 1
-            else:
-                n_chains_per_rank = max(int(np.ceil(n_chains / mpi.n_nodes)), 1)
-                if mpi.n_nodes > 1 and mpi.rank == 0:
-                    if n_chains_per_rank * mpi.n_nodes != n_chains:
-                        import warnings
-
-                        warnings.warn(
-                            f"Using {n_chains_per_rank} chains per rank among {mpi.n_nodes} ranks "
-                            f"(total={n_chains_per_rank * mpi.n_nodes} instead of n_chains={n_chains}). "
-                            f"To directly control the number of chains on every rank, specify "
-                            f"`n_chains_per_rank` when constructing the sampler. "
-                            f"To silence this warning, either use `n_chains_per_rank` or use `n_chains` "
-                            f"that is a multiple of the number of MPI ranks.",
-                            category=UserWarning,
-                            stacklevel=2,
-                        )
-
-            kwargs["n_chains_per_rank"] = n_chains_per_rank
-
-        return (hilbert,), kwargs
-
-    def __post_init__(self):
         # Raise errors if hilbert is not an Hilbert
-        if not isinstance(self.hilbert, AbstractHilbert):
+        if not isinstance(hilbert, AbstractHilbert):
             raise TypeError(
                 "\n\nThe argument `hilbert` of a Sampler must be a subtype "
                 "of netket.hilbert.AbstractHilbert, but you passed in an object "
-                f"of type {type(self.hilbert)}, which is not an AbstractHilbert.\n\n"
+                f"of type {type(hilbert)}, which is not an AbstractHilbert.\n\n"
                 "TO FIX THIS ERROR,\ndouble check the arguments passed to the "
                 "sampler when constructing it, and verify that they have the "
                 "correct types.\n\n"
@@ -128,13 +129,21 @@ class Sampler(abc.ABC):
                 "\n"
             )
 
-        # workaround Jax bug under pmap
-        # might be removed in the future
-        if type(self.machine_pow) != object:
-            if not np.issubdtype(numbers.dtype(self.machine_pow), np.integer):
-                raise ValueError(
-                    f"machine_pow ({self.machine_pow}) must be a positive integer"
-                )
+        if not np.issubdtype(numbers.dtype(machine_pow), np.integer):
+            raise ValueError(
+                f"machine_pow ({self.machine_pow}) must be a positive integer"
+            )
+
+        if not isinstance(n_chains_per_rank, int) or not n_chains_per_rank > 0:
+            raise TypeError(
+                "n_chains_per_rank must be a positive integer, but "
+                f"you specified {n_chains_per_rank}"
+            )
+
+        self.hilbert = hilbert
+        self.n_chains_per_rank = n_chains_per_rank
+        self.machine_pow = machine_pow
+        self.dtype = dtype
 
     @property
     def n_chains(self) -> int:
