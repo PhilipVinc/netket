@@ -291,8 +291,8 @@ def _laplacian_expect_kernel_single(
 
     elif data.algorithm.lower() in ["fwd", "fwd-fwd"]:
         dlogpsi_x = jacfwd(logpsi_x)
-        dp_dx2 = jnp.diag(jacfwd(dlogpsi_x)(x)[0].reshape(x.shape[0], x.shape[0]))
-        dp_dx = dlogpsi_x(x)[0][0] ** 2
+        dp_dx = dlogpsi_x(x) ** 2
+        dp_dx2 = jnp.diag(jacfwd(dlogpsi_x)(x))
 
     elif data.algorithm.lower() in ["jet", "taylor"]:
         from jax.experimental.jet import jet
