@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Callable, Hashable, Iterable, Optional, Tuple, Union
+from typing import Callable, Optional, Union
+from collections.abc import Hashable, Iterable
 from numbers import Number
 
 import numpy as np
@@ -230,7 +231,7 @@ class Laplacian(ContinuousOperator):
         )
 
     @property
-    def _attrs(self) -> Tuple[Hashable, ...]:
+    def _attrs(self) -> tuple[Hashable, ...]:
         print("_attrs of laplacan", self)
         if self.__attrs is None:
             self.__attrs = (
@@ -287,14 +288,16 @@ def _laplacian_expect_kernel_single(
         dlogpsi_x = jacrev(logpsi_x)
         dp_dx2 = jnp.diag(jacfwd(dlogpsi_x)(x)[0].reshape(x.shape[0], x.shape[0]))
         dp_dx = dlogpsi_x(x)[0][0] ** 2
+
     elif data.algorithm.lower() in ["fwd", "fwd-fwd"]:
         dlogpsi_x = jacfwd(logpsi_x)
         dp_dx2 = jnp.diag(jacfwd(dlogpsi_x)(x)[0].reshape(x.shape[0], x.shape[0]))
         dp_dx = dlogpsi_x(x)[0][0] ** 2
+
     elif data.algorithm.lower() in ["jet", "taylor"]:
         from jax.experimental.jet import jet
 
-        xI = jnp.eye(x.size)
+        xI = jnp.eye(x.size, dtype=x.dtype)
 
         # jet returns the taylor coefficients at different orders
         _, (f1, f2) = jax.vmap(
