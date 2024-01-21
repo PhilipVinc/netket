@@ -22,10 +22,10 @@ from jax import numpy as jnp
 from netket.utils import config, mpi, struct
 from netket.jax.sharding import extract_replicated
 
-from . import mean as _mean
-from . import var as _var
-from . import total_size as _total_size
-from ._autocorr import integrated_time
+from netket.stats import mean as _mean
+from netket.stats import var as _var
+from netket.stats import total_size as _total_size
+from netket.stats._autocorr import integrated_time
 
 
 def _format_decimal(value, std, var):

@@ -22,10 +22,10 @@ import numpy as np
 from netket import jax as nkjax
 from netket.utils import config
 
-from . import mean as _mean
-from . import var as _var
-from . import total_size as _total_size
-from .mc_stats import Stats
+from netket.stats import mean as _mean
+from netket.stats import var as _var
+from netket.stats import total_size as _total_size
+from netket.stats.mc_stats import Stats
 
 
 def _get_blocks(data, block_size):

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .mpi_stats import subtract_mean, mean, sum, var, total_size
+from netket.stats.mpi_stats import subtract_mean, mean, sum, var, total_size
 
-from .mc_stats import statistics, Stats
+from netket.stats.mc_stats import statistics, Stats
 
 from netket.utils import _hide_submodules
 
