@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .mpi import (
+from netket.utils.mpi.mpi import (
     mpi4jax_available as available,
     MPI,
     MPI_py_comm,
@@ -22,7 +22,7 @@ from .mpi import (
     rank,
 )
 
-from .primitives import (
+from netket.utils.mpi.primitives import (
     mpi_all,
     mpi_allgather,
     mpi_any,
@@ -31,7 +31,7 @@ from .primitives import (
     mpi_mean,
     mpi_sum,
 )
-from .primitives import (
+from netket.utils.mpi.primitives import (
     mpi_all_jax,
     mpi_allgather_jax,
     mpi_any_jax,

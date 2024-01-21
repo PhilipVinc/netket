@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .struct import dataclass
-from .types import Scalar
+from netket.utils.struct import dataclass
+from netket.utils.types import Scalar
 
 
 @dataclass

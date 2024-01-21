@@ -8,7 +8,7 @@ from types import MappingProxyType
 
 import jax
 
-from .fields import CachedProperty, _cache_name, _raw_cache_name, Uninitialized
+from netket.utils.struct.fields import CachedProperty, _cache_name, _raw_cache_name, Uninitialized
 from netket.utils import config
 
 P = tp.TypeVar("P", bound="Pytree")

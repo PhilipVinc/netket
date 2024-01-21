@@ -14,8 +14,8 @@
 
 # flake8: noqa: F401
 
-from .fields import field, static_field, property_cached, Uninitialized
+from netket.utils.struct.fields import field, static_field, property_cached, Uninitialized
 
-from .dataclass import dataclass
+from netket.utils.struct.dataclass import dataclass
 
-from .pytree import Pytree
+from netket.utils.struct.pytree import Pytree

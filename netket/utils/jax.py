@@ -16,8 +16,8 @@ from typing import Callable
 
 import jax.numpy as jnp
 
-from .partial import HashablePartial
-from . import struct
+from netket.utils.partial import HashablePartial
+from netket.utils import struct
 
 
 def get_afun_if_module(mod_or_fun) -> Callable:

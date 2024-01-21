@@ -20,9 +20,9 @@ import numpy as np
 
 from flax.core import FrozenDict
 
-from .dispatch import dispatch
-from .numbers import is_scalar
-from .types import Array, DType
+from netket.utils.dispatch import dispatch
+from netket.utils.numbers import is_scalar
+from netket.utils.types import Array, DType
 
 
 def raise_if_len_not_match(length, expected_length, string):

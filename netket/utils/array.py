@@ -15,8 +15,8 @@
 import numpy as np
 import jax
 
-from .types import Array, DType, Shape
-from .struct import dataclass
+from netket.utils.types import Array, DType, Shape
+from netket.utils.struct import dataclass
 
 
 @dataclass(cache_hash=True)

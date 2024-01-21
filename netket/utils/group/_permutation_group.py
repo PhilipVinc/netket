@@ -24,8 +24,8 @@ from netket.utils import HashableArray, struct
 from netket.utils.types import Array, DType, Shape
 from netket.utils.dispatch import dispatch
 
-from ._group import FiniteGroup
-from ._semigroup import Element
+from netket.utils.group._group import FiniteGroup
+from netket.utils.group._semigroup import Element
 
 
 class Permutation(Element):

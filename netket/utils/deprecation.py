@@ -18,7 +18,7 @@ import inspect
 
 from textwrap import dedent
 
-from .config_flags import config
+from netket.utils.config_flags import config
 
 
 def deprecated(reason=None, func_name=None):
