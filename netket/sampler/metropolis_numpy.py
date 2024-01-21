@@ -29,7 +29,7 @@ from netket.utils.types import PyTree
 
 import netket.jax as nkjax
 
-from .metropolis import MetropolisSampler
+from netket.sampler.metropolis import MetropolisSampler
 
 
 @dataclass

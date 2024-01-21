@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
-from .fixed import FixedRule
-from .local import LocalRule
-from .exchange import ExchangeRule
-from .hamiltonian import HamiltonianRule
-from .continuous_gaussian import GaussianRule
-from .langevin import LangevinRule
-from .tensor import TensorRule
-from .multiple import MultipleRules
+from netket.sampler.rules.fixed import FixedRule
+from netket.sampler.rules.local import LocalRule
+from netket.sampler.rules.exchange import ExchangeRule
+from netket.sampler.rules.hamiltonian import HamiltonianRule
+from netket.sampler.rules.continuous_gaussian import GaussianRule
+from netket.sampler.rules.langevin import LangevinRule
+from netket.sampler.rules.tensor import TensorRule
+from netket.sampler.rules.multiple import MultipleRules
 
 # numpy backend
-from .local_numpy import LocalRuleNumpy
-from .hamiltonian_numpy import HamiltonianRuleNumpy
-from .custom_numpy import CustomRuleNumpy
+from netket.sampler.rules.local_numpy import LocalRuleNumpy
+from netket.sampler.rules.hamiltonian_numpy import HamiltonianRuleNumpy
+from netket.sampler.rules.custom_numpy import CustomRuleNumpy
 
 from netket.utils import _hide_submodules
 

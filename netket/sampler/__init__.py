@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .base import (
+from netket.sampler.base import (
     Sampler,
     SamplerState,
     sampler_state,
@@ -21,9 +21,9 @@ from .base import (
     samples,
 )
 
-from .exact import ExactSampler
+from netket.sampler.exact import ExactSampler
 
-from .metropolis import (
+from netket.sampler.metropolis import (
     MetropolisSampler,
     MetropolisLocal,
     MetropolisExchange,
@@ -35,16 +35,16 @@ from .metropolis import (
     sample_next,
 )
 
-from .metropolis_numpy import (
+from netket.sampler.metropolis_numpy import (
     MetropolisSamplerNumpy,
     MetropolisLocalNumpy,
     MetropolisHamiltonianNumpy,
     MetropolisCustomNumpy,
 )
 
-from .autoreg import ARDirectSampler
+from netket.sampler.autoreg import ARDirectSampler
 
-from . import rules
+from netket.sampler import rules
 
 # Shorthand
 Metropolis = MetropolisSampler

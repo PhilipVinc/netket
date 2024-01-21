@@ -39,8 +39,8 @@ from netket.jax.sharding import (
     device_count_per_rank,
 )
 
-from .base import Sampler, SamplerState
-from .rules import MetropolisRule
+from netket.sampler.base import Sampler, SamplerState
+from netket.sampler.rules import MetropolisRule
 
 
 class MetropolisSamplerState(SamplerState):

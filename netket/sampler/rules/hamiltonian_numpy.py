@@ -21,7 +21,7 @@ import numpy as np
 from netket.operator import DiscreteOperator
 from netket.utils import struct
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 @struct.dataclass

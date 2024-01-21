@@ -21,7 +21,7 @@ from functools import partial
 
 from flax import struct
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 import netket.jax as nkjax
 
 

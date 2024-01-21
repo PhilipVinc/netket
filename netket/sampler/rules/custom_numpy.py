@@ -22,7 +22,7 @@ from flax import struct
 from netket.operator import DiscreteOperator
 from netket.utils.types import Array
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 @struct.dataclass

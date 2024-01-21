@@ -21,7 +21,7 @@ from jax import numpy as jnp
 
 from netket.graph import AbstractGraph
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 class ExchangeRule(MetropolisRule):

@@ -16,7 +16,7 @@ import jax.numpy as jnp
 import numpy as np
 
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 class GaussianRule(MetropolisRule):

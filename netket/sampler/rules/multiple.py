@@ -26,7 +26,7 @@ from netket.utils.types import Array, PyTree, PRNGKeyT
 if config.netket_sphinx_build:
     from netket import sampler
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 class MultipleRules(MetropolisRule):

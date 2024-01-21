@@ -18,7 +18,7 @@ import numpy as np
 
 from netket.utils import struct
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 @struct.dataclass

@@ -25,7 +25,7 @@ from netket.nn import to_array
 from netket.utils.deprecation import warn_deprecation
 from netket.utils.types import PyTree, SeedT, DType
 
-from .base import Sampler, SamplerState
+from netket.sampler.base import Sampler, SamplerState
 
 
 class ExactSamplerState(SamplerState):

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 class FixedRule(MetropolisRule):

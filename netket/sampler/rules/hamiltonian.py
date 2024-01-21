@@ -25,7 +25,7 @@ from numba4jax import njit4jax
 from netket.operator import AbstractOperator, DiscreteJaxOperator
 from netket.utils import struct
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 class HamiltonianRuleBase(MetropolisRule):

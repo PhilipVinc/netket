@@ -17,7 +17,7 @@ import jax
 
 from netket.hilbert.random import flip_state
 
-from .base import MetropolisRule
+from netket.sampler.rules.base import MetropolisRule
 
 
 class LocalRule(MetropolisRule):
