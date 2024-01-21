@@ -20,7 +20,7 @@ import igraph
 
 from netket.utils.deprecation import warn_deprecation
 from netket.utils.group import Permutation, PermutationGroup
-from .abstract_graph import AbstractGraph, Edge, ColoredEdge, EdgeSequence
+from netket.graph.abstract_graph import AbstractGraph, Edge, ColoredEdge, EdgeSequence
 
 
 class Graph(AbstractGraph):

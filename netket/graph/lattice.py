@@ -27,8 +27,8 @@ from netket.utils import HashableArray
 from netket.utils.float import comparable, comparable_periodic, is_approx_int
 from netket.utils.group import PointGroup, PermutationGroup, trivial_point_group
 
-from .graph import Graph
-from ._lattice_edge_logic import (
+from netket.graph.graph import Graph
+from netket.graph._lattice_edge_logic import (
     get_nn_edges,
     get_custom_edges,
     create_site_positions,

@@ -21,7 +21,7 @@ from math import pi
 from typing import Optional
 from collections.abc import Iterable, Sequence
 
-from .lattice import Lattice
+from netket.graph.lattice import Lattice
 
 from netket.utils import struct
 from netket.utils.types import Array, Union

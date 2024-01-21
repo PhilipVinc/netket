@@ -17,7 +17,7 @@ from typing import Union
 from collections.abc import Sequence
 import numpy as np
 
-from .lattice import Lattice
+from netket.graph.lattice import Lattice
 
 from netket.utils.group import PointGroup, PGSymmetry, planar, cubic, Identity
 

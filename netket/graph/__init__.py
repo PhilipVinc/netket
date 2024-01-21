@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_graph import AbstractGraph
-from .graph import Graph, Edgeless, DoubledGraph, disjoint_union
-from .lattice import Lattice
-from .common_lattices import (
+from netket.graph.abstract_graph import AbstractGraph
+from netket.graph.graph import Graph, Edgeless, DoubledGraph, disjoint_union
+from netket.graph.lattice import Lattice
+from netket.graph.common_lattices import (
     Grid,
     Hypercube,
     Cube,
