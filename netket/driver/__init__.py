@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_variational_driver import AbstractVariationalDriver
-from .vmc import VMC
-from .steady_state import SteadyState
+from netket.driver.abstract_variational_driver import AbstractVariationalDriver
+from netket.driver.vmc import VMC
+from netket.driver.steady_state import SteadyState
 
 from netket.utils import _hide_submodules
 

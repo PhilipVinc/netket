@@ -28,8 +28,8 @@ from netket.optimizer import (
 )
 from netket.jax import tree_cast
 
-from .vmc_common import info
-from .abstract_variational_driver import AbstractVariationalDriver
+from netket.driver.vmc_common import info
+from netket.driver.abstract_variational_driver import AbstractVariationalDriver
 
 
 class VMC(AbstractVariationalDriver):
