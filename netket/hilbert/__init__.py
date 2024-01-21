@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .abstract_hilbert import AbstractHilbert
-from .discrete_hilbert import DiscreteHilbert
-from .homogeneous import HomogeneousHilbert
+from netket.hilbert.abstract_hilbert import AbstractHilbert
+from netket.hilbert.discrete_hilbert import DiscreteHilbert
+from netket.hilbert.homogeneous import HomogeneousHilbert
 
-from .continuous_hilbert import ContinuousHilbert
+from netket.hilbert.continuous_hilbert import ContinuousHilbert
 
-from .custom_hilbert import CustomHilbert
-from .doubled_hilbert import DoubledHilbert
-from .spin import Spin
-from .fock import Fock
-from .qubit import Qubit
-from .particle import Particle
+from netket.hilbert.custom_hilbert import CustomHilbert
+from netket.hilbert.doubled_hilbert import DoubledHilbert
+from netket.hilbert.spin import Spin
+from netket.hilbert.fock import Fock
+from netket.hilbert.qubit import Qubit
+from netket.hilbert.particle import Particle
 
-from .tensor_hilbert import TensorHilbert
-from . import tensor_hilbert_discrete
+from netket.hilbert.tensor_hilbert import TensorHilbert
+from netket.hilbert import tensor_hilbert_discrete
 
 from netket.utils import _hide_submodules
 

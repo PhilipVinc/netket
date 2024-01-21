@@ -23,7 +23,7 @@ from netket.utils.types import Array
 from netket.utils.numbers import is_scalar
 from netket.errors import HilbertIndexingDuringTracingError, concrete_or_error
 
-from .abstract_hilbert import AbstractHilbert
+from netket.hilbert.abstract_hilbert import AbstractHilbert
 
 max_states = np.iinfo(np.int32).max
 """int: Maximum number of states that can be indexed"""

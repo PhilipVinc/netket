@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Optional, Union
 import numpy as np
-from .continuous_hilbert import ContinuousHilbert
+from netket.hilbert.continuous_hilbert import ContinuousHilbert
 
 
 class Particle(ContinuousHilbert):

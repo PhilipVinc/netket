@@ -18,8 +18,8 @@ from jax import numpy as jnp
 from netket.hilbert import DoubledHilbert
 from netket.utils.dispatch import dispatch
 
-from ..homogeneous import HomogeneousHilbert
-from .base import flip_state_scalar, random_state
+from netket.hilbert.homogeneous import HomogeneousHilbert
+from netket.hilbert.random.base import flip_state_scalar, random_state
 
 
 @dispatch

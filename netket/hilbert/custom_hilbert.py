@@ -18,7 +18,7 @@ from numbers import Real
 
 import jax.numpy as jnp
 
-from .homogeneous import HomogeneousHilbert
+from netket.hilbert.homogeneous import HomogeneousHilbert
 
 
 class CustomHilbert(HomogeneousHilbert):

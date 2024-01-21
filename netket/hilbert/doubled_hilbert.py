@@ -16,8 +16,8 @@ import numpy as np
 
 from netket.utils.dispatch import parametric
 
-from .abstract_hilbert import AbstractHilbert
-from .discrete_hilbert import DiscreteHilbert
+from netket.hilbert.abstract_hilbert import AbstractHilbert
+from netket.hilbert.discrete_hilbert import DiscreteHilbert
 
 
 @parametric

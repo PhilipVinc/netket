@@ -18,7 +18,7 @@ from functools import partial
 import numpy as np
 from numba import jit
 
-from .homogeneous import HomogeneousHilbert
+from netket.hilbert.homogeneous import HomogeneousHilbert
 
 FOCK_MAX = np.iinfo(np.intp).max - 1
 """

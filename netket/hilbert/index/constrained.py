@@ -14,7 +14,7 @@
 
 from functools import lru_cache
 
-from .unconstrained import UnconstrainedHilbertIndex
+from netket.hilbert.index.unconstrained import UnconstrainedHilbertIndex
 
 import numpy as np
 

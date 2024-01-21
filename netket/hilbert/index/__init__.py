@@ -29,6 +29,6 @@ defined in the file `base.py`.
 
 """
 
-from .base import HilbertIndex
-from .unconstrained import UnconstrainedHilbertIndex
-from .constrained import ConstrainedHilbertIndex
+from netket.hilbert.index.base import HilbertIndex
+from netket.hilbert.index.unconstrained import UnconstrainedHilbertIndex
+from netket.hilbert.index.constrained import ConstrainedHilbertIndex

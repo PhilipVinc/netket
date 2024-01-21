@@ -18,8 +18,8 @@ from numbers import Real
 
 import numpy as np
 
-from .discrete_hilbert import DiscreteHilbert
-from .index import HilbertIndex, UnconstrainedHilbertIndex, ConstrainedHilbertIndex
+from netket.hilbert.discrete_hilbert import DiscreteHilbert
+from netket.hilbert.index import HilbertIndex, UnconstrainedHilbertIndex, ConstrainedHilbertIndex
 
 
 class HomogeneousHilbert(DiscreteHilbert):

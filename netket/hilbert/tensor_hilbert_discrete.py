@@ -15,8 +15,8 @@
 import numpy as np
 import jax.numpy as jnp
 
-from .discrete_hilbert import DiscreteHilbert, _is_indexable
-from .tensor_hilbert import TensorHilbert
+from netket.hilbert.discrete_hilbert import DiscreteHilbert, _is_indexable
+from netket.hilbert.tensor_hilbert import TensorHilbert
 
 
 class TensorDiscreteHilbert(TensorHilbert, DiscreteHilbert):

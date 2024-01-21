@@ -13,7 +13,7 @@
 # limitations under the License.
 from typing import Union
 
-from .abstract_hilbert import AbstractHilbert
+from netket.hilbert.abstract_hilbert import AbstractHilbert
 
 import numpy as np
 

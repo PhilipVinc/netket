@@ -19,7 +19,7 @@ from abc import ABC
 
 import numpy as np
 
-from .abstract_hilbert import AbstractHilbert
+from netket.hilbert.abstract_hilbert import AbstractHilbert
 
 
 class TensorHilbert(ABC):

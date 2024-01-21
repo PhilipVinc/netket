@@ -16,7 +16,7 @@ from typing import Optional, Union
 
 import numpy as np
 
-from .homogeneous import HomogeneousHilbert
+from netket.hilbert.homogeneous import HomogeneousHilbert
 
 
 class Qubit(HomogeneousHilbert):
