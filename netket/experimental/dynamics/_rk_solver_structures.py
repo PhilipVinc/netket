@@ -229,12 +229,16 @@ def general_time_step_adaptive(
         scaled_err,
         tableau.error_order,
         limits=(
-            jnp.maximum(0.1 * rk_state.dt, dt_limits[0])
-            if dt_limits[0]
-            else 0.1 * rk_state.dt,
-            jnp.minimum(5.0 * rk_state.dt, dt_limits[1])
-            if dt_limits[1]
-            else 5.0 * rk_state.dt,
+            (
+                jnp.maximum(0.1 * rk_state.dt, dt_limits[0])
+                if dt_limits[0]
+                else 0.1 * rk_state.dt
+            ),
+            (
+                jnp.minimum(5.0 * rk_state.dt, dt_limits[1])
+                if dt_limits[1]
+                else 5.0 * rk_state.dt
+            ),
         ),
     )
 
