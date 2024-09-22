@@ -135,6 +135,25 @@ def shard_along_axis(x, axis: int):
 
 
 @jax.jit
+def with_replicate_sharding_constraint(x):
+    def _shard_replicate(arr):
+        # Shard shape is (1, 1, 1, -1, 1, 1) where -1 is the axis
+        shard_shape = [1 for _ in range(arr.ndim)]
+        if len(shard_shape) > 0:
+            shard_shape[0] = -1
+        shard_shape = tuple(shard_shape)
+
+        par_sharding = (
+            PositionalSharding(jax.devices()).reshape(shard_shape).replicate()
+        )
+        return jax.lax.with_sharding_constraint(arr, par_sharding)
+
+    if config.netket_experimental_sharding:
+        x = jax.tree_util.tree_map(_shard_replicate, x)
+    return x
+
+
+@jax.jit
 def with_samples_sharding_constraint(x, shape=None):
     """
     ensure the input x is sharded along axis 0 on all devices
