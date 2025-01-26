@@ -14,6 +14,8 @@
 
 import sys
 
+moduleT = type(sys)
+
 
 def _hide_submodules(
     module_name, *, remove_self=True, ignore=tuple(), hide_folder=tuple()
@@ -49,7 +51,7 @@ def _hide_submodules(
     if remove_self and hasattr(module, "_hide_submodules"):
         delattr(module, "_hide_submodules")
 
-    auto_export(module)
+    autogenerate_all(module)
 
 
 def rename_class(new_name):
@@ -81,7 +83,7 @@ def export(fn):
     return fn
 
 
-def auto_export(module):
+def autogenerate_all(module):
     """
     Automatically construct __all__ with all modules desired.
     This is necessary to have correct paths in the documentation.
@@ -105,6 +107,23 @@ def auto_export(module):
 
         if el not in _all:
             _all.append(el)
+
+
+def set_exported_modname(module, ignore=tuple()):
+    """Sets the `__module__` attribute of objects listed
+    in __all__ to be the current module name.
+    """
+    if isinstance(module, str):
+        module = sys.modules[module]
+    modulename = module.__name__
+
+    _all = getattr(module, "__all__", [])
+    print("all are", _all)
+    for name in _all:
+        print(f"{module}, {name}")
+        obj = getattr(module, name)
+        if not isinstance(obj, moduleT) and name not in ignore:
+            obj.__module__ = modulename
 
 
 def hide_unexported(module_name):
