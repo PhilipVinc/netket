@@ -56,6 +56,9 @@ MetropolisNumpy = MetropolisSamplerNumpy
 # MetropolisHamiltonian = MetropolisHamiltonianNumpy
 MetropolisCustom = MetropolisCustomNumpy
 
-from netket.utils import _hide_submodules
+from netket.utils import _hide_submodules, set_exported_modname
 
 _hide_submodules(__name__)
+set_exported_modname(__name__)
+
+del set_exported_modname

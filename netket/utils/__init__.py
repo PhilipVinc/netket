@@ -14,7 +14,12 @@
 
 from .config_flags import config
 
-from .moduletools import _hide_submodules, rename_class, auto_export as _auto_export
+from .moduletools import (
+    _hide_submodules,
+    rename_class,
+    autogenerate_all as _autogenerate_all,
+    set_exported_modname,
+)
 from .version_check import module_version
 
 # error if old dependencies are detected
@@ -64,3 +69,17 @@ _hide_submodules(
         "display",
     ],
 )
+
+
+from netket.utils.deprecation import deprecation_getattr as _deprecation_getattr
+
+_deprecations = {
+    # September 2024, NetKet 3.14
+    "_auto_export": (
+        "netket.utils._auto_export is deprecated: use netket.utils._autogenerate_all instead",
+        _autogenerate_all,
+    ),
+}
+__getattr__ = _deprecation_getattr(__name__, _deprecations)
+
+del _deprecation_getattr

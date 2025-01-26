@@ -46,9 +46,11 @@ _deprecations = {
 }
 
 from netket.utils.deprecation import deprecation_getattr as _deprecation_getattr
-from netket.utils import _hide_submodules
+from netket.utils import _hide_submodules, _auto_export, set_exported_modname
 
 __getattr__ = _deprecation_getattr(__name__, _deprecations)
 _hide_submodules(__name__)
+_auto_export(__name__)
+set_exported_modname(__name__)
 
-del _deprecation_getattr
+del _deprecation_getattr, _auto_export, set_exported_modname

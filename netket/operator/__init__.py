@@ -35,6 +35,9 @@ from ._sumoperators import SumOperator
 
 from . import spin, boson
 
-from netket.utils import _auto_export
+from netket.utils import _auto_export, set_exported_modname
 
 _auto_export(__name__)
+set_exported_modname(__name__)
+
+del _auto_export, set_exported_modname
