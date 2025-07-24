@@ -85,6 +85,19 @@ for name, Op in fermi_operator_impl.items():
     )
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_fermion_operators():
+    """Clean up global fermion operator dictionaries after all tests in this module complete."""
+    # Setup phase - nothing needed
+    yield
+    # Teardown phase - clear all global dictionaries
+    import gc
+
+    op_ferm.clear()
+    fermi_operator_impl.clear()
+    gc.collect()  # Force garbage collection
+
+
 @pytest.mark.parametrize(
     "op_ferm, is_hermitian",
     [pytest.param(op, is_herm, id=name) for name, (op, is_herm) in op_ferm.items()],

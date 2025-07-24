@@ -180,6 +180,22 @@ for name, op in op_finite_size.items():
         op_jax_compatible[name] = op
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_operators():
+    """Clean up global operator dictionaries after all tests in this module complete."""
+    # Setup phase - nothing needed
+    yield
+    # Teardown phase - clear all global dictionaries
+    import gc
+
+    operators.clear()
+    op_special.clear()
+    op_finite_size.clear()
+    operators_numba.clear()
+    op_jax_compatible.clear()
+    gc.collect()  # Force garbage collection
+
+
 @pytest.mark.parametrize("attr", ["get_conn", "get_conn_padded"])
 @pytest.mark.parametrize(
     "op", [pytest.param(op, id=name) for name, op in operators.items()]

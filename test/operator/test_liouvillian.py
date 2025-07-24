@@ -50,6 +50,18 @@ for i in range(L):
 lind = nk.operator.LocalLiouvillian(ha, j_ops)
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_liouvillian_operators():
+    """Clean up global liouvillian operator lists after all tests in this module complete."""
+    # Setup phase - nothing needed
+    yield
+    # Teardown phase - clear all global lists
+    import gc
+
+    j_ops.clear()
+    gc.collect()  # Force garbage collection
+
+
 def test_lindblad_form():
     ## Construct the lindbladian by hand:
     idmat = sparse.eye(2**L)

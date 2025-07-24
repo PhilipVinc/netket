@@ -392,6 +392,19 @@ for Op in operators:
     ]
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_pauli_operators():
+    """Clean up global pauli operator lists after all tests in this module complete."""
+    # Setup phase - nothing needed
+    yield
+    # Teardown phase - clear all global lists
+    import gc
+
+    operators.clear()
+    operators_to_test.clear()
+    gc.collect()  # Force garbage collection
+
+
 @pytest.mark.parametrize("b", operators_to_test)
 @pytest.mark.parametrize("a", operators_to_test)
 def test_pauli_inplace(a, b):

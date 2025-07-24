@@ -67,6 +67,19 @@ sp_hat = nk.operator.LocalOperatorNumba(hi, [sp] * 3, [[0], [1], [4]])
 generic_operators["sigma +/-"] = (sm_hat, sp_hat)
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup_local_operators():
+    """Clean up global local operator dictionaries after all tests in this module complete."""
+    # Setup phase - nothing needed
+    yield
+    # Teardown phase - clear all global dictionaries
+    import gc
+
+    herm_operators.clear()
+    generic_operators.clear()
+    gc.collect()  # Force garbage collection
+
+
 def assert_same_matrices(matl, matr, eps=1.0e-6):
     if isinstance(matl, AbstractOperator):
         matl = matl.to_dense()
