@@ -44,6 +44,8 @@ gs = nk.driver.VMC_SR(
     op,
     variational_state=vs,
     diag_shift=0.01,
+    use_ntk=True,
+    on_the_fly=True,
 )
 
 # Run the optimization for 500 iterations

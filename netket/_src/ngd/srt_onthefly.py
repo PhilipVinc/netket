@@ -1,8 +1,6 @@
 from collections.abc import Callable
 from functools import partial
 
-from einops import rearrange
-
 import jax
 import jax.numpy as jnp
 from jax.tree_util import tree_map
@@ -15,7 +13,25 @@ from netket.jax._jacobian.default_mode import JacobianMode
 from netket.utils import timing
 from netket.utils.types import Array
 
-from netket.jax import _ntk as nt
+
+def _generate_random_orthogonal_vectors(key, num_vectors, dimension):
+    """
+    Generate num_vectors random orthogonal unit vectors in dimension-dimensional space.
+    Uses QR decomposition to ensure orthogonality.
+
+    Args:
+        key: PRNG key
+        num_vectors: Number of orthogonal vectors to generate (M)
+        dimension: Dimension of the parameter space (Npars)
+
+    Returns:
+        Array of shape (dimension, num_vectors) where each column is a unit vector
+    """
+    # Generate random matrix
+    random_matrix = jax.random.normal(key, (dimension, num_vectors))
+    # QR decomposition to get orthogonal vectors
+    Q, _ = jnp.linalg.qr(random_matrix)
+    return Q  # shape: (dimension, num_vectors)
 
 
 @timing.timed
@@ -26,6 +42,7 @@ from netket.jax import _ntk as nt
         "solver_fn",
         "chunk_size",
         "mode",
+        "projection_dim",
     ),
 )
 def srt_onthefly(
@@ -38,15 +55,22 @@ def srt_onthefly(
     diag_shift: float | Array,
     solver_fn: Callable[[Array, Array], Array],
     mode: JacobianMode,
+    projection_dim: int | None = None,
     proj_reg: float | Array | None = None,
     momentum: float | Array | None = None,
     old_updates: Array | None = None,
     chunk_size: int | None = None,
+    rng_key: jax.Array | None = None,
 ):
     N_mc = local_energies.size
 
     # Split all parameters into real and imaginary parts separately
     parameters_real, rss = nkjax.tree_to_real(parameters)
+
+    # Flatten parameters to get dimension
+    from jax.flatten_util import ravel_pytree
+    parameters_flat, unravel_fn = ravel_pytree(parameters_real)
+    n_params = parameters_flat.size
 
     # complex: (Nmc) -> (Nmc,2) - splitting real and imaginary output like 2 classes
     # real:    (Nmc) -> (Nmc,)  - no splitting
@@ -98,91 +122,83 @@ def srt_onthefly(
     if mode == "complex":
         dv = jax.lax.collapse(dv, 0, 2)  # shape [2*N_mc,] or [N_mc, ] if not complex
 
-    # Collect all samples on all MPI ranks, those label the columns of the T matrix
-    all_samples = samples
+    # Generate random orthogonal projection vectors
+    if projection_dim is None:
+        projection_dim = n_params  # Use full rank if not specified
+        projection_dim = N_mc
+
+    # Use provided RNG key or create a new one
+    if rng_key is None:
+        rng_key = jax.random.PRNGKey(0)
+
+    # Generate M random orthogonal vectors in parameter space
+    # Q has shape (n_params, projection_dim)
+    Q = _generate_random_orthogonal_vectors(rng_key, projection_dim, n_params)
+
+    # Compute projected jacobian: for each of M vectors, compute JVP
+    # This gives us a (N_mc, projection_dim) or (N_mc, 2, projection_dim) matrix
+    def compute_projected_jacobian(parameters_real, projection_vectors, samples):
+        """
+        Compute the projected jacobian by doing JVPs along projection directions.
+
+        Args:
+            parameters_real: pytree of real parameters
+            projection_vectors: (n_params, projection_dim) array
+            samples: samples array
+
+        Returns:
+            Projected jacobian of shape (N_mc, projection_dim) or (N_mc, 2, projection_dim)
+        """
+        def jvp_single_direction(vec_flat):
+            """Compute JVP along a single direction vector."""
+            vec_pytree = unravel_fn(vec_flat)
+            return jvp_f_chunk(parameters_real, vec_pytree, samples)
+
+        # Apply to all projection directions
+        # projection_vectors[:, i] is the i-th projection direction
+        proj_jac = jax.vmap(jvp_single_direction, in_axes=1, out_axes=-1)(projection_vectors)
+        return proj_jac  # shape: (N_mc, projection_dim) or (N_mc, 2, projection_dim)
+
+    # Handle sharding for samples
     if config.netket_experimental_sharding:
         samples = jax.lax.with_sharding_constraint(
             samples, NamedSharding(jax.sharding.get_abstract_mesh(), P("S", None))
         )
-        all_samples = jax.lax.with_sharding_constraint(
-            samples, NamedSharding(jax.sharding.get_abstract_mesh(), P())
+
+    # Compute the projected jacobian with chunking if specified
+    if chunk_size is not None:
+        # Chunk over samples
+        samples_chunked, _ = nkjax.chunk(samples, chunk_size=chunk_size)
+        proj_jac_chunks = jax.lax.map(
+            lambda s_chunk: compute_projected_jacobian(parameters_real, Q, s_chunk),
+            samples_chunked
         )
-
-    _jacobian_contraction = nt.empirical_ntk_by_jacobian(
-        f=_apply_fn,
-        trace_axes=(),
-        vmap_axes=0,
-    )
-
-    def jacobian_contraction(samples, all_samples, parameters_real):
-        if config.netket_experimental_sharding:
-            parameters_real = jax.lax.pvary(parameters_real, "S")
-        if chunk_size is None:
-            # STRUCTURED_DERIVATIVES returns a complex array, but the imaginary part is zero
-            # shape [N_mc/p.size, N_mc, 2, 2]
-            return _jacobian_contraction(samples, all_samples, parameters_real).real
+        # Concatenate chunks back together
+        if mode == "complex":
+            # proj_jac_chunks: (n_chunks, chunk_size, 2, projection_dim)
+            proj_jac = jnp.concatenate(proj_jac_chunks, axis=0)  # (N_mc, 2, projection_dim)
         else:
-            _all_samples, _ = nkjax.chunk(all_samples, chunk_size=chunk_size)
-            ntk_local = jax.lax.map(
-                lambda batch_lattice: _jacobian_contraction(
-                    samples, batch_lattice, parameters_real
-                ).real,
-                _all_samples,
-            )
-            if mode == "complex":
-                return rearrange(ntk_local, "nbatches i j z w -> i (nbatches j) z w")
-            else:
-                return rearrange(ntk_local, "nbatches i j -> i (nbatches j)")
-
-    # If we are sharding, use shard_map manually
-    if config.netket_experimental_sharding:
-        mesh = jax.sharding.get_abstract_mesh()
-        # SAMPLES, ALL_SAMPLES PARAMETERS_REAL
-        in_specs = (P("S", None), P(), P())
-        out_specs = P("S", None)
-
-        # By default, I'm not sure whether the jacobian_contraction of NeuralTangents
-        # Is correctly automatically sharded across devices. So we force it to be
-        # sharded with shard map to be sure
-
-        jacobian_contraction = jax.shard_map(
-            jacobian_contraction,
-            mesh=mesh,
-            in_specs=in_specs,
-            out_specs=out_specs,
-        )
-
-    # This disables the nkjax.sharding_decorator in here, which might appear
-    # in the apply function inside.
-    with nkjax.sharding._increase_SHARD_MAP_STACK_LEVEL():
-        ntk_local = jacobian_contraction(samples, all_samples, parameters_real).real
-
-    # shape [N_mc, N_mc, 2, 2] or [N_mc, N_mc]
-    if config.netket_experimental_sharding:
-        ntk = jax.lax.with_sharding_constraint(
-            ntk_local, NamedSharding(jax.sharding.get_abstract_mesh(), P())
-        )
+            # proj_jac_chunks: (n_chunks, chunk_size, projection_dim)
+            proj_jac = jnp.concatenate(proj_jac_chunks, axis=0)  # (N_mc, projection_dim)
     else:
-        ntk = ntk_local
-    if mode == "complex":
-        # shape [2*N_mc, 2*N_mc] checked with direct calculation of J^T J
-        ntk = rearrange(ntk, "i j z w -> (i z) (j w)")
+        proj_jac = compute_projected_jacobian(parameters_real, Q, samples)
 
-    # Center the NTK by multiplying with a carefully designed matrix
-    # shape [N_mc, N_mc] symmetric matrix
-    delta = jnp.eye(N_mc) - 1 / N_mc
+    # Center the projected jacobian
+    # Shape: (N_mc, projection_dim) or (N_mc, 2, projection_dim)
+    proj_jac_mean = jnp.mean(proj_jac, axis=0, keepdims=True)
+    proj_jac_centered = (proj_jac - proj_jac_mean) / jnp.sqrt(N_mc)
+
+    # Flatten for complex mode: (N_mc, 2, projection_dim) -> (2*N_mc, projection_dim)
     if mode == "complex":
-        # shape [2*N_mc, 2*N_mc]
-        # Gets applied to the sub-blocks corresponding to the real part and imaginary part
-        delta_conc = jnp.zeros((2 * N_mc, 2 * N_mc)).at[0::2, 0::2].set(delta)
-        delta_conc = delta_conc.at[1::2, 1::2].set(delta)
-        delta_conc = delta_conc.at[0::2, 1::2].set(0.0)
-        delta_conc = delta_conc.at[1::2, 0::2].set(0.0)
+        proj_jac_flat = jax.lax.collapse(proj_jac_centered, 0, 2)
     else:
-        delta_conc = delta
+        proj_jac_flat = proj_jac_centered
 
-    # shape [2*N_mc, 2*N_mc] centering the jacobian
-    ntk = (delta_conc @ (ntk @ delta_conc)) / N_mc
+    # Compute NTK as O_proj @ O_proj.T
+    # Shape: (N_mc, projection_dim) @ (projection_dim, N_mc) -> (N_mc, N_mc)
+    # or (2*N_mc, projection_dim) @ (projection_dim, 2*N_mc) -> (2*N_mc, 2*N_mc)
+    # Note: The NTK is already centered because we centered the projected jacobian
+    ntk = proj_jac_flat @ proj_jac_flat.T
 
     # add diag shift
     ntk_shifted = ntk + diag_shift * jnp.eye(ntk.shape[0])
@@ -201,38 +217,23 @@ def srt_onthefly(
     if info is None:
         info = {}
 
-    # Center the vector, equivalent to centering
-    # The Jacobian
-    aus_vector = aus_vector / jnp.sqrt(N_mc)
-    aus_vector = delta_conc @ aus_vector
+    # Compute the projected updates: updates_proj = O_proj.T @ aus_vector
+    # Shape: (projection_dim, N_mc or 2*N_mc) @ (N_mc or 2*N_mc,) -> (projection_dim,)
+    updates_proj = proj_jac_flat.T @ aus_vector
 
-    # shape [N_mc,2]
-    if mode == "complex":
-        aus_vector = aus_vector.reshape(-1, 2)
-    # shape [N_mc // p.size,2]
-    if config.netket_experimental_sharding:
-        aus_vector = jax.lax.with_sharding_constraint(
-            aus_vector,
-            NamedSharding(
-                jax.sharding.get_abstract_mesh(),
-                P("S", *(None,) * (aus_vector.ndim - 1)),
-            ),
-        )
+    # Project back to full parameter space: updates = Q @ updates_proj
+    # Shape: (n_params, projection_dim) @ (projection_dim,) -> (n_params,)
+    updates_flat = Q @ updates_proj
 
-    # _, vjp_fun = jax.vjp(f, parameters_real)
-    vjp_fun = nkjax.vjp_chunked(
-        _apply_fn,
-        parameters_real,
-        samples,
-        chunk_size=chunk_size,
-        chunk_argnums=1,
-        nondiff_argnums=1,
-    )
+    # Unravel to pytree structure (in real representation)
+    updates_real = unravel_fn(updates_flat)
 
-    (updates,) = vjp_fun(aus_vector)  # pytree [N_params,]
-
+    # Handle momentum in real representation
     if momentum is not None:
-        updates = tree_map(lambda x, y: x + momentum * y, updates, old_updates)
-        old_updates = updates
+        updates_real = tree_map(lambda x, y: x + momentum * y, updates_real, old_updates)
+        old_updates = updates_real
 
-    return rss(updates), old_updates, info
+    # Convert back to original parameter structure (complex if needed)
+    updates = rss(updates_real)
+
+    return updates, old_updates, info
