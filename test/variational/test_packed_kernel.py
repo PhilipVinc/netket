@@ -115,6 +115,17 @@ SYSTEMS = {
 }
 
 
+# The operators that compute their connected configurations one at a time.
+GENERATING = [
+    "heisenberg_chain",
+    "heisenberg_triangular",
+    "j1j2_triangular",
+    "ising",
+    "pauli_strings",
+    "local_operator",
+]
+
+
 def _vstate(system, param_dtype=complex, n_samples=64):
     hi, H, sa = SYSTEMS[system]()
     sa = sa.replace(n_chains=8 * jax.device_count())
@@ -400,6 +411,49 @@ def test_padding_is_the_sample(system):
     σp, mels = H.get_conn_padded(σ)
     is_conn = np.any(np.asarray(σp) != np.asarray(σ)[:, None, :], axis=-1)
     assert np.all(np.asarray(mels)[is_conn] != 0)
+
+
+@pytest.mark.parametrize("system", GENERATING)
+def test_get_conn_mels_and_at(system):
+    # get_conn_mels and get_conn_at give the connected elements of
+    # get_conn_padded that differ from the sample, and the same diagonal.
+    vs, H = _vstate(system, n_samples=16)
+    σ = np.asarray(vs.samples.reshape(-1, vs.hilbert.size))
+    σp, mels_p = jax.tree.map(np.asarray, H.get_conn_padded(σ))
+    is_new_p = np.any(σp != σ[:, None], axis=-1)
+
+    mels, is_new = jax.tree.map(np.asarray, jax.jit(type(H).get_conn_mels)(H, σ))
+    assert mels.shape == is_new.shape and mels.shape[0] == σ.shape[0]
+    n_slots = mels.shape[-1]
+    sample = np.repeat(np.arange(σ.shape[0]), n_slots)
+    slot = np.tile(np.arange(n_slots), σ.shape[0])
+    σp_at = np.asarray(jax.jit(type(H).get_conn_at)(H, σ[sample], slot))
+    σp_at = σp_at.reshape(σ.shape[0], n_slots, -1)
+    assert σp_at.dtype == σ.dtype
+
+    differs = np.any(σp_at != σ[:, None], axis=-1)
+    np.testing.assert_array_equal(differs[is_new], True)
+    # The slots that are not selected hold the sample or a zero element.
+    assert np.all(~differs[~is_new] | (mels[~is_new] == 0))
+    np.testing.assert_allclose(
+        np.where(is_new, 0, mels).sum(axis=-1),
+        np.where(is_new_p, 0, mels_p).sum(axis=-1),
+        rtol=1e-13,
+        atol=1e-13,
+    )
+    for i in range(σ.shape[0]):
+        expected = sorted(
+            (tuple(x), m.real, m.imag)
+            for x, m in zip(σp[i][is_new_p[i]], mels_p[i][is_new_p[i]].astype(complex))
+        )
+        result = sorted(
+            (tuple(x), m.real, m.imag)
+            for x, m in zip(σp_at[i][is_new[i]], mels[i][is_new[i]].astype(complex))
+        )
+        assert [x for x, *_ in result] == [x for x, *_ in expected]
+        np.testing.assert_allclose(
+            [m[1:] for m in result], [m[1:] for m in expected], rtol=1e-13, atol=1e-13
+        )
 
 
 @pytest.mark.parametrize("chunk_size", [None, 3])
