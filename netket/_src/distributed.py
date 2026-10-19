@@ -19,3 +19,14 @@ def any_rank(flag: bool) -> bool:
     # ("Received data size doesn't match expected size").
     flags = multihost_utils.process_allgather(np.asarray([flag], dtype=np.int32))
     return bool(np.any(flags))
+
+
+def from_first_process(value: int | None) -> int | None:
+    """Process 0's ``value``, a non-negative integer or ``None``, on every process.
+    A collective: every process must call it, at the same point."""
+    if not _is_distributed():
+        return value
+    value = -1 if value is None else value
+    value = multihost_utils.broadcast_one_to_all(np.asarray([value], dtype=np.int32))
+    value = int(np.asarray(value)[0])
+    return None if value < 0 else value
